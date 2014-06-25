@@ -1,9 +1,10 @@
-function [unew dnew] = genSplitBregman( Phi, Phiu, H, tol, N )
+function u = genSplitBregman(A, b, lambda, tol, N )
 
-
-d = zeros(len,1);
-u = zeros(len,2);
-u(:,2) = ones(len,3);
+len    = length(b);
+u      = zeros(len, 2);
+u(:,2) = ones(len, 1);
+d      = zeros(len, 1);
+c      = zeros(len, 1);
 
 % Begin the iterative process and continue until we are below
 % a certain threshold.
@@ -15,18 +16,20 @@ while norm( u(:,2)-u(:,1) ) > tol
     for i = 1:N
         
         % Perform step 1 of the algorithm.        
-        u(:,2) = 
+        u(:,2) = fminunc( @(u)norm(A*u-b)^2+norm(d-u-c)^2, u(:,1) );
         
         % Perform step 2 of the algorithm.
-        d = shrink( Phiu+b, 1/lambda ); 
+        d = shrink( u(:,2)+c, 1/lambda ); 
         
     end
     
-    b = b + ( Phi(u(3))-d(3) );
+    % Update c.
+    c = c + ( -d(3) );
     
 end
 
 function d = shrink( x, gamma )
+% Helper function carries out step 2 of the algorithm.
 
 xsum = sum(x);
 d = (x./xsum)*max( xsum-gamma, 0 );
