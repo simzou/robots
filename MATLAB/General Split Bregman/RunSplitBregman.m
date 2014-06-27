@@ -1,20 +1,22 @@
-n = 30;
-m = 100;
+clc; clear all;
+n = 100;
+m = 30;
 sparsity = 10;
-lambda1 = 100;
+lambda1 = 1;
 lambda2 = 1;
 
 [A u b] = generateData( n, m, sparsity );
 H = @(x) (lambda/2)*norm(A*x-b)^2;
 Phi = @(x) x;
 
-uguess = zeros(n, 100, 100);
+%uguess = zeros(n, 100, 100);
 
-for i=1:100
-    for j=1:100
-        solver = directSolve1( A, b, i, j );
-        uguess( :, i, j ) = genSplitBregman( n, Phi, H, solver, j );
-    end
-end
+% for i=1:100
+%     for j=1:100
+%         solver = directSolve1( A, b, i, j );
+%         uguess( :, i, j ) = genSplitBregman( n, Phi, H, solver, j );
+%     end
+% end
 
-save lambdatest;
+solver = gaussSeidelSolver( A, b, lambda1, lambda2 );
+uguess = genSplitBregman( n, Phi, H, solver );
