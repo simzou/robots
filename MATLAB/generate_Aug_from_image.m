@@ -25,13 +25,14 @@ for i=1:size(paths,1)
     path = paths(i,:);
     pathmat = zeros(size(umat));
     xstart = path(1,1); xend = path(1,3); ystart = path(1,2); yend = path(1,4);
-    ystartind = size(umat,1)-ystart+1; yendind = size(umat,1)-yend+1;
+    ystartind = size(umat,1)-ystart; yendind = size(umat,1)-yend+1;
     if xstart==xend && ystart==yend
-        pathmat(ystartind,xstart) = 1;
     elseif xstart==xend && ystart~=yend
-        pathmat(min([ystartind yendind]):max([ystartind yendind]),xstart) = 1;
+        pathmat(min([ystartind yendind])+1:max([ystartind yendind]),ceil(xstart)) = 1;
     elseif ystart==yend && xstart~=xend
-        pathmat(ystartind,min([xstart xend]):max([xstart xend])) = 1;
+        pathmat(ceil(ystartind),min([xstart xend])+1:max([xstart xend])) = 1;
+    else
+        pathmat = path_weights(path,size(umat));
     end
         A(i,:) = reshape(pathmat,1,siglength);
 end
