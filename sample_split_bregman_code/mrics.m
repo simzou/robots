@@ -1,5 +1,5 @@
-%           mrics.m  by Tom Goldstein (TomGoldstein1@gmail.com)
-%     This file contains methods for performing compressed sensing
+%  mrics.m  by Tom Goldstein (TomGoldstein1@gmail.com)
+%  This file contains methods for performing compressed sensing
 %  recontructions of images from k-space data using the Split Bregman 
 %  method.  
 %     To use the method, simply add this "m" file to your current directory, 
@@ -38,7 +38,7 @@ function u = mrics(R,f, mu, lambda, gamma, nInner, nBreg)
     [rows,cols] = size(f);
     
         
-         % Reserve memory for the auxillary variables
+    % Reserve memory for the auxillary variables
     f0 = f;
     u = zeros(rows,cols);
     x = zeros(rows,cols);
