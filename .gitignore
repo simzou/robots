@@ -1,2 +1,6 @@
 .DS_Store
-lambdatest1.mat
+*.mat
+*.bbl
+*.blg
+*.aux
+*.log
