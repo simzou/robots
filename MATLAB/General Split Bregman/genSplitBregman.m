@@ -23,21 +23,21 @@ d      = zeros(n, 1);
 b      = zeros(n, 1);
 
 % Set defaults for our parameters
-if ~exist('lambda','var')
-  lambda = 1;
+if nargin < 7
+    N = 1;
 end
-if ~exist('tol','var')
-  tol = 0.001;
+if nargin < 6
+    tol = 0.0001;
 end
-if ~exist('N','var')
-  N = 1;
+if nargin < 5
+    lambda = 1;
 end
-if ~exist('solver','var')
+if nargin < 4
     % By default, we solve the first step numerically using fminsearch.
     options = optimset('Display','off');
 
     func = @(u, b, d) H(u)+(lambda/2)*norm(d-Phi(u)-b)^2;
-    solver = @(b, d, uguess) fminsearch(@(u) func(u,b,d), uguess, options);  
+    solver = @(b, d, uguess) fminsearch(@(u) func(u,b,d), uguess, options);   
 end
 
 %tic    

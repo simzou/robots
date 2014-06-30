@@ -1,4 +1,6 @@
 function solver = gaussSeidelSolver( A, g, lambda1, lambda2 )
+% Create a solver for Ax=g that uses the Gauss-Seidel method.
+%
 
 U = lambda1.*(A'*A)+lambda2.*eye(size(A,2));
 
@@ -9,20 +11,29 @@ solver = @(b,d,uguess) gaussSeidel( U, c(b,d), uguess );
 
 end
 
-function x = gaussSeidel( A, b, binit )
+function x = gaussSeidel( A, b, xinit )
+% Solves Ax=b. Only works if A is diagonally dominant or if it 
+% is symmetric and positive definite.
+%
 
-x = [ binit binit*2 ];
+iterations = 0;
+x = [ xinit xinit*2 ];
 
-D = diag( diag( A ) );
-L = tril( A, -1 );
+L = tril( A );
 U = triu( A, 1 );
 
-while norm( x(:,2)-x(:,1) ) > 0.001
-   
-    x(:,2) = (D-L)\(U*x(:,1)+b);
+T = -L\U;
+C = L\b;
+
+% Now perform our iteration.
+while norm( x(:,2)-x(:,1) ) > 0.0001 && iterations < 200
+    x(:,1) = x(:,2);
+    x(:,2) = T*x(:,1)+C;
     
+    iterations = iterations+1;
 end
 
-x = x(:,2)
+% Return our answer.
+x = x(:,2);
 
 end
