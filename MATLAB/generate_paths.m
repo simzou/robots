@@ -5,7 +5,8 @@ function paths = generate_paths(num_paths, image_dim, path_type)
 		for i = 1:num_paths
 			% choosing two edges of the image
 			% 1 = left, 2 = top, 3 = right, 4 = bottom
-			edges = randperm(4,2);
+			edges = randperm(4);
+            edges = edges(1:2);
 			switch edges(1)
 			case 1
 				x1 = 0;
