@@ -32,7 +32,6 @@ weights = path_weights([start_point end_point], grid_size);
 imagesc(weights);
 pause;
 
-
 % horizontal
 start_point = [0 20.4];
 end_point = [50 20.4];
