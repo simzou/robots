@@ -18,8 +18,8 @@ Phi = @(x) x;
 %     end
 % end
 
-solver = gaussSeidelSolver( A, b, lambda1, lambda2 );
-%solver = directSolve1( A, b, lambda1, lambda2 );
+%solver = gaussSeidelSolver( A, b, lambda1, lambda2 );
+solver = directSolve1( A, b, lambda1, lambda2 );
 
 uguess = genSplitBregman( n, Phi, H, solver );
 
