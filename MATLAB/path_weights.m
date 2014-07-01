@@ -33,17 +33,23 @@ for i=1:size(intersects,1)-1
     xx2 = intersects(i+1,1); yy2 = intersects(i+1,2);
     weight = sqrt((yy2-yy1)^2+(xx2-xx1)^2);
     if mod(xx1,1)<0.000000001 || 1-mod(xx1,1)<0.000000001
-        if (mod(yy1,1)<0.000000001 || 1-mod(yy1,1)<0.000000001) && yy2-yy1<0
-            weights(ceil(dimensions(1)-yy1+1),round(xx1+1)) = weight;
+        xint=round(xx1);
+        if (mod(yy1,1)<0.000000001 || 1-mod(yy1,1)<0.000000001)
+            yint = round(yy1);
+            if yy2-yy1<0
+                weights(dimensions(1)-yint+1,xint+1) = weight;
+            else
+                weights(dimensions(1)-yint,xint+1) = weight;
+            end
         else
-            weights(ceil(dimensions(1)-yy1),round(xx1+1)) = weight;
+            weights(ceil(dimensions(1)-yy1),xint+1) = weight;
         end
     else
+        yint = round(yy1);
         if yy2-yy1>0
-            weights(round(dimensions(1)-yy1),ceil(xx1)) = weight;
+            weights(dimensions(1)-yint,ceil(xx1)) = weight;
         else
-            weights(round(dimensions(1)-yy1+1),ceil(xx1)) = weight;
+            weights(dimensions(1)-yint+1,ceil(xx1)) = weight;
         end
     end
-    
 end
