@@ -9,27 +9,32 @@ x1 = ends(1); x2 = ends(3); y1 = ends(2); y2 = ends(4);
 yfun = [(y2-y1)/(x2-x1) ((y1-y2)/(x2-x1)*x1+y1)];
 xfun = [(x2-x1)/(y2-y1) ((x1-x2)/(y2-y1)*y1+x1)];
 
-xintersects = ceil(min([x1 x2])):floor(max([x1 x2]));
+xintersects = [];
+for x = ceil(min([x1 x2])):floor(max([x1 x2]))
+    yval = yfun(1)*x+yfun(2);
+    xintersects = [xintersects; x yval];
+end
+
 yintersects = [];
 for y = ceil(min([y1 y2])):floor(max([y1 y2]))
     xval = xfun(1)*y+xfun(2);
-    if mod(xval,1)==0
+    if mod(xval,1)<0.000000001 || 1-mod(xval,1)<0.000000001
     else
-        yintersects = [yintersects xval];
+        yintersects = [yintersects; xval y];
     end
 end
 
-intersects = [xintersects yintersects];
-intersects = sort(intersects);
+intersects = [xintersects; yintersects];
+intersects = sortrows(intersects);
 %keyboard
 
-for i=1:size(intersects,2)-1
-    xx1 = intersects(i); yy1 = yfun(1)*intersects(i)+yfun(2);
-    xx2 = intersects(i+1); yy2 = yfun(1)*intersects(i+1)+yfun(2);
+for i=1:size(intersects,1)-1
+    xx1 = intersects(i,1); yy1 = intersects(i,2);
+    xx2 = intersects(i+1,1); yy2 = intersects(i+1,2);
     weight = sqrt((yy2-yy1)^2+(xx2-xx1)^2);
-    if mod(xx1,1)==0
-        if mod(yy1,1)==0
-            weights(ceil(dimensions(1)-yy1)+1,round(xx1+1)) = weight;
+    if mod(xx1,1)<0.000000001 || 1-mod(xx1,1)<0.000000001
+        if (mod(yy1,1)<0.000000001 || 1-mod(yy1,1)<0.000000001) && yy2-yy1<0
+            weights(ceil(dimensions(1)-yy1+1),round(xx1+1)) = weight;
         else
             weights(ceil(dimensions(1)-yy1),round(xx1+1)) = weight;
         end
