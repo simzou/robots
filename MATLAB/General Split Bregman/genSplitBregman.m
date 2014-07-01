@@ -53,7 +53,11 @@ while norm( u(:,2)-u(:,1) ) > tol
         u(:,2) = solver( b, d, u(:,1) );
                 
         %% Perform step 2 of the algorithm.
-        d = shrink( Phi(u(:,2))+b, 1/lambda ); 
+        P = Phi(u(:,2)) + b;
+        for i = 1:size(P,1)
+            d(i) = shrink_element(P(i),1/lambda);
+        end
+        % d = shrink( Phi(u(:,2))+b, 1/lambda ); 
         
     end
     
@@ -74,4 +78,13 @@ function d = shrink( x, gamma )
 xsum = abs(x);
 d = (x./xsum).*max( xsum-gamma, 0 );
 
+end
+
+function d = shrink_element(x, gamma)
+
+if x == 0
+    d = 0;
+else
+    d = (x/abs(x))*max([abs(x)-gamma 0]);
+end
 end
