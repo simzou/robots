@@ -1,51 +1,41 @@
 function paths = generate_paths(num_paths, image_dim, path_type)
 	% by default, generate random paths
 	paths = [];
-	if ~exist(path_type)
+	if (~exist('path_type'))
+		disp('nothing')
 		for i = 1:num_paths
 			% choosing two edges of the image
 			% 1 = left, 2 = top, 3 = right, 4 = bottom
 			edges = randperm(4);
             edges = edges(1:2);
-			switch edges(1)
-			case 1
-				x1 = 0;
-				y1 = rand(1)*image_dim(1);
-			case 2
-				x1 = rand(1)*image_dim(2);
-				y1 = image_dim(1);
-			case 3
-				x1 = image_dim(2);
-				y1 = rand(1)*image_dim(1);
-			case 4
-				x1 = rand(1)*image_dim(2);
-				y1 = 0;
-			end
-			switch edges(2)
-			case 1
-				x2 = 0;
-				y2 = rand(1)*image_dim(1);
-			case 2
-				x2 = rand(1)*image_dim(2);
-				y2 = image_dim(1);
-			case 3
-				x2 = image_dim(2);
-				y2 = rand(1)*image_dim(1);
-			case 4
-				x2 = rand(1)*image_dim(2);
-				y2 = 0;
-			end
-			paths = [paths; x1 y1 x2 y2];
+			point1 = get_random_point_on_edge(edges(1), image_dim);
+			point2 = get_random_point_on_edge(edges(2), image_dim);							
+			paths = [paths; point1 point2];
 		end
 	elseif (path_type == 'bouncy')
-		for i = 1:num_paths,
-
+		disp('bouncy')
+		edges = randperm(4);
+        edges = edges(1:2);
+		point1 = get_random_point_on_edge(edges(1), image_dim);
+		point2 = get_random_point_on_edge(edges(2), image_dim);							
+		paths = [paths; point1 point2];
+		last_edge = edges(2);
+		for i = 2:num_paths,
+			rand_edge = randi(4);
+			% make sure we don't bounce to the same edge
+			while (rand_edge == last_edge)
+				rand_edge = randi(4);
+			end
+			point1 = point2;
+			point2 = get_random_point_on_edge(rand_edge, image_dim);
+			last_edge = rand_edge;
+			paths = [paths; point1 point2];
 		end
 	end
 
 end
 
-function point = get_random_point_on_edge(edge_num)
+function point = get_random_point_on_edge(edge_num, image_dim)
 	switch edge_num
 	case 1
 		x1 = 0;
@@ -60,4 +50,5 @@ function point = get_random_point_on_edge(edge_num)
 		x1 = rand(1)*image_dim(2);
 		y1 = 0;
 	end
+	point = [x1 y1];
 end
