@@ -37,6 +37,27 @@ function paths = generate_paths(num_paths, image_dim, path_type)
 			end
 			paths = [paths; x1 y1 x2 y2];
 		end
+	elseif (path_type == 'bouncy')
+		for i = 1:num_paths,
+
+		end
 	end
+
 end
 
+function point = get_random_point_on_edge(edge_num)
+	switch edge_num
+	case 1
+		x1 = 0;
+		y1 = rand(1)*image_dim(1);
+	case 2
+		x1 = rand(1)*image_dim(2);
+		y1 = image_dim(1);
+	case 3
+		x1 = image_dim(2);
+		y1 = rand(1)*image_dim(1);
+	case 4
+		x1 = rand(1)*image_dim(2);
+		y1 = 0;
+	end
+end
