@@ -41,3 +41,7 @@ inaccurate "splitting" of areas of interest in the image.
 - test_step1matrix_solver.m
 
 ### How to use
+
+### Further Reading
+
+[The Split Bregman Method for L1-Regularized Problems](http://epubs.siam.org/doi/abs/10.1137/080725891)
