@@ -2,11 +2,25 @@
 
 ### Purpose
 
+Our objective is to recover an unknown grayscale image `u` from a collection of sums of the 
+pixel values of the images taken across linear paths across the image's surface.
+
+
+We wish to solve the minimization problem 
+````
+min_{u} a|u|+b|grad_x(u)|+b|grad_y(u)| st Au=g,
+````
+which we relax to the unconstrained problem
+````
+min_{u} a|u|+b|grad_x(u)|+b|grad_y(u)|+(mu/2)||Au-g||^2.
+````
+
+
 ### The files
 
 #### The Algorithm
 
-- directional_gradient.m
+- directional_gradient.m 
 - directional_gradient_transpose.m
 - generate_Aug_from_image.m
 - generate_paths.m
