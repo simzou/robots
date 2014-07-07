@@ -1,0 +1,58 @@
+ver
+	shows toolboxes
+%% 
+	separates comments
+
+Recommended at the top of every .m file
+	clear all; clc;
+
+keyboard command
+	essentially puts a breakpoint in the code
+	can explore variables
+return makes it go
+dbquit exits
+
+Can put ~ in place of variables you don't store
+
+MATLAB is case sensitive
+
+v(end) last entry of v
+
+plotting
+	figure;
+	plot(err);
+	hold on;
+	plot(x);
+
+can define local functions
+	define at the end
+function 
+
+end
+
+tic - starts timer
+
+toc - stops timer
+
+MATLAB is semi compiled
+	if there's only one for loop
+
+Reshape stacks columns
+
+bsxfun does functional programming
+
+A = ones(4,2);
+b = [1 2];
+
+bsxfun(@rdivide, A, b)
+
+THis is incredible holy shit
+
+pause
+work with images in doubles
+imagesc a matrix
+colormap('gray')
+colormap('default')
+
+save(filename, var1, var2, var3, ...)
+puts all variables into .mat files
