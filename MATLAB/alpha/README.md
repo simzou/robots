@@ -44,4 +44,4 @@ inaccurate "splitting" of areas of interest in the image.
 
 ### Further Reading
 
-[The Split Bregman Method for L1-Regularized Problems](http://epubs.siam.org/doi/abs/10.1137/080725891)
+[The Split Bregman Method for L1-Regularized Problems](http://epubs.siam.org/doi/abs/10.1137/080725891), Goldstein and Osher
