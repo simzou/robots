@@ -1,7 +1,7 @@
-# Sparse Image Reconstruction using Split-Bregman Iteration
+## Sparse Image Reconstruction using Split-Bregman Iteration
 
-## Purpose:
+### Purpose:
 
-## The files:
+### The files:
 
-## How to use:
+### How to use:
