@@ -3,10 +3,10 @@
 ### Purpose
 
 Our objective is to recover an unknown grayscale image `u` from a collection of sums of the 
-pixel values of the images taken across linear paths across the image's surface.
+pixel values of the image taken across a small number of linear paths across the image's surface.
 
-
-We wish to solve the minimization problem 
+As such, we encode such paths into a binary matrix `A` and the sums in a vector `g` and use 
+the Split-Bregman algorithm to find a sparse solution to 
 ````
 min_{u} a|u|+b|grad_x(u)|+b|grad_y(u)| st Au=g,
 ````
@@ -15,6 +15,7 @@ which we relax to the unconstrained problem
 min_{u} a|u|+b|grad_x(u)|+b|grad_y(u)|+(mu/2)||Au-g||^2.
 ````
 
+The algorithm is performed in three steps.
 
 ### The files
 
