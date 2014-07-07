@@ -13,7 +13,7 @@ function paths = generate_paths(num_paths, image_dim, path_type)
 			paths = [paths; point1 point2];
 		end
 	elseif (path_type == 'bouncy')
-		disp('bouncy')
+		%disp('bouncy')
 		edges = randperm(4);
         edges = edges(1:2);
 		point1 = get_random_point_on_edge(edges(1), image_dim);
