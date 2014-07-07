@@ -8,6 +8,8 @@ A = rand(100, dim^2);
 m = dim;
 n = dim;
 rhs = step1matrix(mu, lambda1, lambda2, A, u, m, n);
+disp('rhs:')
+size(rhs)
 usolved = step1matrix_solver(mu, lambda1, lambda2, A, m, n, rhs);
 [u usolved];
 toc
