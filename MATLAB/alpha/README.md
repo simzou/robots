@@ -14,8 +14,8 @@ which we relax to the unconstrained problem
 ````
 min_{u} a|u|+b|grad_x(u)|+b|grad_y(u)|+(mu/2)||Au-g||^2.
 ````
-
-The algorithm is performed in three steps.
+The |u| term keeps our solution sparse, while the gradient minimization terms are meant to prevent 
+inaccurate "splitting" of areas of interest in the image.
 
 ### The files
 
