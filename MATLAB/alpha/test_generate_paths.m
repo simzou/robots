@@ -1,6 +1,8 @@
 colormap gray;
 grid_size = [50 70];
+
 paths = generate_paths(20, grid_size, 'bouncy');
+
 
 weights = zeros(grid_size);
 
