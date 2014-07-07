@@ -1,6 +1,6 @@
 colormap gray;
 grid_size = [50 70];
-paths = generate_paths(20, grid_size, []);
+paths = generate_paths(1000, grid_size, []);
 
 weights = zeros(grid_size);
 
