@@ -1,15 +1,11 @@
 clc; clear all;
-dim = 50;
+dim = 10;
 num_paths = 150;
 paths = generate_paths(num_paths, [dim dim], 'bouncy');
 filename = strcat('test', int2str(dim), '.png');
 [A u ugrad g] = generate_Aug_from_image(filename, paths);
 u = double(u);
-size(u)
-mu = 10;
-lambda1 = 10;
-lambda2 = 10;
-lambda3 = 10;
+%size(u)
 m = dim;
 n = dim;
 
