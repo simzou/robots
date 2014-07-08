@@ -1,7 +1,7 @@
 clc; clear all;
 
-dim = 10;
-num_paths = 100;
+dim = 20;
+num_paths = 200;
 
 filename = strcat('test', int2str(dim), '.png');
 paths = generate_paths(num_paths, [dim dim], 'bouncy');
