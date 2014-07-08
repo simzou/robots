@@ -1,5 +1,7 @@
 clc; clear all;
-dim = 50;
+profile on;
+tic;
+dim = 20;
 num_paths = 150;
 paths = generate_paths(num_paths, [dim dim], 'bouncy');
 filename = strcat('test', int2str(dim), '.png');
@@ -18,3 +20,5 @@ Phi3 = @(u) directional_gradient_y(u, m, n);
 uguess = genSplitBregman_step1solver( n*n, Phi1, Phi2, Phi3, A, g, dim, dim);
 
 [u uguess]
+toc;
+profile viewer;
