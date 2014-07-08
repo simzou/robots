@@ -15,5 +15,5 @@ function u = step1matrix_solver(mu, lambda1, lambda2, A, m, n, rhs)
 	tol = 10e-8;
 	max_iter = 1000;
 	preconditioner = @(f) solve_Laplace(f, lambda1, lambda2, m, n);
-	[u flag] = pcg(step1, rhs, tol, max_iter, preconditioner);
+	[u ~] = pcg(step1, rhs, tol, max_iter, preconditioner);
 end

@@ -67,7 +67,7 @@ while norm( u(:,2)-u(:,1) ) > tol
     end
     
     %% Step 3: Update b.
-    b = b + ( u(:,2) - d );
+    b  = b  + ( u(:,2) - d );
     bx = bx + ( Phi2(u(:,2)) - dx );
     by = by + ( Phi3(u(:,2)) - dy );
 end

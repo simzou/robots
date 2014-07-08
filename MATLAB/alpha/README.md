@@ -23,8 +23,13 @@ inaccurate "splitting" of areas of interest in the image.
 
 - directional_gradient.m 
 - directional_gradient_transpose.m
+- directional_gradient_x.m 
+- directional_gradient_y.m 
 - generate_Aug_from_image.m
 - generate_paths.m
+- genSplitBregman_step1solver.m
+- make_right_hand_side.m
+- RunSplitBregman_step1solver.m
 - path_weights.m
 - solve_Laplace.m
 - step1matrix.m
@@ -37,6 +42,7 @@ inaccurate "splitting" of areas of interest in the image.
 - test50.PNG
 - test_generate_paths.m
 - test_path_weights.m
+- test_reconstruction.m
 - test_solve_Laplace.m
 - test_step1matrix_solver.m
 
