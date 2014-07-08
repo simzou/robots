@@ -39,7 +39,7 @@ if nargin < num_params - 1
     tol = 0.001;
 end
 if nargin < num_params - 2
-    lambda2 = .1;
+    lambda2 = 1;
 end
 if nargin < num_params - 3
     lambda1 = .1;
@@ -49,10 +49,10 @@ if nargin < num_params - 4
 end
 
 AtA = A'*A;
-DelX = - eye(n) + diag( ones(n-1,1), 1 );
-DelY = - eye(n) + diag( ones(n-col, 1), col );
+%DelX = - eye(n) + diag( ones(n-1,1), 1 );
+%DelY = - eye(n) + diag( ones(n-col, 1), col );
 
-U = mu*AtA+lambda1*eye(n)+lambda2*(DelX'*DelX+DelY'*DelY);
+%U = mu*AtA+lambda1*eye(n)+lambda2*(DelX'*DelX+DelY'*DelY);
 
 %tic    
 %% Begin the iterative process and continue until we are below

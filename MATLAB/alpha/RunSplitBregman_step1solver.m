@@ -4,6 +4,10 @@ tic;
 dim = 10;
 num_paths = 20;
 
+paths = generate_paths(num_paths, [dim dim], 'bouncy');
+weights = compute_paths(paths,[dim dim]);
+%A = rand(num_paths, dim*dim);
+
 file = strcat('test', int2str(dim), '.png');
 
 u = rgb2gray(imread(file));
@@ -23,16 +27,20 @@ u      = reshape(u,dim,dim);
 uguess = reshape(uguess,dim,dim);
 
 hold on
-
-subplot(1,2,1);
+colormap gray;
+subplot(1,3,1);
 imagesc(u);
 title('Original Image')
 
-subplot(1,2,2);
+subplot(1,3,2);
 imagesc(uguess);
 title('Reconstructed Image')
 
-%[u uguess]
+subplot(1,3,3);
+imagesc(weights);
+title('Paths')
+
+[u uguess]
 toc;
-profile viewer;
 hold off
+profile viewer;
