@@ -1,7 +1,7 @@
 clc; clear all;
 profile on;
 tic;
-dim = 20;
+dim = 25;
 num_paths = 150;
 paths = generate_paths(num_paths, [dim dim], 'bouncy');
 
@@ -26,11 +26,11 @@ uguess = reshape(uguess,dim,dim);
 hold on
 
 subplot(1,2,1);
-imshow(u);
+imagesc(u);
 title('Original Image')
 
 subplot(1,2,2);
-imshow(uguess);
+imagesc(uguess);
 title('Reconstructed Image')
 
 [u uguess]
