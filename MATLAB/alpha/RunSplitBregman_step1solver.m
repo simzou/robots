@@ -3,6 +3,10 @@ clc; clear all;
 dim = 20;
 num_paths = 200;
 
+profile on;
+tic;
+paths = generate_paths(num_paths, [dim dim], 'bouncy');
+
 filename = strcat('test', int2str(dim), '.png');
 paths = generate_paths(num_paths, [dim dim], 'bouncy');
 [A u ugrad g] = generate_Aug_from_image(filename, paths);
@@ -31,4 +35,7 @@ subplot(1,2,2);
 imshow(uguess);
 title('Reconstructed Image')
 
+[u uguess]
+toc;
+profile viewer;
 hold off

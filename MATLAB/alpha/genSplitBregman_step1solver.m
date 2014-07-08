@@ -34,7 +34,7 @@ if nargin < num_params
     N = 1;
 end
 if nargin < num_params - 1
-    tol = 0.01;
+    tol = 0.1;
 end
 if nargin < num_params - 2
     lambda2 = .1;
