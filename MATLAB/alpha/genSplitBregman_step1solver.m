@@ -1,4 +1,4 @@
-function u = genSplitBregman_step1solver(n, Phi1, Phi2, Phi3, A, g, row, col, mu, lambda1, lambda2, tol, N )
+function u = genSplitBregman_step1solver(Phi1, Phi2, Phi3, A, g, row, col, mu, lambda1, lambda2, tol, N )
 % This function solves the problem
 %     argmin_{u,d} |d|+|e|+H(u) such that d=Phi1(u), e=Phi2(u) 
 % by converting it into the unconstrained problem
@@ -16,6 +16,8 @@ function u = genSplitBregman_step1solver(n, Phi1, Phi2, Phi3, A, g, row, col, mu
 %    N      = the number of times perform the inner loop.
 %
 
+n = row*col;
+
 % Initialize our iterates.
 u      = zeros(n, 2);
 u(:,2) = ones(n, 1);
@@ -27,7 +29,7 @@ dy     = zeros(n, 1);
 by     = zeros(n, 1);
 
 
-num_params = 13;
+num_params = 12;
 % Set defaults for our parameters
 
 if nargin < num_params

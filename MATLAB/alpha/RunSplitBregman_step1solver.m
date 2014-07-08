@@ -7,19 +7,19 @@ paths = generate_paths(num_paths, [dim dim], 'bouncy');
 weights = compute_paths(paths,[dim dim]);
 %A = rand(num_paths, dim*dim);
 
-filename = strcat('test', int2str(dim), '.png');
-paths = generate_paths(num_paths, [dim dim], 'bouncy');
-[A u ugrad g] = generate_Aug_from_image(filename, paths);
-u = double(u);
+file = strcat('test', int2str(dim), '.png');
 
-m = dim;
-n = dim;
+u = rgb2gray(imread(file));
+[m n] = size(u);
+
+paths = generate_paths(num_paths, [m n], 'bouncy');
+[A u ugrad g] = generate_Aug_from_image(u, paths);
 
 Phi1 = @(u) u;
 Phi2 = @(u) directional_gradient_x(u, m, n);
 Phi3 = @(u) directional_gradient_y(u, m, n);
 
-uguess = genSplitBregman_step1solver( n*n, Phi1, Phi2, Phi3, A, g, m, n);
+uguess = genSplitBregman_step1solver( Phi1, Phi2, Phi3, A, g, m, n);
 
 error  = norm(u-uguess)
 u      = reshape(u,dim,dim);

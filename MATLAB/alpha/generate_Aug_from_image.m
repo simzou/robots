@@ -1,4 +1,4 @@
-function [ A u ugrad g ] = generate_Aug_from_image( image_file, paths )
+function [ A u ugrad g ] = generate_Aug_from_image( umat, paths )
 % Takes an image file and a list of path endpoints
 % Returns the A, u, and g, as well as those of the gradient.
 
@@ -6,7 +6,6 @@ function [ A u ugrad g ] = generate_Aug_from_image( image_file, paths )
 % In each path, the entries should be xstart, ystart, xend, yend, in that
 % order.
 
-umat = rgb2gray(imread(image_file));
 ugradmat = zeros(size(umat));
 
 siglength = size(umat,1)*size(umat,2);
@@ -37,7 +36,7 @@ for i=1:size(paths,1)
         A(i,:) = reshape(pathmat,1,siglength);
 end
 
-u = reshape(umat,siglength,1);
+u = double(reshape(umat,siglength,1));
 ugrad = reshape(ugradmat,siglength,1);
 
 g = A*double(u);
