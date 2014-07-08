@@ -1,8 +1,8 @@
 clc; clear all;
 profile on;
 tic;
-dim = 25;
-num_paths = 150;
+dim = 10;
+num_paths = 20;
 
 file = strcat('test', int2str(dim), '.png');
 

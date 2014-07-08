@@ -36,7 +36,7 @@ if nargin < num_params
     N = 1;
 end
 if nargin < num_params - 1
-    tol = 0.1;
+    tol = 0.001;
 end
 if nargin < num_params - 2
     lambda2 = .1;
@@ -48,6 +48,11 @@ if nargin < num_params - 4
     mu = 1;
 end
 
+AtA = A'*A;
+DelX = - eye(n) + diag( ones(n-1,1), 1 );
+DelY = - eye(n) + diag( ones(n-col, 1), col );
+
+U = mu*AtA+lambda1*eye(n)+lambda2*(DelX'*DelX+DelY'*DelY);
 
 %tic    
 %% Begin the iterative process and continue until we are below
@@ -60,10 +65,12 @@ while norm( u(:,2)-u(:,1) ) > tol
         
         %% Perform step 1 of the algorithm.
         rhs = make_right_hand_side(mu, lambda1, lambda2, A, b, d, bx, dx, by, dy, g, row, col);
-        u(:,2) = step1matrix_solver(mu, lambda1, lambda2, A, row, col, rhs);
-                
+        
+        u(:,2) = step1matrix_solver(mu, lambda1, lambda2, AtA, row, col, rhs);
+        %u(:,2) = U\rhs;
+        
         %% Perform step 2 of the algorithm.
-        d = shrink( Phi1(u(:,2))+b, 1/lambda1 ); 
+        d  = shrink( Phi1(u(:,2))+b, 1/lambda1 ); 
         dx = shrink( Phi2(u(:,2))+bx, 1/lambda2 ); 
         dy = shrink( Phi3(u(:,2))+by, 1/lambda2 ); 
     end
