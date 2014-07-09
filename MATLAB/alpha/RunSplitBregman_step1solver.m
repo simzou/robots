@@ -31,7 +31,27 @@ Phi1 = @(u) u;
 Phi2 = @(u) directional_gradient_x(u, m, n);
 Phi3 = @(u) directional_gradient_y(u, m, n);
 
-[uguess errplot energyplot] = genSplitBregman_step1solver( Phi1, Phi2, Phi3, A, g, m, n, alpha, beta, mu, lambda1, lambda2, tol, N);
+iter = 100;
+uguess = zeros(m*n, iter, iter, iter);
+errplot = zeros(100, iter, iter, iter);
+energyplot = zeros(100, iter, iter, iter);
+iterplot = zeros(iter,iter,iter);
+
+for i = 1:1:iter
+    for j = 1:1:iter
+        for k = 1:1:iter
+            
+            mu = 0.01*i;
+            lambda1 = 0.01*j;
+            lambda2 = 0.01*k;
+            
+            [uguess(:,i,j,k) errplot(:,i,j,k) energyplot(:,i,j,k) iterplot(i,j,k)] = ... 
+                genSplitBregman_step1solver( Phi1, Phi2, Phi3, A, g, m, n, alpha, beta, mu, lambda1, lambda2, tol, N);
+            
+        end
+    end
+end
+
 
 error = norm(u - uguess) / norm(u)
 
