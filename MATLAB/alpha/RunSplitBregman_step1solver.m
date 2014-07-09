@@ -1,14 +1,14 @@
 clc; clear all;
 
-dim = 50;
+dim = 75;
 num_paths = 200;
 
 alpha = 1;
 beta = 1;
 mu = 1;
 lambda1 = .1;
-lambda2 = .1;
-tol = 0.01;
+lambda2 = 1;
+tol = 1/256;
 N = 1;
 
 profile on;
@@ -52,6 +52,8 @@ for i = 1:1:iter
     end
 end
 
+
+error = norm(u - uguess) / norm(u)
 
 u      = reshape(u,dim,dim);
 uguess = reshape(uguess,dim,dim);
