@@ -1,4 +1,4 @@
-function [u errplot energyplot] = genSplitBregman_step1solver(Phi1, Phi2, Phi3, A, g, row, col, mu, lambda1, lambda2, tol, N )
+function [u errplot energyplot] = genSplitBregman_step1solver(Phi1, Phi2, Phi3, A, g, row, col, alpha, beta, mu, lambda1, lambda2, tol, N )
 % This function solves the problem
 %     argmin_{u,d} |d|+|e|+H(u) such that d=Phi1(u), e=Phi2(u) 
 % by converting it into the unconstrained problem
@@ -34,7 +34,7 @@ dy     = zeros(n, 1);
 by     = zeros(n, 1);
 
 
-num_params = 12;
+num_params = 14;
 % Set defaults for our parameters
 
 if nargin < num_params
@@ -51,6 +51,12 @@ if nargin < num_params - 3
 end
 if nargin < num_params - 4
     mu = 1;
+end
+if nargin < num_params - 5
+    beta = 1;
+end
+if nargin < num_params - 5
+    alpha = 1;
 end
 
 % AtA = A'*A;
@@ -78,20 +84,20 @@ while norm( u(:,2)-u(:,1) ) / norm(u(:,1)) > tol
         %pause;
 
         %% Perform step 2 of the algorithm.
-        d  = shrink( Phi1(u(:,2))+b, 1/lambda1 ); 
-        dx = shrink( Phi2(u(:,2))+bx, 1/lambda2 ); 
-        dy = shrink( Phi3(u(:,2))+by, 1/lambda2 ); 
+        d  = shrink( alpha*Phi1(u(:,2))+b, 1/lambda1 ); 
+        dx = shrink( beta*Phi2(u(:,2))+bx, 1/lambda2 ); 
+        dy = shrink( beta*Phi3(u(:,2))+by, 1/lambda2 ); 
     end
     
     %% Step 3: Update b.
-    b  = b  + ( u(:,2) - d );
-    bx = bx + ( Phi2(u(:,2)) - dx );
-    by = by + ( Phi3(u(:,2)) - dy );
+    b  = b  + ( alpha*u(:,2) - d );
+    bx = bx + ( beta*Phi2(u(:,2)) - dx );
+    by = by + ( beta*Phi3(u(:,2)) - dy );
     
     iter = iter + 1;
     errplot(iter)    = norm( u(:,2)-u(:,1) )/norm(u(:,1));
     [Dx Dy] = directional_gradient(u(:,2), row, col);
-    energyplot(iter) = sum(u(:,2))+sum(Dx)+sum(Dy);
+    energyplot(iter) = alpha*sum(u(:,2))+beta*sum(Dx)+beta*sum(Dy);
 end
 %toc
 
