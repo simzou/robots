@@ -1,14 +1,14 @@
 clc; clear all;
 
-dim = 50;
+dim = 75;
 num_paths = 200;
 
 alpha = 1;
 beta = 1;
 mu = 1;
 lambda1 = .1;
-lambda2 = .1;
-tol = 0.01;
+lambda2 = 1;
+tol = 1/256;
 N = 1;
 
 profile on;
@@ -32,6 +32,8 @@ Phi2 = @(u) directional_gradient_x(u, m, n);
 Phi3 = @(u) directional_gradient_y(u, m, n);
 
 [uguess errplot energyplot] = genSplitBregman_step1solver( Phi1, Phi2, Phi3, A, g, m, n, alpha, beta, mu, lambda1, lambda2, tol, N);
+
+error = norm(u - uguess) / norm(u)
 
 u      = reshape(u,dim,dim);
 uguess = reshape(uguess,dim,dim);
