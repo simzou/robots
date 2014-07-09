@@ -1,14 +1,10 @@
 clc; clear all;
 
 dim = 50;
-<<<<<<< HEAD
 num_paths = 200;
 
 alpha = 1;
 beta = 1;
-=======
-num_paths = 100;
->>>>>>> a81609115cea918178a6fb5b8426e7ac4bc7ad21
 mu = 1;
 lambda1 = .1;
 lambda2 = .1;
