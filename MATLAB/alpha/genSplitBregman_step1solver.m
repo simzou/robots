@@ -87,6 +87,7 @@ while norm( u(:,2)-u(:,1) ) > tol && iter < maxiter
     
     iter = iter + 1;
     errplot(iter)    = norm( u(:,2)-u(:,1) )/norm(u(:,1));
+    [Dx Dy] = directional_gradient(u(:,2), row, col);
     energyplot(iter) = sum(u(:,2))+sum(Dx)+sum(Dy);
 end
 %toc
