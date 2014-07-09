@@ -39,7 +39,7 @@ if nargin < num_params - 1
     tol = 0.001;
 end
 if nargin < num_params - 2
-    lambda2 = 1;
+    lambda2 = .1;
 end
 if nargin < num_params - 3
     lambda1 = .1;

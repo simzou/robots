@@ -1,8 +1,8 @@
 clc; clear all;
 profile on;
 tic;
-dim = 10;
-num_paths = 20;
+dim = 50;
+num_paths = 500;
 
 paths = generate_paths(num_paths, [dim dim], 'bouncy');
 weights = compute_paths(paths,[dim dim]);
