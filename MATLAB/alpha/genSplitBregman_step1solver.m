@@ -36,10 +36,10 @@ if nargin < num_params
     N = 1;
 end
 if nargin < num_params - 1
-    tol = 0.001;
+    tol = .001;
 end
 if nargin < num_params - 2
-    lambda2 = 1;
+    lambda2 = .1;
 end
 if nargin < num_params - 3
     lambda1 = .1;
@@ -48,7 +48,7 @@ if nargin < num_params - 4
     mu = 1;
 end
 
-AtA = A'*A;
+% AtA = A'*A;
 %DelX = - eye(n) + diag( ones(n-1,1), 1 );
 %DelY = - eye(n) + diag( ones(n-col, 1), col );
 
@@ -57,7 +57,7 @@ AtA = A'*A;
 %tic    
 %% Begin the iterative process and continue until we are below
 % a certain threshold.
-while norm( u(:,2)-u(:,1) ) > tol
+while norm( u(:,2)-u(:,1) ) / norm(u(:,1)) > tol
     for i = 1:N
         
         % Save our previous iteration's value for u.
@@ -66,7 +66,7 @@ while norm( u(:,2)-u(:,1) ) > tol
         %% Perform step 1 of the algorithm.
         rhs = make_right_hand_side(mu, lambda1, lambda2, A, b, d, bx, dx, by, dy, g, row, col);
         
-        u(:,2) = step1matrix_solver(mu, lambda1, lambda2, AtA, row, col, rhs);
+        u(:,2) = step1matrix_solver(mu, lambda1, lambda2, A, row, col, rhs);
         %u(:,2) = U\rhs;
         
         imagesc(reshape(u(:,2), row, col)); colormap gray;
@@ -93,7 +93,7 @@ end
 function d = shrink( x, gamma )
 % Helper function carries out step 2 of the algorithm.
 
-xsum = abs(x);
+xsum = abs(x)+eps;
 d = (x./xsum).*max( xsum-gamma, 0 );
 
 end
