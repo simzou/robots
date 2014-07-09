@@ -69,6 +69,9 @@ while norm( u(:,2)-u(:,1) ) > tol
         u(:,2) = step1matrix_solver(mu, lambda1, lambda2, A, row, col, rhs);
         %u(:,2) = U\rhs;
         
+        imagesc(reshape(u(:,2), row, col)); colormap('gray');
+        pause;
+
         %% Perform step 2 of the algorithm.
         d  = shrink( Phi1(u(:,2))+b, 1/lambda1 ); 
         dx = shrink( Phi2(u(:,2))+bx, 1/lambda2 ); 
