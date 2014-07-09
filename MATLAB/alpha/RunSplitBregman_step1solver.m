@@ -1,7 +1,7 @@
 clc; clear all;
 
-dim = 30;
-num_paths = 500;
+dim = 50;
+num_paths = 200;
 % mu = 1;
 % lambda1 = .1;
 % lambda2 = .1;

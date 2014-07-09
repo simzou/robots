@@ -36,16 +36,16 @@ if nargin < num_params
     N = 1;
 end
 if nargin < num_params - 1
-    tol = 1e-6;
+    tol = .001;
 end
 if nargin < num_params - 2
-    lambda2 = 1e2;
+    lambda2 = .1;
 end
 if nargin < num_params - 3
-    lambda1 = 1e2;
+    lambda1 = .1;
 end
 if nargin < num_params - 4
-    mu = 1e3;
+    mu = 1;
 end
 
 % AtA = A'*A;
@@ -57,7 +57,7 @@ end
 %tic    
 %% Begin the iterative process and continue until we are below
 % a certain threshold.
-while norm( u(:,2)-u(:,1) ) > tol
+while norm( u(:,2)-u(:,1) ) / norm(u(:,1)) > tol
     for i = 1:N
         
         % Save our previous iteration's value for u.
@@ -69,8 +69,8 @@ while norm( u(:,2)-u(:,1) ) > tol
         u(:,2) = step1matrix_solver(mu, lambda1, lambda2, A, row, col, rhs);
         %u(:,2) = U\rhs;
         
-        imagesc(reshape(u(:,2), row, col)); colormap('gray');
-        pause;
+        % imagesc(reshape(u(:,2), row, col)); colormap('gray');
+        % pause;
 
         %% Perform step 2 of the algorithm.
         d  = shrink( Phi1(u(:,2))+b, 1/lambda1 ); 
