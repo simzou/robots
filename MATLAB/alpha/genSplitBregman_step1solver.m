@@ -1,4 +1,4 @@
-function [u errplot energyplot] = genSplitBregman_step1solver(Phi1, Phi2, Phi3, A, g, row, col, alpha, beta, mu, lambda1, lambda2, tol, N )
+function [u errplot energyplot iter] = genSplitBregman_step1solver(Phi1, Phi2, Phi3, A, g, row, col, alpha, beta, mu, lambda1, lambda2, tol, N )
 % This function solves the problem
 %     argmin_{u,d} |d|+|e|+H(u) such that d=Phi1(u), e=Phi2(u) 
 % by converting it into the unconstrained problem
@@ -32,7 +32,6 @@ dx     = zeros(n, 1);
 bx     = zeros(n, 1);
 dy     = zeros(n, 1);
 by     = zeros(n, 1);
-
 
 num_params = 14;
 % Set defaults for our parameters
@@ -101,9 +100,9 @@ while norm( u(:,2)-u(:,1) ) / norm(u(:,1)) > tol
 end
 %toc
 
-u = u(:,2);
 errplot = errplot(1:iter);
 energyplot = energyplot(1:iter);
+u = u(:,2);
 
 end
 
