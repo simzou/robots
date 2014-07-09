@@ -1,45 +1,61 @@
 clc; clear all;
+
+dim = 50;
+num_paths = 100;
+mu = 1;
+lambda1 = .1;
+lambda2 = .1;
+tol = 0.01;
+N = 1;
+
 profile on;
 tic;
-dim = 25;
-num_paths = 100;
-paths = generate_paths(num_paths, [dim dim], 'bouncy');
 %for i = 1:dim
 %    paths(i,:) = [0 i-.5 dim i-.5];
 %    paths(i+dim,:) = [i-.5 0 i-.5 dim];
 %end
 
-filename = strcat('test', int2str(dim), '.png');
-%paths = generate_paths(num_paths, [dim dim], 'bouncy');
-[A u ugrad g] = generate_Aug_from_image(filename, paths);
-u = double(u);
+file = strcat('test', int2str(dim), '.png');
 
-m = dim;
-n = dim;
+u = rgb2gray(imread(file));
+[m n] = size(u);
+
+paths = generate_paths(num_paths, [m n], 'bouncy');
+weights = compute_paths(paths,[m n]);
+[A u ugrad g] = generate_Aug_from_image(u, paths);
 
 Phi1 = @(u) u;
 Phi2 = @(u) directional_gradient_x(u, m, n);
 Phi3 = @(u) directional_gradient_y(u, m, n);
 
-uguess = genSplitBregman_step1solver( n*n, Phi1, Phi2, Phi3, A, g, m, n);
+[uguess errplot energyplot] = genSplitBregman_step1solver( Phi1, Phi2, Phi3, A, g, m, n, mu, lambda1, lambda2, tol, N);
 
-error  = norm(u-uguess)
 u      = reshape(u,dim,dim);
 uguess = reshape(uguess,dim,dim);
 
 hold on
-
-subplot(1,2,1);
+colormap gray;
+subplot(2,3,1);
 imagesc(u);
 title('Original Image')
 
-subplot(1,2,2);
+subplot(2,3,2);
 imagesc(uguess);
 title('Reconstructed Image')
 
-colormap gray
+subplot(2,3,3);
+imagesc(weights);
+title('Paths')
 
-[u uguess]
+subplot(2,3,4);
+plot(errplot);
+title('Error')
+
+subplot(2,3,5);
+plot(energyplot);
+title('Energy')
+
+% [u uguess]
 toc;
-profile viewer;
 hold off
+profile viewer;

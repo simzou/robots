@@ -1,4 +1,3 @@
-
 function result = step1matrix(mu, lambda1, lambda2, A, u, m, n)
 % function to minimize in split Bregman
 % includes gradient 
