@@ -10,6 +10,7 @@ N = 1;
 
 profile on;
 tic;
+
 paths = generate_paths(num_paths, [dim dim], 'bouncy');
 weights = compute_paths(paths,[dim dim]);
 
