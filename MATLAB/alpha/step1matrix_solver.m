@@ -12,7 +12,7 @@ function u = step1matrix_solver(mu, lambda1, lambda2, A, m, n, rhs)
 	% disp('step1matrix_solver start')
 	% keyboard
 	step1 = @(u) step1matrix(mu, lambda1, lambda2, A, u, m, n);
-	tol = 10e-8;
+	tol = 10e-6;
 	max_iter = 1000;
 	preconditioner = @(f) solve_Laplace(f, lambda1, lambda2, m, n);
 	[u ~] = pcg(step1, rhs, tol, max_iter, preconditioner);
