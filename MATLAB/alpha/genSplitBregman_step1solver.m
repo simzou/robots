@@ -1,4 +1,4 @@
-function u = genSplitBregman_step1solver(Phi1, Phi2, Phi3, A, g, row, col, mu, lambda1, lambda2, tol, N )
+function [u errplot energyplot] = genSplitBregman_step1solver(Phi1, Phi2, Phi3, A, g, row, col, mu, lambda1, lambda2, tol, N )
 % This function solves the problem
 %     argmin_{u,d} |d|+|e|+H(u) such that d=Phi1(u), e=Phi2(u) 
 % by converting it into the unconstrained problem
@@ -17,6 +17,11 @@ function u = genSplitBregman_step1solver(Phi1, Phi2, Phi3, A, g, row, col, mu, l
 %
 
 n = row*col;
+maxiter = 100;
+iter = 0;
+
+errplot = zeros(maxiter, 1);
+energyplot = zeros(maxiter, 1);
 
 % Initialize our iterates.
 u      = zeros(n, 2);
@@ -57,7 +62,7 @@ end
 %tic    
 %% Begin the iterative process and continue until we are below
 % a certain threshold.
-while norm( u(:,2)-u(:,1) ) > tol
+while norm( u(:,2)-u(:,1) ) > tol && iter < maxiter
     for i = 1:N
         
         % Save our previous iteration's value for u.
@@ -79,6 +84,10 @@ while norm( u(:,2)-u(:,1) ) > tol
     b  = b  + ( u(:,2) - d );
     bx = bx + ( Phi2(u(:,2)) - dx );
     by = by + ( Phi3(u(:,2)) - dy );
+    
+    iter = iter + 1;
+    errplot(iter)    = norm( u(:,2)-u(:,1) )/norm(u(:,1));
+    energyplot(iter) = sum(u(:,2))+sum(Dx)+sum(Dy);
 end
 %toc
 
