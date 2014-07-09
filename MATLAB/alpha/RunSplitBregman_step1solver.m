@@ -1,7 +1,7 @@
 clc; clear all;
 
 dim = 50;
-num_paths = 2500;
+num_paths = 200;
 mu = 1;
 lambda1 = .1;
 lambda2 = .1;
@@ -26,7 +26,7 @@ Phi1 = @(u) u;
 Phi2 = @(u) directional_gradient_x(u, m, n);
 Phi3 = @(u) directional_gradient_y(u, m, n);
 
-uguess = genSplitBregman_step1solver( Phi1, Phi2, Phi3, A, g, m, n, mu, lambda1, lambda2, tol, N);
+uguess = genSplitBregman_step1solver( Phi1, Phi2, Phi3, A, g, m, n)
 
 error  = norm(u-uguess);
 u      = reshape(u,dim,dim);
