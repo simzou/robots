@@ -1,7 +1,7 @@
-clc; clear all;
+clc; clear all; close all;
 
-dim = 75;
-num_paths = 200;
+dim = 50;
+num_paths = 120;
 
 alpha = 1;
 beta = 1;
