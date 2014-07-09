@@ -97,7 +97,7 @@ while norm( u(:,2)-u(:,1) ) / norm(u(:,1)) > tol
     iter = iter + 1;
     errplot(iter)    = norm( u(:,2)-u(:,1) )/norm(u(:,1));
     [Dx Dy] = directional_gradient(u(:,2), row, col);
-    energyplot(iter) = alpha*sum(u(:,2))+beta*sum(Dx)+beta*sum(Dy);
+    energyplot(iter) = alpha*sum(u(:,2))+beta*sum(Dx)+beta*sum(Dy)+(mu/2)*norm(A*u(:,2)-g)^2;
 end
 %toc
 

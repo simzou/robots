@@ -39,6 +39,7 @@ u      = reshape(u,dim,dim);
 uguess = reshape(uguess,dim,dim);
 
 hold on
+
 colormap gray;
 subplot(2,3,1);
 imagesc(u);
