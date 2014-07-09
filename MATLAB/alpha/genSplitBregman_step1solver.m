@@ -96,6 +96,8 @@ end
 %toc
 
 u = u(:,2);
+errplot = errplot(1:iter);
+energyplot = energyplot(1:iter);
 
 end
 
