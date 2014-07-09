@@ -2,11 +2,15 @@ clc; clear all;
 profile on;
 tic;
 dim = 25;
-num_paths = 150;
+num_paths = 100;
 paths = generate_paths(num_paths, [dim dim], 'bouncy');
+%for i = 1:dim
+%    paths(i,:) = [0 i-.5 dim i-.5];
+%    paths(i+dim,:) = [i-.5 0 i-.5 dim];
+%end
 
 filename = strcat('test', int2str(dim), '.png');
-paths = generate_paths(num_paths, [dim dim], 'bouncy');
+%paths = generate_paths(num_paths, [dim dim], 'bouncy');
 [A u ugrad g] = generate_Aug_from_image(filename, paths);
 u = double(u);
 
@@ -32,6 +36,8 @@ title('Original Image')
 subplot(1,2,2);
 imagesc(uguess);
 title('Reconstructed Image')
+
+colormap gray
 
 [u uguess]
 toc;
