@@ -74,8 +74,8 @@ while norm( u(:,2)-u(:,1) ) / norm(u(:,1)) > tol
         u(:,2) = step1matrix_solver(mu, lambda1, lambda2, A, row, col, rhs);
         %u(:,2) = U\rhs;
         
-        imagesc(reshape(u(:,2), row, col)); colormap gray;
-        pause;
+        %imagesc(reshape(u(:,2), row, col)); colormap gray;
+        %pause;
 
         %% Perform step 2 of the algorithm.
         d  = shrink( Phi1(u(:,2))+b, 1/lambda1 ); 
@@ -96,6 +96,8 @@ end
 %toc
 
 u = u(:,2);
+errplot = errplot(1:iter);
+energyplot = energyplot(1:iter);
 
 end
 

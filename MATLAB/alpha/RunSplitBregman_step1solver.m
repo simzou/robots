@@ -26,25 +26,32 @@ Phi1 = @(u) u;
 Phi2 = @(u) directional_gradient_x(u, m, n);
 Phi3 = @(u) directional_gradient_y(u, m, n);
 
-uguess = genSplitBregman_step1solver( Phi1, Phi2, Phi3, A, g, m, n)
+[uguess errplot energyplot] = genSplitBregman_step1solver( Phi1, Phi2, Phi3, A, g, m, n);
 
-error  = norm(u-uguess);
 u      = reshape(u,dim,dim);
 uguess = reshape(uguess,dim,dim);
 
 hold on
 colormap gray;
-subplot(1,3,1);
+subplot(2,3,1);
 imagesc(u);
 title('Original Image')
 
-subplot(1,3,2);
+subplot(2,3,2);
 imagesc(uguess);
 title('Reconstructed Image')
 
-subplot(1,3,3);
+subplot(2,3,3);
 imagesc(weights);
 title('Paths')
+
+subplot(2,3,4);
+plot(errplot);
+title('Error')
+
+subplot(2,3,5);
+plot(energyplot);
+title('Energy')
 
 % [u uguess]
 toc;
