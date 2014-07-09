@@ -13,9 +13,10 @@ N = 1;
 
 profile on;
 tic;
-
-paths = generate_paths(num_paths, [dim dim], 'bouncy');
-weights = compute_paths(paths,[dim dim]);
+%for i = 1:dim
+%    paths(i,:) = [0 i-.5 dim i-.5];
+%    paths(i+dim,:) = [i-.5 0 i-.5 dim];
+%end
 
 file = strcat('test', int2str(dim), '.png');
 
@@ -23,6 +24,7 @@ u = rgb2gray(imread(file));
 [m n] = size(u);
 
 paths = generate_paths(num_paths, [m n], 'bouncy');
+weights = compute_paths(paths,[m n]);
 [A u ugrad g] = generate_Aug_from_image(u, paths);
 
 Phi1 = @(u) u;
