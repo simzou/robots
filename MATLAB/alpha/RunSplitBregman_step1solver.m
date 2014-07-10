@@ -1,17 +1,18 @@
-clc; clear all; close all;
+clc; clear all; 
+% close all;
 
-dim = 75;
-num_paths = 150;
+dim = 100;
+num_paths = 500;
 
 alpha = 1;
 beta = 1;
-mu = 1;
-lambda1 = .1;
+mu = 0.01;
+lambda1 = 0.1;
 lambda2 = 1;
 tol = 1/256;
 N = 1;
 
-profile on;
+% profile on;
 tic;
 %for i = 1:dim
 % paths(i,:) = [0 i-.5 dim i-.5];
@@ -40,6 +41,7 @@ error = norm(u - uguess) / norm(u)
 u = reshape(u,dim,dim);
 uguess = reshape(uguess,dim,dim);
 
+figure;
 hold on
 
 colormap gray;
@@ -66,7 +68,7 @@ title('Energy')
 % [u uguess]
 toc;
 hold off
-profile viewer;
+% profile viewer;
 
 path_lengths = zeros(num_paths,1);
 for i = 1:num_paths
