@@ -1,7 +1,15 @@
-clc; clear all;
+clc; clear all; close all;
 
+<<<<<<< HEAD
 dim = 50;
 num_paths = 300;
+=======
+dim = 75;
+num_paths = 150;
+
+alpha = 1;
+beta = 1;
+>>>>>>> 74c42cba80d4e3dfa7a3973e77eca5edc1e95586
 mu = 1;
 lambda1 = .1;
 lambda2 = .1;
@@ -26,7 +34,15 @@ Phi1 = @(u) u;
 Phi2 = @(u) directional_gradient_x(u, m, n);
 Phi3 = @(u) directional_gradient_y(u, m, n);
 
+<<<<<<< HEAD
 uguess = genSplitBregman_step1solver( Phi1, Phi2, Phi3, A, g, m, n, mu, lambda1, lambda2, tol, N);
+=======
+[uguess errplot energyplot iterplot] = ...
+                genSplitBregman_step1solver( Phi1, Phi2, Phi3, A, g, m, n, alpha, beta, mu, lambda1, lambda2, tol, N);
+            
+
+error = norm(u - uguess) / norm(u)
+>>>>>>> 74c42cba80d4e3dfa7a3973e77eca5edc1e95586
 
 error  = norm(u-uguess);
 u      = reshape(u,dim,dim);
@@ -50,3 +66,9 @@ title('Paths')
 toc;
 hold off
 profile viewer;
+
+path_lengths = zeros(num_paths,1);
+for i = 1:num_paths
+	path = paths(i,:);
+	path_lengths(i) = sqrt( (path(3)-path(1))^2 + (path(2) - path(4))^2 );
+end
