@@ -1,6 +1,12 @@
 function paths = generate_paths(num_paths, image_dim, path_type, rad_center)
 	% by default, generate random paths
+    
 	paths = zeros(num_paths,4);
+
+    % we define min path length as the length of the path from a midpoint 
+	% of one side to the midpoint of an adjacent side
+	min_path_length = sqrt((image_dim(1)/2)^2 + (image_dim(2)/2)^2);
+	%min_path_length = 0;
     
     if nargin == 2
 		%disp('nothing')
@@ -31,6 +37,13 @@ function paths = generate_paths(num_paths, image_dim, path_type, rad_center)
 			end
 			point1 = point2;
 			point2 = get_random_point_on_edge(rand_edge, image_dim);
+
+			path_length = pdist([point1; point2], 'euclidean');
+			while (path_length < min_path_length)
+				point2 = get_random_point_on_edge(rand_edge, image_dim);
+				path_length = pdist([point1; point2], 'euclidean');
+			end
+
 			last_edge = rand_edge;
 			paths(i,:) = [point1 point2];
         end
