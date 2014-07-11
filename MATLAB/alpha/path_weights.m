@@ -5,7 +5,6 @@ function [ weights ] = path_weights(ends, dimensions)
 % dimensions should be the size of the image matrix
 
 % A start point of [0 0] will refer to the bottom left corner
-
 weights = zeros(dimensions);
 x1 = ends(1); x2 = ends(3); y1 = ends(2); y2 = ends(4);
 
@@ -36,7 +35,6 @@ intersects = sortrows(intersects);
 
 % go through each intersection
 for i=1:size(intersects,1)-1
-
     % calculate distance between two consecutive intersection points
     xx1 = intersects(i,1); yy1 = intersects(i,2);
     xx2 = intersects(i+1,1); yy2 = intersects(i+1,2);
