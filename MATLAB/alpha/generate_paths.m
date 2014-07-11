@@ -1,30 +1,35 @@
-function paths = generate_paths(num_paths, image_dim, path_type)
+function paths = generate_paths(num_paths, image_dim, path_type, rad_center)
 	% by default, generate random paths
-	paths = [];
-	% we define min path length as the length of the path from a midpoint 
+    
+	paths = zeros(num_paths,4);
+
+    % we define min path length as the length of the path from a midpoint 
 	% of one side to the midpoint of an adjacent side
 	min_path_length = sqrt((image_dim(1)/2)^2 + (image_dim(2)/2)^2);
 	%min_path_length = 0;
-	if (~exist('path_type'))
-		disp('nothing')
-		for i = 1:num_paths
+    
+    if nargin == 2
+		%disp('nothing')
+        for i = 1:num_paths
 			% choosing two edges of the image
 			% 1 = left, 2 = top, 3 = right, 4 = bottom
 			edges = randperm(4);
             edges = edges(1:2);
 			point1 = get_random_point_on_edge(edges(1), image_dim);
-			point2 = get_random_point_on_edge(edges(2), image_dim);		
-			paths = [paths; point1 point2];
-		end
-	elseif (path_type == 'bouncy')
-		%disp('bouncy')
-		edges = randperm(4);
+			point2 = get_random_point_on_edge(edges(2), image_dim);							
+			paths(i,:) = [point1 point2];
+        end
+        
+    % If the path type is bouncy, then bounce from wall to wall.
+	elseif strcmp(path_type, 'bouncy')
+        %disp('bouncy')
+        edges = randperm(4);
         edges = edges(1:2);
 		point1 = get_random_point_on_edge(edges(1), image_dim);
 		point2 = get_random_point_on_edge(edges(2), image_dim);							
-		paths = [paths; point1 point2];
+		paths(1,:) = [point1 point2];
 		last_edge = edges(2);
-		for i = 2:num_paths,
+        for i = 2:num_paths,
 			rand_edge = randi(4);
 			% make sure we don't bounce to the same edge
 			while (rand_edge == last_edge)
@@ -40,9 +45,40 @@ function paths = generate_paths(num_paths, image_dim, path_type)
 			end
 
 			last_edge = rand_edge;
-			paths = [paths; point1 point2];
-		end
-	end
+			paths(i,:) = [point1 point2];
+        end
+        
+    elseif strcmp(path_type, 'radial')
+
+        N = image_dim(1);
+        M = image_dim(2);
+        
+        if nargin == 3
+            rad_center = [ N/2 M/2 ]; % TODO
+        end
+        
+        n = rad_center(1);
+        m = rad_center(2);
+        
+        theta = (2*pi/(2*num_paths))*(0:2*num_paths-1)';
+        thetaMod = mod(theta+pi/4, pi/2) - pi/4;
+        r = abs((N-n)./cos(thetaMod));
+        
+        theta0   = theta(1:num_paths);
+        thetaend = theta(num_paths+1:end);
+        
+        r0 = r(1:num_paths);
+        rend = r(num_paths+1:end);
+        
+        x0   = r0.*cos(theta0) + n;
+        y0   = r0.*sin(theta0) + m;
+        xend = rend.*cos(thetaend) + n;
+        yend = rend.*sin(thetaend) + m;
+        
+        paths(:,:) = [ x0 y0 xend yend ];
+        
+    end
+    
 
 end
 
