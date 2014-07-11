@@ -1,7 +1,7 @@
 clc; clear all; close all;
 
-dim = 75;
-num_paths = 150;
+dim = 50;
+num_paths = 100;
 
 alpha = 1;
 beta = 1;
@@ -23,7 +23,7 @@ file = strcat('test', int2str(dim), '.png');
 u = rgb2gray(imread(file));
 [m n] = size(u);
 
-paths = generate_paths(num_paths, [m n], 'bouncy');
+paths = generate_paths(num_paths, [m n], 'radial');
 weights = compute_paths(paths,[m n]);
 [A u ugrad g] = generate_Aug_from_image(u, paths);
 
