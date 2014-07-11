@@ -58,11 +58,11 @@ imagesc(weights);
 title('Paths')
 
 subplot(2,3,4);
-plot(errplot);
+semilogy(errplot(2:end));
 title('Error')
 
 subplot(2,3,5);
-plot(energyplot);
+plot(energyplot(2:end));
 title('Energy')
 
 % [u uguess]
