@@ -54,7 +54,7 @@ function paths = generate_paths(num_paths, image_dim, path_type, rad_center)
         M = image_dim(2);
         
         if nargin == 3
-            rad_center = [ N/2+.5 M/2+.5 ];
+            rad_center = [ N/2 M/2 ]; % TODO
         end
         
         n = rad_center(1);
@@ -75,7 +75,7 @@ function paths = generate_paths(num_paths, image_dim, path_type, rad_center)
         xend = rend.*cos(thetaend) + n;
         yend = rend.*sin(thetaend) + m;
         
-        paths(:,:) = [ x0 y0 xend yend ]
+        paths(:,:) = [ x0 y0 xend yend ];
         
     end
     

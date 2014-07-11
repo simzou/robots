@@ -83,20 +83,21 @@ while norm( u(:,2)-u(:,1) ) / norm(u(:,1)) > tol
         % pause;
 
         %% Perform step 2 of the algorithm.
-        d  = shrink( alpha*Phi1(u(:,2))+b, 1/lambda1 ); 
-        dx = shrink( beta*Phi2(u(:,2))+bx, 1/lambda2 ); 
-        dy = shrink( beta*Phi3(u(:,2))+by, 1/lambda2 ); 
+        d  = shrink( Phi1(u(:,2))+b, alpha/lambda1 ); 
+        dx = shrink( Phi2(u(:,2))+bx, beta/lambda2 ); 
+        dy = shrink( Phi3(u(:,2))+by, beta/lambda2 ); 
     end
     
     %% Step 3: Update b.
-    b  = b  + ( alpha*u(:,2) - d );
-    bx = bx + ( beta*Phi2(u(:,2)) - dx );
-    by = by + ( beta*Phi3(u(:,2)) - dy );
+    b  = b  + ( u(:,2) - d );
+    bx = bx + ( Phi2(u(:,2)) - dx );
+    by = by + ( Phi3(u(:,2)) - dy );
     
     iter = iter + 1;
     errplot(iter)    = norm( u(:,2)-u(:,1) )/norm(u(:,1));
     [Dx Dy] = directional_gradient(u(:,2), row, col);
     energyplot(iter) = alpha*sum(u(:,2))+beta*sum(Dx)+beta*sum(Dy)+(mu/2)*norm(A*u(:,2)-g)^2;
+    
 end
 %toc
 
