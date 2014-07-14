@@ -16,4 +16,9 @@ function u = step1matrix_solver(mu, lambda1, lambda2, A, m, n, rhs)
 	max_iter = 40;
 	preconditioner = @(f) solve_Laplace(f, lambda1, lambda2, m, n);
 	[u ~] = pcg(step1, rhs, tol, max_iter, preconditioner);
-end
+% num_iter = 5;
+% u = rhs;
+% for ii=1:num_iter
+%     u_iter = A'*(A*u);
+%     u = -mu*solve_Laplace(u_iter, lambda1, lambda2, m, n) + rhs;
+% end

@@ -6,10 +6,10 @@ num_paths = 500;
 
 alpha = 1;
 beta = 1;
-mu = 0.01;
+mu = 1;
 lambda1 = 0.1;
 lambda2 = 1;
-tol = 1/256;
+tol = 0.5/256;
 N = 1;
 
 % profile on;
@@ -27,6 +27,7 @@ u = rgb2gray(imread(file));
 paths = generate_paths(num_paths, [m n], 'bouncy');
 weights = compute_paths(paths,[m n]);
 [A u ugrad g] = generate_Aug_from_image(u, paths);
+A_norm = norm(A); A = A/A_norm; g = g/A_norm;
 
 Phi1 = @(u) u;
 Phi2 = @(u) directional_gradient_x(u, m, n);
