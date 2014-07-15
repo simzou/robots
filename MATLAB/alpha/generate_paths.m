@@ -83,9 +83,6 @@ function paths = generate_paths(num_paths, image_dim, path_type, rad_center)
         M = image_dim(2);
     	point1 = [rand(1)*N rand(1)*M];
         for i = 1:num_paths
-			% choosing two edges of the image
-			% 1 = left, 2 = top, 3 = right, 4 = bottom
-
     		point2 = [rand(1)*N rand(1)*M];
 			paths(i,:) = [point1 point2];
 			point1 = point2;
