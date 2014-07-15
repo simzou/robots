@@ -1,4 +1,4 @@
-function paths = generate_paths(num_paths, image_dim, path_type, rad_center)
+function paths = generate_paths(num_paths, image_dim, path_type, center)
 	% by default, generate random paths
     
 	paths = zeros(num_paths,4);
@@ -19,6 +19,10 @@ function paths = generate_paths(num_paths, image_dim, path_type, rad_center)
 			point2 = get_random_point_on_edge(edges(2), image_dim);							
 			paths(i,:) = [point1 point2];
         end
+        
+    elseif strcmp(path_type, 'random')
+        
+        paths = image_dim(1)*rand(num_paths,4);
         
     % If the path type is bouncy, then bounce from wall to wall.
 	elseif strcmp(path_type, 'bouncy')
@@ -53,12 +57,8 @@ function paths = generate_paths(num_paths, image_dim, path_type, rad_center)
         N = image_dim(1);
         M = image_dim(2);
         
-        if nargin == 3
-            rad_center = [ N/2 M/2 ]; % TODO
-        end
-        
-        n = rad_center(1);
-        m = rad_center(2);
+        n = N/2;
+        m = M/2;
         
         theta = (2*pi/(2*num_paths))*(0:2*num_paths-1)';
         thetaMod = mod(theta+pi/4, pi/2) - pi/4;
@@ -76,6 +76,12 @@ function paths = generate_paths(num_paths, image_dim, path_type, rad_center)
         yend = rend.*sin(thetaend) + m;
         
         paths(:,:) = [ x0 y0 xend yend ];
+        
+    elseif strcmp(path_type, 'centered')
+        
+        theta = 2*pi*rand(1);
+        thetaMod = mod(theta+pi/4, pi/2) - pi/4;
+        r = abs((N-n)./cos(thetaMod));
         
     end
     
