@@ -34,8 +34,7 @@
 % path_style: How to generate the paths. Options are described in 
 %     generatePaths.m.
 %
-% param: A struct to hold the parameters for Split Bregman. Described in 
-%     splitBregmanSolve.m.
+% param: struct to hold the parameters for Split Bregman. Described below.
 %
 %% Output:
 %
@@ -55,15 +54,15 @@ file          = 'test10.png';
 num_paths     = 20;
 path_style    = 'random';
 
-param.p       = 1;
-param.alpha   = 1;
-param.beta    = 1;
-param.mu      = 10;
-param.lambda1 = .1;
-param.lambda2 = 1;
-param.N       = 1;
-param.tol     = 1/250;
-param.maxiter = 100;
+param.p       = 1;  % We are using the l^p norm.
+param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
+param.beta    = 1;  % Beta weights towards sparsity of gradient.
+param.mu      = 10; % Parameter on the fidelity term.
+param.lambda1 = .1; % Coefficient on the regular constraint.
+param.lambda2 = 1;  % Coefficient on the gradient constraints.
+param.N       = 5;  % Number of inner loops.
+param.tol     = 1/250; % We iterate until the rel. err is under this.
+param.maxiter = 100; % Split Bregman performs this many iterations at most.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Do not touch below here unless you know what you are doing. %
