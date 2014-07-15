@@ -1,18 +1,19 @@
 clc; clear all; close all;
 
-dim = 10;
-num_paths = 100;
+dim = 100;
+num_paths = 300;
 
+p = .25;
 alpha = 1;
 beta = 1;
 mu = 1;
 lambda1 = .1;
-lambda2 = 1;
+lambda2 = 10;
 tol = 1/256;
 N = 1;
 
 profile on;
-tic;
+%tic;
 %for i = 1:dim
 %    paths(i,:) = [0 i-.5 dim i-.5];
 %    paths(i+dim,:) = [i-.5 0 i-.5 dim];
@@ -32,15 +33,21 @@ weights = compute_paths(paths,[m n]);
 Phi1 = @(u) u;
 Phi2 = @(u) directional_gradient_x(u, m, n);
 Phi3 = @(u) directional_gradient_y(u, m, n);
-
+tic;
+[uguessp errplotp energyplotp iterplotp] = ...
+                genSplitBregman_step1solver_pshrink( Phi1, Phi2, Phi3, A, g, m, n, p, alpha, beta, mu, lambda1, lambda2, tol, N);
+toc;
+tic;
 [uguess errplot energyplot iterplot] = ...
-                genSplitBregman_step1solver( Phi1, Phi2, Phi3, A, g, m, n, alpha, beta, mu, lambda1, lambda2, tol, N);
+                genSplitBregman_step1solver( Phi1, Phi2, Phi3, A, g, m, n, alpha, beta, mu, lambda1, lambda2, tol, N);            
+toc;
             
-
 error = norm(u - uguess) / norm(u)
+errorp = norm(u - uguessp) / norm(u)
 
-u      = reshape(u,m,n);
-uguess = reshape(uguess,m,n);
+u      = reshape(u,dim,dim);
+uguess = reshape(uguess,dim,dim);
+uguessp = reshape(uguessp,dim,dim);
 
 hold on
 
@@ -58,15 +65,11 @@ imagesc(weights);
 title('Paths')
 
 subplot(2,3,4);
-plot(errplot);
-title('Error')
-
-subplot(2,3,5);
-plot(energyplot);
-title('Energy')
+imagesc(uguessp);
+title('Reconstructed with p-shrink')
 
 % [u uguess]
-toc;
+%toc;
 hold off
 profile viewer;
 
