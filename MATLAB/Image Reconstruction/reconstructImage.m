@@ -80,23 +80,25 @@ paths = generatePaths(num_paths, dim, path_style);
 
 %% Now run the Split Bregman Algorithm to reconstruct u from A and g.
 u0 = zeros(prod(dim), 1);
+tic;
 [uguess err energy] = splitBregmanSolve( A, g, u0, dim, param );
+t=toc;
 trueError = norm(u-uguess) / norm(u);
 
 %% Now plot our results.
 
-u = reshape(u, dim);
-u_guess = reshape(uguess, dim);
+img = reshape(u, dim);
+img_guess = reshape(uguess, dim);
 
 hold on
 
 colormap gray;
 subplot(2,3,1);
-imagesc(u);
+imagesc(img);
 title('Original Image');
 
 subplot(2,3,2);
-imagesc(u_guess);
+imagesc(img_guess);
 title('Reconstructed Image');
 
 subplot(2,3,3);
