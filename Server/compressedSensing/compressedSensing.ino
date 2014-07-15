@@ -3,7 +3,7 @@
  * \authors Siddarth Srinivasan (UCLA REU 2014)
  * \date 10th July 2014
  *
- * \brief Arduino code to collect and communicate data to a server to
+ * \brief Arduino code to collect and communicate data to a server which can
  *   reconstruct it using a compressed sensing algorithm.
  */
 
@@ -20,19 +20,19 @@ using namespace ArduinoJson::Parser;
 #define ADAFRUIT_CC3000_IRQ   3 
 #define ADAFRUIT_CC3000_VBAT  5
 #define ADAFRUIT_CC3000_CS    10
-
 #define IR 9
+#define LED 13
 
 // WiFi Network Username/Pwd/Security
 #define WLAN_SSID       "UCLA-MATHNET"
-#define WLAN_PASS       "5Dog+8Cat<Ape"
+#define WLAN_PASS       ""
 #define WLAN_SECURITY   WLAN_SEC_WEP
 
-// Memory to allocate for the char array that stores the response
+// Memory to allocate for the char array that stores the  server response
 #define PREALLOC 512
 
 // Number of paths to travel on, also equal to number of data points
-#define NUM_PATHS 10
+#define NUM_PATHS 3
 
 // Instantiate the AdaFruit WiFi shield object and the client object
 Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, 
@@ -42,7 +42,7 @@ Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS,
 Adafruit_CC3000_Client client;
 
 // Variables for connecting to the network and server
-uint32_t ip = cc3000.IP2U32(172,31,69,148);
+uint32_t ip = cc3000.IP2U32(169,232,149,167);
 int port = 93;
 String repository = "/projects/Robots14/";
 
@@ -73,6 +73,7 @@ void setup(void)
 {
     Serial.begin(9600);
     pinMode(IR, INPUT);
+    pinMode(LED, OUTPUT);
     setupConnection();
 }
 
@@ -82,9 +83,9 @@ void setup(void)
  * \details Handles the main logic for the Arduino. Essentially, it checks if
  *          the Arduino has travelled NUM_PATHS. If not, check how its state has
  *          changed: 
- *              1) If it has gone to state 1 from state 0, it is ready to move 
+ *              1) If it has gone from state 0 to state 1, it is ready to move
  *                 and collect data from the reflectance sensor.
- *              2) If it has gone to state 0 from state 1, it is ready to move
+ *              2) If it has gone from state 1 to state 0, it is ready to move
  *                 to a new starting position.
  *              3) Otherwise, the state has not changed, so the server has not
  *                 been able to successfully locate the robot, so send a request
@@ -93,19 +94,10 @@ void setup(void)
 void loop(void)
 {
     if (paths < NUM_PATHS) {
-        if ((oldState == 1) && (state == 0)) {
-            // We have just travelled a path and data needs to be reset
-            ++paths;
-            data = 0;
-        }
-        else if ((oldState == 0) && (state == 1)){
-            for (uint16_t i = 0; i < 50000 ; ++i )
-                data += digitalRead(IR);
-        }
-        
+
         String request = "GET " + repository + "robotServer.cgi?state=" +
-                         state + "&data=" + data + "&submitdata=Submit" + 
-                         " HTTP/1.1\r\n" + "Host: " + ip + ":" + port + "\r\n";
+                 state + "&data=" + data + "&submitdata=Submit" + 
+                 " HTTP/1.1\r\n" + "Host: " + ip + ":" + port + "\r\n";
 
         // Record the state before sending the request
         oldState = state;
@@ -113,7 +105,19 @@ void loop(void)
             get_response();
         }
 
-        Serial.println(paths);          // FIXME! -- Unnecessary printing
+        if ((oldState == 1) && (state == 0)) {
+            // We have just travelled a path and data needs to be reset
+            ++paths;
+            data = 0;
+            // moveToNewStart()
+        }
+        else if ((oldState == 0) && (state == 1)){
+            Serial.println("Collecting Data");
+            digitalWrite(LED, HIGH);
+            for (uint16_t i = 0; i < 50000 ; ++i )
+                data += digitalRead(IR);
+            digitalWrite(LED, LOW);
+        }
     }
     else if (paths == NUM_PATHS) {
         // Clean up the connection
@@ -125,7 +129,7 @@ void loop(void)
 
 
 /*******************************************************************************
- *                        HELPER FUNCTIONS                                     *    
+ *                           HELPER FUNCTIONS                                  *
  ******************************************************************************/
 
 /**
@@ -141,7 +145,7 @@ void loop(void)
  */
 bool send_request (String request)
 {
-    Serial.println("Connecting to server...");
+    Serial.print("Connecting to server...");
     int t = millis();
     do {
         client = cc3000.connectTCP(ip, port);
@@ -165,7 +169,7 @@ bool send_request (String request)
 /**
  * \brief Receives and processes the HTTP response from the server
  * \details The response from the server gets stored in responseHTTP, but it
- *          also gets parsed to obtain just the json response without the 
+ *          also gets parsed to obtain just the json response without the
  *          headers in responseJSON. If the server's 'Response' is true, then
  *          it has identified the robot's location, so we can flip its state.
  *
@@ -176,7 +180,7 @@ bool send_request (String request)
  */
 void get_response() {
 
-    Serial.println("Getting response...");
+    Serial.println("\nGetting response");
 
     // Counters and Arrays to store the response
     static uint16_t resHIndex = 0;
@@ -245,9 +249,9 @@ void setupConnection(void)
     Serial.println(getFreeRam(), DEC);
     
     // Initialise the module
-    Serial.println(F("\nInitialising the CC3000 ..."));
+    Serial.println(F("\nInitialising the CC3000..."));
     if (!cc3000.begin()) {
-        Serial.println(F("Unable to initialise CC3000! Check your wiring?"));
+        Serial.println(F("Unable to initialise CC3000! Check your wiring."));
         while(1);
     }
 
@@ -267,7 +271,6 @@ void setupConnection(void)
       while(1);
     }
     Serial.println(F("Connected!"));
-
     
     // Wait for DHCP to complete
     Serial.println(F("Request DHCP"));
@@ -308,4 +311,3 @@ bool displayConnectionDetails(void)
       return true;
     }
 }
-      
