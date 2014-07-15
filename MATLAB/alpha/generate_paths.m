@@ -82,9 +82,17 @@ function paths = generate_paths(num_paths, image_dim, path_type, center)
         theta = 2*pi*rand(1);
         thetaMod = mod(theta+pi/4, pi/2) - pi/4;
         r = abs((N-n)./cos(thetaMod));
-        
-    end
     
+    elseif strcmp(path_type, 'randombounce')
+        N = image_dim(1);
+        M = image_dim(2);
+    	point1 = [rand(1)*N rand(1)*M];
+        for i = 1:num_paths
+    		point2 = [rand(1)*N rand(1)*M];
+			paths(i,:) = [point1 point2];
+			point1 = point2;
+        end    	
+    end
 
 end
 

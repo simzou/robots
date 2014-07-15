@@ -1,4 +1,4 @@
-function [uguess errplot energyplot iter] = splitBregmanSolve( A, g, u0, dim, param )
+function [uguess errplot energyplot] = splitBregmanSolve( A, g, u0, dim, param )
 % This function solves the problem
 %     argmin_{u} |d|+|e|+H(u) such that d=Phi1(u), e=Phi2(u) 
 % by converting it into the unconstrained problem
@@ -74,9 +74,11 @@ while norm(u(:,2)-u(:,1))/norm(u(:,1)) > param.tol && iter < param.maxiter
         % pause;
 
         %% Perform step 2 of the algorithm, shrinkage.
-        d  = shrink( Phi1(u(:,2))+b, alpha/param.lambda1 ); 
-        dx = shrink( Phi2(u(:,2))+bx, beta/param.lambda2 ); 
-        dy = shrink( Phi3(u(:,2))+by, beta/param.lambda2 ); 
+        [gradX gradY] = directional_gradient(u(:,2), dim);
+        
+        d  = shrink( u(:,2)+b, alpha/param.lambda1 ); 
+        dx = shrink( gradX+bx, beta/param.lambda2 ); 
+        dy = shrink( gradY+by, beta/param.lambda2 ); 
     end
     
     %% Step 3: Update b.
@@ -87,10 +89,8 @@ while norm(u(:,2)-u(:,1))/norm(u(:,1)) > param.tol && iter < param.maxiter
     %% Record our results so far.
     
     errplot(iter)    = norm( u(:,2)-u(:,1) )/norm(u(:,1));
-    
-    [Dx Dy] = directional_gradient(u(:,2), dim);
-    energyplot(iter) = param.alpha*sum(u(:,2))+param.beta*sum(Dx)+...
-        param.beta*sum(Dy)+(param.mu/2)*norm(A*u(:,2)-g)^2;
+    energyplot(iter) = param.alpha*sum(u(:,2))+param.beta*sum(gradX)+...
+        param.beta*sum(gradY)+(param.mu/2)*norm(A*u(:,2)-g)^2;
     
     iter = iter + 1;
     
@@ -99,22 +99,6 @@ end
 errplot = errplot(1:iter);
 energyplot = energyplot(1:iter);
 uguess = u(:,2);
-
-end
-
-function u = Phi1(u)
-
-end
-
-function dx = Phi2(u)
-
-dx = directional_gradient(u, m, n);
-
-end
-
-function dy = Phi3(u)
-
-[~, dy] = directional_gradient(u, m, n);
 
 end
 
