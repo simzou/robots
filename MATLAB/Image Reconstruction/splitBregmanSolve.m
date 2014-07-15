@@ -1,22 +1,10 @@
-function [uguess errplot energyplot] = splitBregmanSolve( A, g, u0, dim, param )
-% This function solves the problem
-%     argmin_{u} |d|+|e|+H(u) such that d=Phi1(u), e=Phi2(u) 
-% by converting it into the unconstrained problem
-%     argmin_{u,d} |d|+|e|+H(u)+(lambda1/2)*norm(d-Phi1(u))^2+(lambda2/2)*norm(e-Phi2(u))^2
-% and then running the Split-Bregman iteration to solve it.
-%
-% Inputs:
-%    n = dimension of u.
-%    Phi = R^n->R. Phi is a differentiable and |Phi()| is convex. 
-%    H = Functional from R^n->R that is convex.
-% Optional inputs:
-%    solver = function with inputs uk, bk, dk that returns uk+1.
-%    lambda = parameter for the unconstrained problem.
-%    tol    = we iterate until the norm(u^k-u^{k-1})<tol.
-%    N      = the number of times perform the inner loop.
-%
+function [uguess err energy] = splitBregmanSolve( A, g, u0, dim, param )
+% TODO
 
-%% If no parameters are specified, use these defaults.
+%% If certain parameters aren't specified, use these defaults.
+if ~isfield(param, 'p')
+    param.p = 1;
+end
 if ~isfield(param, 'alpha')
     param.alpha = 1;
 end
@@ -45,22 +33,23 @@ end
 %% Initialize our iterates and other variables.
 n = prod(dim);
 
-errplot    = zeros(param.maxiter, 1);
-energyplot = zeros(param.maxiter, 1);
+% Preallocating our error and energy vectors.
+err    = param.tol*ones(param.maxiter, 1);
+energy = zeros(param.maxiter, 1);
 
-u = [u0-ones(n,1) u0]; % Constructed so that we can get into the loop.
-d      = zeros(n, 1);
-b      = zeros(n, 1);
-dx     = zeros(n, 1);
-bx     = zeros(n, 1);
-dy     = zeros(n, 1);
-by     = zeros(n, 1);
+u  = [zeros(n,1) u0];
+d  = zeros(n, 1);
+b  = zeros(n, 1);
+dx = zeros(n, 1);
+bx = zeros(n, 1);
+dy = zeros(n, 1);
+by = zeros(n, 1);
 
-iter = 0; % Number of iterations completed.
+iter = 1; % Iteration we are on.
 
 %% Begin the Split Bregman algorithm.
-while norm(u(:,2)-u(:,1))/norm(u(:,1)) > param.tol && iter < param.maxiter
-    for i = 1:N
+while iter <= param.maxiter && err(iter) >= param.tol
+    for i = 1:param.N
         
         % Save our previous iteration's value for u.
         u(:,1) = u(:,2);
@@ -73,40 +62,41 @@ while norm(u(:,2)-u(:,1))/norm(u(:,1)) > param.tol && iter < param.maxiter
         % imagesc(reshape(u(:,2), dim)); colormap gray;
         % pause;
 
-        %% Perform step 2 of the algorithm, shrinkage.
-        [gradX gradY] = directional_gradient(u(:,2), dim);
+        %% Perform step 2 of the algorithm, p-shrinkage.
+        [gradX gradY] = dirGradient(u(:,2), dim);
         
-        d  = shrink( u(:,2)+b, alpha/param.lambda1 ); 
-        dx = shrink( gradX+bx, beta/param.lambda2 ); 
-        dy = shrink( gradY+by, beta/param.lambda2 ); 
+        d  = pshrink( u(:,2)+b, param.alpha/param.lambda1, param.p  ); 
+        dx = pshrink( gradX+bx, param.beta/param.lambda2, param.p ); 
+        dy = pshrink( gradY+by, param.beta/param.lambda2, param.p  ); 
     end
     
     %% Step 3: Update b.
     b  = b  + ( u(:,2) - d );
-    bx = bx + ( Phi2(u(:,2)) - dx );
-    by = by + ( Phi3(u(:,2)) - dy );
+    bx = bx + ( gradX - dx );
+    by = by + ( gradY - dy );
     
-    %% Record our results so far.
+    %% Record our progress so far.
     
-    errplot(iter)    = norm( u(:,2)-u(:,1) )/norm(u(:,1));
-    energyplot(iter) = param.alpha*sum(u(:,2))+param.beta*sum(gradX)+...
+    err(iter)    = norm( u(:,2)-u(:,1) )/norm(u(:,1));
+    energy(iter) = param.alpha*sum(u(:,2))+param.beta*sum(gradX)+...
         param.beta*sum(gradY)+(param.mu/2)*norm(A*u(:,2)-g)^2;
     
     iter = iter + 1;
     
 end
 
-errplot = errplot(1:iter);
-energyplot = energyplot(1:iter);
+% Finally, submit our output.
+err = err(1:iter-1);
+energy = energy(1:iter-1);
 uguess = u(:,2);
 
 end
 
-function d = shrink( x, gamma )
-% Helper function carries out step 2 of the algorithm.
+function d = pshrink( x, gamma, p )
+% The p-shrinkage function carries out step 2 of the algorithm.
 
-xsum = abs(x)+eps;
-d = (x./xsum).*max( xsum-gamma, 0 );
+xabs = abs(x)+eps;
+d = (x./xabs).*max( xabs-gamma.*xabs.^(p-1), 0 );
 
 end
 

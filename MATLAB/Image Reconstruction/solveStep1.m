@@ -21,14 +21,14 @@ end
 
 function lhs = makeLHS(A, u, dim, param)
 
-[dx dy] = directional_gradient(u, dim);
+[gradX gradY] = dirGradient(u, dim);
 
 term1 = A' * (A * u);
 term2 = u;
-term3 = directional_gradient_transpose(dx, dim);
-[~, term4] = directional_gradient_transpose(dy, dim);
+term3 = dirGradient(gradX, dim, 'transpose');
+[~, term4] = dirGradient(gradY, dim, 'transpose');
 
-lhs = param.mu*term1 + param.lambda1*term2 + param*lambda2*(term3 + term4);
+lhs = param.mu*term1 + param.lambda1*term2 + param.lambda2*(term3 + term4);
 
 end
 
@@ -36,8 +36,8 @@ function rhs = makeRHS(A, g, d, b, dx, bx, dy, by, dim, param)
 
 term1 = A' * g;
 term2 = (d - b);
-[term3, ~] = directional_gradient_transpose(dx-bx, dim);
-[~, term4] = directional_gradient_transpose(dy-by, dim);
+[term3, ~] = dirGradient(dx-bx, dim, 'transpose');
+[~, term4] = dirGradient(dy-by, dim, 'transpose');
 
 rhs = param.mu*term1 + param.lambda1*term2 + param.lambda2*(term3 + term4);
     
@@ -59,13 +59,12 @@ Cy = zeros(dim);
 for ii=1:dim(1)
 	Cx(ii,:) = fft(cxT) .* fft(cx);
 end
-
 for jj=1:dim(2)
 	Cy(:,jj) = fft(cyT) .* fft(cy);
 end
 
 F = reshape(f, dim);
 U = ifft2(fft2(F)./(param.lambda1*ones(dim) + param.lambda2*(Cx+Cy)));
-u = reshape(U, dim, 1);
+u = reshape(U, prod(dim), 1);
 
 end

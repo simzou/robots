@@ -1,7 +1,7 @@
 clc; clear all; close all;
 
-dim = 100;
-num_paths = 300;
+dim = 10;
+num_paths = 20;
 
 p = .25;
 alpha = 1;
@@ -21,7 +21,7 @@ profile on;
 
 %file = strcat('test', int2str(dim), '.png');
 
-file = 'photo.jpg';
+file = 'test10.png';
 
 u = rgb2gray(imread(file));
 [m n] = size(u);
