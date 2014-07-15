@@ -1,6 +1,6 @@
 %reconstructImage.m A compressed sensing reconstruction using Split Bregman
 %
-% Authors: Ke Yin, Mitchell Horning, Matthew Lin, Simon Zou
+% Authors: Ke Yin, Mitchell Horning, Matthew Lin, Sid Srinivasan, Simon Zou 
 %
 %% Summary
 %
@@ -32,9 +32,10 @@
 %
 % num_paths: The number of paths to collect data along.
 % path_style: How to generate the paths. Options are described in 
-%      generatePaths.m.
+%     generatePaths.m.
 %
-% param: A struct to hold the parameters for Split Bregman.
+% param: A struct to hold the parameters for Split Bregman. Described in 
+%     splitBregmanSolve.m.
 %
 %% Output:
 %
@@ -45,6 +46,8 @@
 % the true image after the algorithm has been run and the difference
 % between the pixel values of the original image and the guess.
 %
+
+%% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
 file          = 'test10.png';
