@@ -22,9 +22,14 @@
 import cgi, cgitb
 cgitb.enable()
 
+import sys
+sys.path.append("/Library/Frameworks/Python.framework/Versions/2.7/lib/" + 
+                "python2.7/site-packages/")
+
 import mysql.connector as conn
 import time
 import json
+import serial
 
 
 ################################################################################
@@ -32,7 +37,6 @@ import json
 ################################################################################
 
 ## Eventually, we should not even need these.
-
 def htmlForm():
     """
         Function that generates the html form if a state hasn't been submitted
@@ -59,7 +63,8 @@ def htmlForm():
                         <input type = "text" name = "data" />
                         <br><br>
 
-                        <input type = "submit" name = "submitdata" value = "Submit" />
+                        <input type = "submit" name = "submitdata" value = 
+                                      "Submit" />
                     </form> 
                 </body>
             </html>""")
@@ -90,40 +95,67 @@ def jsonResponse(response):
 
 
 ################################################################################
-#                             CAMERA HANDLERS
+#                               CAMERA HANDLER
 ################################################################################
 
-
-def locate():
+def locate(carNum):
     """
         Function that returns the x and y coordinates of the robot if it has
-        been detected, and None and None otherwise.
+        been detected, and None and None otherwise. The data is read from the
+        serial port, which comes in from the Wi232 transceiver which is
+        transmitting data from the video camera. The data comes in the following
+        format:
+                *CarNumber|x|y|x_vel|y_vel|theta|theta change!
     """
 
-    ## TODO! -- Write this function.
+    ser = serial.Serial('/dev/tty.usbserial', 115200, timeout=5, xonxoff=False,
+                                                     rtscts=False, dsrdtr=False)
+    ser.flushInput()
+    ser.flushOutput()
 
-    return 2, 3
+    raw_data = ser.readline()
 
+    # Read data
+    while not raw_data:             ## FIXME! -- Add Timeout?
+        raw_data = ser.readline()
 
+    ## Now, begin parsing the data
+    startData = False   # whether we are in 'reading' data mode
+    locationIndex = 0   # Tracks where entries from raw_data go to location_data
+    numCamData = 7      # The number of data points we will be tracking
+    
+    # List that stores the data from the camera
+    locationData = [""] * numCamData
 
-# def saveState(state):
-#     currentTime = time.ctime(time.time())
-#     stateObject = {currentTime : state}
-#     filename = "Log1.json"
-#     path = 'Logs/' + filename
+    loopIndex = 0       # Loop over all of raw_data
+    while loopIndex < len(raw_data):
+        # Only enter data 'reading' mode if raw_data contains the car we are
+        # looking for
+        if raw_data[loopIndex] == "*" and raw_data[loopIndex+1] and \
+            int(raw_data[loopIndex+1]) == carNum:
+            startData = True
+        # Upon entering data 'reading' mode, check for end-of-data-packet and
+        # end of single piece of data
+        elif startData:
+            if raw_data[loopIndex] == "|":
+                locationIndex += 1
+            elif raw_data[loopIndex] == "!":
+                locationIndex = 0
+                break
+            else:
+                locationData[locationIndex] += raw_data[loopIndex]
+        loopIndex += 1
 
-#     f = open(path, 'a')
-#     f.write("    " + currentTime + " : " + str(state) + "\n")
-#     #json.dump(stateObject, f, indent=4)
-#     f.close()
+    #print locationData              ## FIXME! - Unnecessary printing
+    ser.close()
 
-#     print "Saved state to file ", filename, "\n"
+    return locationData[1], locationData[2]    ## FIXME! -- Potential inaccuracy
+                                               ## from considering only 1 readin
 
 
 ################################################################################
 #                             MySQL DATABASE HANDLERS
 ################################################################################
-
 
 def connectDB(dbName):
     """
@@ -155,7 +187,9 @@ def saveStartToDB(dbName, startX, startY):
     """
         Called when the video camera has located the robot, and the robot was
         looking to start it path, it saves the starting coordinates of the robot
-        to the database
+        to the database.
+
+        ASSUMES that the previous entry has been completed.
     """
 
     db, cursor = connectDB(dbName)
@@ -196,11 +230,13 @@ def numDataCollected(dbName):
 #                             MAIN PROGRAM
 ################################################################################
 
-
 if __name__ == "__main__":
     try:       
         # The database to save to
         dbName = "Log1"
+
+        # The number of the car to locate
+        carNum = 9
 
         # The number of data points collected
         numDataPt = numDataCollected(dbName)
@@ -216,19 +252,20 @@ if __name__ == "__main__":
             state = int(state)
             saveStateToDB(dbName, state)   # Record the state in the database
         
-            x, y = locate()
+            x, y = locate(carNum)
 
             # If the camera has located the Arduino
             if x and y:
                 # Save its position to the database, along with data if it has
                 # been collected, and let the robot know.
                 if state == 0:
-                    saveStartToDB(dbName, x, y)
+                    saveStartToDB(dbName, int(x), int(y))
                     jsonResponse([True])
+                    #print x, y
 
                 elif state == 1:
                     data = int(submittedData.getvalue("data"))
-                    saveEndDataToDB(dbName, x, y, data, numDataPt)
+                    saveEndDataToDB(dbName, int(x), int(y), data, numDataPt)
                     jsonResponse([True])
 
                 else:

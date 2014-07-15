@@ -1,0 +1,120 @@
+--------------------------------------------------------------------------------
+Log
+--------------------------------------------------------------------------------
+
+Things needed for this project:
+Software:
+Arduino IDE
+Python
+XAMPP
+MATLAB
+
+Libraries:
+Arduino Json Library
+AdaFruit WiFi Shield Library
+PySerial, for reading serial with Python
+
+Hardware:
+Arduino
+AdaFruit WiFi Shield
+2 Wi232 Transceivers
+USB-Serial Cable
+
+
+
+1. So I don't really even need html, I can just run a script on the server that
+handles everything.
+
+2. String time: time.ctime(time.time())
+
+3. Permissions: The following command allowed me to write to the logs folder.
+
+chmod a+w Logs/
+
+ls-al allows you to see permissions
+
+4. chmod 705 filename.cgi makes it executable
+
+5. I wanted a form that submitted multiple fields in databaseManager. It
+   didn’t work when I used cgi.FieldStorage().getvalue(name). I had to
+   store cgi.FieldStorage() in a variable and then get value from there.
+   This is because the post request gets read all at once.
+
+
+6. For MATLAB-MySQL, I looked at
+
+http://www.courant.nyu.edu/~almgren/mysql/
+
+I had to edit Matlab root/bin/mexopts.sh by changing all 10.7 to 10.9 for macos
+
+
+The path I used was different, I used:
+mex -I/Applications/XAMPP/xamppfiles/include -L/Applications/XAMPP/xamppfiles/lib -lmysqlclient mysql.cpp
+
+because that's where my mysql.h and libmysqlclient.a were (respectively).
+
+
+I edited line 582 in mysql.cpp to add parentheses.
+
+
+I added typedef uint16_t char16_t; before the include mex.h line in mysql.cpp
+
+DIDN'T WORK IN THE END I GAVE UP.
+
+
+7. Sending Get requests using arduino was easy.
+
+    // String request = "GET " + repository + "_Learning/helloWorld.cgi" + 
+    //                  " HTTP/1.1\r\n" + "Host: " + ip + ":" + port + "\r\n";
+
+Post, I haven't figured out yet, so I'm just sticking with get requests, since
+my server side script doesn't care how the data comes into FieldStorage().
+
+    // String request = "POST /projects/Robots14/robotServer.cgi HTTP/1.1\r\n"
+    //                  "Host: 169.232.149.133:93\r\n"
+    //                  "Cache-Control: max-age=0\r\n"
+    //                  "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n"
+    //                  "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36\r\n"
+    //                  "Content-Type: application/x-www-form-urlencoded\r\n"
+    //                  "Referer: http://169.232.149.133:93/projects/Robots14/robotServer.cgi\r\n"
+    //                  "Accept-Encoding: gzip,deflate,sdch\r\n"
+    //                  "Accept-Language: en-US,en;q=0.8\r\n"
+    //                  "state=1&data=&submitdata=Submit\r\n";
+
+
+    OR
+
+        // String request = "POST "+ repository + "robotServer.cgi" + " HTTP/1.1\r\n"+
+    //                   "Host: " + ip + ":" + port + "\r\n";// +
+    //                   "state=2&data=&submitdata=Submit\r\n";
+
+
+8. Found stuff on http://forum.arduino.cc/index.php/topic,188902.0.html
+ to figure out how to read into array.s
+
+8.5 MySql kept shutting down when starting up, so I went to Activity Monitor and
+quit the process called mysqld.
+
+9. Installed driver from 
+
+    http://www.prolific.com.tw/US/ShowProduct.aspx?p_id=229&pcid=41
+to access Serial data. I used System Information -> USB -> USB Hub -> USB-Serial
+Controller to identify it was Prolific 2303. Potential usefull info at
+
+    http://forums.macrumors.com/archive/index.php/t-1086504.html
+
+10. pySerial library was not installed to the right place; I was able to access
+it from terminal but no IDLE. I added these lines to show it the path of the One
+True Library
+
+import sys
+sys.path.append("/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/")
+
+
+11. I had trouble deleting a database Log1, so I went to 
+
+/Applications/XAMPP/var/mysql/data or something like that
+and performed
+sudo rm -rf Log1
+
+and it worked.
