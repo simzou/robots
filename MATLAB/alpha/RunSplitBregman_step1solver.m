@@ -1,14 +1,14 @@
 clc; clear all; close all;
 
-dim = 10;
-num_paths = 20;
+% dim = 50;
+num_paths = 100;
 
 p = .25;
 alpha = 1;
 beta = 1;
-mu = 1;
+mu = .1;
 lambda1 = .1;
-lambda2 = 10;
+lambda2 = 1;
 tol = 1/256;
 N = 1;
 
@@ -21,12 +21,12 @@ profile on;
 
 %file = strcat('test', int2str(dim), '.png');
 
-file = 'test10.png';
+file = 'test50.png';
 
 u = rgb2gray(imread(file));
 [m n] = size(u);
 
-paths = generate_paths(num_paths, [m n], 'random');
+paths = generate_paths(num_paths, [m n], 'randombounce');
 weights = compute_paths(paths,[m n]);
 [A u ugrad g] = generate_Aug_from_image(u, paths);
 
@@ -45,9 +45,9 @@ toc;
 error = norm(u - uguess) / norm(u)
 errorp = norm(u - uguessp) / norm(u)
 
-u      = reshape(u,dim,dim);
-uguess = reshape(uguess,dim,dim);
-uguessp = reshape(uguessp,dim,dim);
+u      = reshape(u,m,n);
+uguess = reshape(uguess,m,n);
+uguessp = reshape(uguessp,m,n);
 
 hold on
 

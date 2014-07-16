@@ -45,10 +45,15 @@ bx = zeros(n, 1);
 dy = zeros(n, 1);
 by = zeros(n, 1);
 
-iter = 1; % Iteration we are on.
+iter = 0; % Iteration we are on.
+first = true;
 
 %% Begin the Split Bregman algorithm.
-while iter <= param.maxiter && err(iter) >= param.tol
+
+% imitation of a do while loop
+while first || (iter <= param.maxiter && err(iter) >= param.tol)
+    first = false;
+    iter = iter + 1;
     for i = 1:param.N
         
         % Save our previous iteration's value for u.
@@ -80,8 +85,6 @@ while iter <= param.maxiter && err(iter) >= param.tol
     err(iter)    = norm( u(:,2)-u(:,1) )/norm(u(:,1));
     energy(iter) = param.alpha*sum(u(:,2))+param.beta*sum(gradX)+...
         param.beta*sum(gradY)+(param.mu/2)*norm(A*u(:,2)-g)^2;
-    
-    iter = iter + 1;
     
 end
 

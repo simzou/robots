@@ -49,18 +49,18 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'test10.png';
+file          = 'test50.png';
 
-num_paths     = 20;
+num_paths     = 100;
 path_style    = 'random';
 
 param.p       = 1;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
 param.beta    = 1;  % Beta weights towards sparsity of gradient.
-param.mu      = 10; % Parameter on the fidelity term.
+param.mu      = .01; % Parameter on the fidelity term.
 param.lambda1 = .1; % Coefficient on the regular constraint.
 param.lambda2 = 1;  % Coefficient on the gradient constraints.
-param.N       = 5;  % Number of inner loops.
+param.N       = 1;  % Number of inner loops.
 param.tol     = 1/250; % We iterate until the rel. err is under this.
 param.maxiter = 100; % Split Bregman performs this many iterations at most.
 
@@ -79,7 +79,7 @@ paths = generatePaths(num_paths, dim, path_style);
 [A u g] = generateAug(u, paths);
 
 %% Now run the Split Bregman Algorithm to reconstruct u from A and g.
-u0 = zeros(prod(dim), 1);
+u0 = ones(prod(dim), 1);
 [uguess err energy] = splitBregmanSolve( A, g, u0, dim, param );
 trueError = norm(u-uguess) / norm(u);
 
@@ -113,7 +113,7 @@ plot(energy);
 title('Energy');
 
 subplot(2,3,6);
-plot(u-uguess);
+plot(u-u_guess);
 title(strcat('True Error = ',num2str(trueError)));
 
 hold off
