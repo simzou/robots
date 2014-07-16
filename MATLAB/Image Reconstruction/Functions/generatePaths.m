@@ -103,9 +103,9 @@ function point = get_random_point_on_edge(edge_num, dim)
 		y1 = rand(1)*dim(1);
 	case 2
 		x1 = rand(1)*dim(2);
-		y1 = image_dim(1);
+		y1 = dim(1);
 	case 3
-		x1 = image_dim(2);
+		x1 = dim(2);
 		y1 = rand(1)*dim(1);
 	case 4
 		x1 = rand(1)*dim(2);
