@@ -49,14 +49,14 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'flowers.jpg';
+file          = 'test50.png';
 
-num_paths     = 300;
+num_paths     = 100;
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 path_style    = 'randombounce';
-num_reconstr  = 3;
+num_reconstr  = 1;
 
 param.p       = 1/2;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
@@ -138,7 +138,7 @@ for i = 1:num_tests
 	colormap gray;
 	subplot(subplot_rows,subplot_cols,1);
 	imagesc(img);
-	title('Original Image');
+	title(strcat('Original Image: ', num2str(dim(1)), 'x', num2str(dim(2))));
 
 	subplot(subplot_rows,subplot_cols,2);
 	imagesc(img_guess);
@@ -147,7 +147,7 @@ for i = 1:num_tests
 	subplot(subplot_rows,subplot_cols,3);
 	weights = compute_paths(paths,dim);
 	imagesc(weights);
-	title('Paths');
+	title(strcat(num2str(num_paths), ' Paths'));
 
 	subplot(subplot_rows,subplot_cols,5);
 	plot(err);
