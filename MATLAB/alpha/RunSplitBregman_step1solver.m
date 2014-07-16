@@ -3,6 +3,7 @@ clc; clear all; close all;
 dim = 50;
 num_paths = 100;
 
+
 p = .5;
 alpha = 1;
 beta = 1;
@@ -19,12 +20,14 @@ profile on;
 %    paths(i+dim,:) = [i-.5 0 i-.5 dim];
 %end
 
-file = strcat('test', int2str(dim), '.png');
+%file = strcat('test', int2str(dim), '.png');
+
+file = 'test10.png';
 
 u = rgb2gray(imread(file));
 [m n] = size(u);
 
-paths = generate_paths(num_paths, [m n], 'randombounce');
+paths = generate_paths(num_paths, [m n], 'random');
 weights = compute_paths(paths,[m n]);
 [A u ugrad g] = generate_Aug_from_image(u, paths);
 
