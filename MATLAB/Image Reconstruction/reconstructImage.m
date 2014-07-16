@@ -57,7 +57,7 @@ times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 path_style    = 'randombounce';
 
-param.p       = 1;  % We are using the l^p norm.
+param.p       = 1/2;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
 param.beta    = 1;  % Beta weights towards sparsity of gradient.
 param.mu      = .01;  % Parameter on the fidelity term.
