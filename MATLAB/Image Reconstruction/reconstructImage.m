@@ -1,4 +1,4 @@
-%reconstructImage.m A compressed sensing reconstruction using Split Bregman
+% reconstructImage.m A compressed sensing reconstruction using Split Bregman
 %
 % Authors: Ke Yin, Mitchell Horning, Matthew Lin, Sid Srinivasan, Simon Zou 
 %
@@ -52,43 +52,57 @@ clc; clear all; close all;
 file          = 'test50.png';
 
 num_paths     = 100;
-path_style    = 'random';
+num_tests     = 1;
+times         = zeros(num_tests, 1);
+errors        = zeros(num_tests, 1);
+path_style    = 'randombounce';
 
 param.p       = 1;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
 param.beta    = 1;  % Beta weights towards sparsity of gradient.
-param.mu      = .01; % Parameter on the fidelity term.
+param.mu      = .01;  % Parameter on the fidelity term.
 param.lambda1 = .1; % Coefficient on the regular constraint.
 param.lambda2 = 1;  % Coefficient on the gradient constraints.
 param.N       = 1;  % Number of inner loops.
-param.tol     = 1/250; % We iterate until the rel. err is under this.
+param.tol     = 1/255; % We iterate until the rel. err is under this.
 param.maxiter = 100; % Split Bregman performs this many iterations at most.
+
+view_profile  = false;
+show_all_fig  = false;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Do not touch below here unless you know what you are doing. %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+if view_profile, profile on; end
+
 %% Read our image in.
-u = rgb2gray(imread(file));
-dim = size(u);
+u_image = rgb2gray(imread(file));
+dim = size(u_image);
+
+for i = 1:num_tests
 
 %% Generate the line-segment paths that we collect data from.
 paths = generatePaths(num_paths, dim, path_style);
 
 %% Compute A, our path matrix, convert u to a vector, and compute Au=g.
-[A u g] = generateAug(u, paths);
+[A u g] = generateAug(u_image, paths);
 
 %% Now run the Split Bregman Algorithm to reconstruct u from A and g.
 u0 = zeros(prod(dim), 1);
 tic;
 [uguess err energy] = splitBregmanSolve( A, g, u0, dim, param );
-t=toc;
+times(i)=toc;
+solveTime = times(i);
 trueError = norm(u-uguess) / norm(u);
+errors(i) = trueError;
 
 %% Now plot our results.
 
 img = reshape(u, dim);
 img_guess = reshape(uguess, dim);
+
+if show_all_fig, figure; end
 
 hold on
 
@@ -99,7 +113,7 @@ title('Original Image');
 
 subplot(2,3,2);
 imagesc(img_guess);
-title('Reconstructed Image');
+title({'Reconstructed Image ', strcat('Solve Time = ', num2str(solveTime), 's')});
 
 subplot(2,3,3);
 weights = compute_paths(paths,dim);
@@ -115,7 +129,11 @@ plot(energy);
 title('Energy');
 
 subplot(2,3,6);
-plot(u-uguess);
-title(strcat('True Error = ',num2str(trueError)));
+imagesc(reshape(abs(u-uguess), dim));
+title(strcat('True Error = ', num2str(trueError)));
 
 hold off
+
+end % end of for loop for each test
+
+if view_profile, profile viewer; end
