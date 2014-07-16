@@ -2,7 +2,7 @@ clc; clear all; close all;
 
 dim = 50;
 scale_factor = .5;
-num_paths = 2500;
+num_paths = 100;
 
 alpha = 1;
 beta = 1;
@@ -44,10 +44,10 @@ lPhi3 = @(u) directional_gradient_y(u, (1+scale_factor)*m, (1+scale_factor)*n);
                 genSplitBregman_step1solver( Phi1, Phi2, Phi3, A, g, m, n, alpha, beta, mu, lambda1, lambda2, tol, N);
             
 [smalluguess errplot energyplot iterplot] = ...
-                genSplitBregman_step1solver( Phi1, sPhi2, sPhi3, smallA, g, (1-scale_factor)*m, (1-scale_factor)*n, alpha, beta, mu, lambda1, lambda2, tol, N);
+                genSplitBregman_step1solver( Phi1, sPhi2, sPhi3, smallA, (1-scale_factor).*g, (1-scale_factor)*m, (1-scale_factor)*n, alpha, beta, mu, lambda1, lambda2, tol, N);
             
 [largeuguess errplot energyplot iterplot] = ...
-                genSplitBregman_step1solver( Phi1, lPhi2, lPhi3, largeA, g, (1+scale_factor)*m, (1+scale_factor)*n, alpha, beta, mu, lambda1, lambda2, tol, N);
+                genSplitBregman_step1solver( Phi1, lPhi2, lPhi3, largeA, (1+scale_factor).*g, (1+scale_factor)*m, (1+scale_factor)*n, alpha, beta, mu, lambda1, lambda2, tol, N);
 
 error = norm(u - uguess) / norm(u)
 
