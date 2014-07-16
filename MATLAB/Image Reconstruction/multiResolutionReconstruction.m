@@ -56,8 +56,9 @@ num_tests     = 5;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 path_style    = 'randombounce';
+num_reconstr  = 2;
 
-param.p       = 1;  % We are using the l^p norm.
+param.p       = 1/2;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
 param.beta    = 1;  % Beta weights towards sparsity of gradient.
 param.mu      = .01;  % Parameter on the fidelity term.
@@ -82,57 +83,77 @@ dim = size(u_image);
 
 for i = 1:num_tests
 
-%% Generate the line-segment paths that we collect data from.
-paths = generatePaths(num_paths, dim, path_style);
+	%% Generate the line-segment paths that we collect data from.
+	paths = generatePaths(num_paths, dim, path_style);
+	partial_paths = paths(1:num_paths/num_reconstr, :);
+	scaled_partial_paths = 1/num_reconstr * partial_paths;
 
-%% Compute A, our path matrix, convert u to a vector, and compute Au=g.
-[A u g] = generateAug(u_image, paths);
+	%% Compute A, our path matrix, convert u to a vector, and compute Au=g.
+	[A u g] = generateAug(u_image, paths);
+	scaled_dim = 1/num_reconstr * dim;
+	partial_A = generateAug(zeros(scaled_dim), scaled_partial_paths);
+	partial_g = 1/num_reconstr * g(1:num_paths/num_reconstr, :);
 
-%% Now run the Split Bregman Algorithm to reconstruct u from A and g.
-u0 = zeros(prod(dim), 1);
-tic;
-[uguess err energy] = splitBregmanSolve( A, g, u0, dim, param );
-times(i)=toc;
-solveTime = times(i);
-trueError = norm(u-uguess) / norm(u);
-errors(i) = trueError;
+	%% Now run the Split Bregman Algorithm to reconstruct u from A and g.
+	u0 = zeros(prod(scaled_dim), 1);
+	tic;
+	[partial_uguess partial_err partial_energy] = splitBregmanSolve( partial_A, partial_g, u0, scaled_dim, param );
 
-%% Now plot our results.
+	better_u0 = resizeu(partial_uguess, scaled_dim, num_reconstr);
+	[uguess err energy] = splitBregmanSolve ( A, g, better_u0, dim, param);
 
-img = reshape(u, dim);
-img_guess = reshape(uguess, dim);
+	err = [partial_err; err];
+	energy = [partial_energy; energy];
 
-if show_all_fig, figure; end
+	times(i)=toc;
+	solveTime = times(i);
+	trueError = norm(u-uguess) / norm(u);
+	errors(i) = trueError;
 
-hold on
+	%% Now plot our results.
 
-colormap gray;
-subplot(2,3,1);
-imagesc(img);
-title('Original Image');
+	img = reshape(u, dim);
+	img_guess = reshape(uguess, dim);
 
-subplot(2,3,2);
-imagesc(img_guess);
-title({'Reconstructed Image ', strcat('Solve Time = ', num2str(solveTime), 's')});
+	if show_all_fig, figure; end
 
-subplot(2,3,3);
-weights = compute_paths(paths,dim);
-imagesc(weights);
-title('Paths');
+	hold on
 
-subplot(2,3,5);
-plot(err);
-title('Error');
+	colormap gray;
+	subplot(3,3,1);
+	imagesc(img);
+	title('Original Image');
 
-subplot(2,3,4);
-plot(energy);
-title('Energy');
+	subplot(3,3,2);
+	imagesc(img_guess);
+	title({'Reconstructed Image ', strcat('Solve Time = ', num2str(solveTime), 's')});
 
-subplot(2,3,6);
-imagesc(reshape(abs(u-uguess), dim));
-title(strcat('True Error = ', num2str(trueError)));
+	subplot(3,3,3);
+	weights = compute_paths(paths,dim);
+	imagesc(weights);
+	title('Paths');
 
-hold off
+	subplot(3,3,5);
+	plot(err);
+	title('Error');
+
+	subplot(3,3,4);
+	plot(energy);
+	title('Energy');
+
+	subplot(3,3,6);
+	imagesc(reshape(abs(u-uguess), dim));
+	title(strcat('True Error = ', num2str(trueError)));
+
+	subplot(3,3,7);
+	imagesc(reshape(partial_uguess, scaled_dim));
+	title('scaled down uguess');
+
+	subplot(3,3,8);
+	imagesc(reshape(better_u0, dim));
+	title('better u0');
+
+	hold off
 
 end % end of for loop for each test
 
