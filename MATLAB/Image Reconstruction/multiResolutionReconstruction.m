@@ -51,12 +51,12 @@ clc; clear all; close all;
 
 file          = 'test100.png';
 
-num_paths     = 150;
+num_paths     = 210;
 num_tests     = 5;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 path_style    = 'randombounce';
-num_reconstr  = 2;
+num_reconstr  = 3;
 
 param.p       = 1/2;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
@@ -69,7 +69,7 @@ param.tol     = 1/255; % We iterate until the rel. err is under this.
 param.maxiter = 100; % Split Bregman performs this many iterations at most.
 
 view_profile  = false;
-show_all_fig  = false;
+show_all_fig  = true;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Do not touch below here unless you know what you are doing. %
@@ -82,28 +82,38 @@ u_image = rgb2gray(imread(file));
 dim = size(u_image);
 
 for i = 1:num_tests
-
-	%% Generate the line-segment paths that we collect data from.
 	paths = generatePaths(num_paths, dim, path_style);
-	partial_paths = paths(1:num_paths/num_reconstr, :);
-	scaled_partial_paths = 1/num_reconstr * partial_paths;
-
-	%% Compute A, our path matrix, convert u to a vector, and compute Au=g.
 	[A u g] = generateAug(u_image, paths);
-	scaled_dim = 1/num_reconstr * dim;
-	partial_A = generateAug(zeros(scaled_dim), scaled_partial_paths);
-	partial_g = 1/num_reconstr * g(1:num_paths/num_reconstr, :);
+	err = [];
+	energy = [];
+	tic
+	for j = 1:num_reconstr
+		scaling_factor = 2^(num_reconstr-j);
+		scaled_dim = 1/scaling_factor * dim;
+		if j == 1
+			u0 = zeros(prod(scaled_dim),1);
+		else
+			u0 = resizeu(partial_uguess, scaled_dim_old, 2);
+		end
 
-	%% Now run the Split Bregman Algorithm to reconstruct u from A and g.
-	u0 = zeros(prod(scaled_dim), 1);
-	tic;
-	[partial_uguess partial_err partial_energy] = splitBregmanSolve( partial_A, partial_g, u0, scaled_dim, param );
+		%% Generate the line-segment paths that we collect data from.
+		partial_paths = paths(1:j*num_paths/num_reconstr, :);
+		scaled_partial_paths = 1/scaling_factor * partial_paths;
 
-	better_u0 = resizeu(partial_uguess, scaled_dim, num_reconstr);
-	[uguess err energy] = splitBregmanSolve ( A, g, better_u0, dim, param);
+		%% Compute A, our path matrix, convert u to a vector, and compute Au=g.
+		partial_A = generateAug(zeros(scaled_dim), scaled_partial_paths);
+		partial_g = 1/scaling_factor * g(1:j*num_paths/num_reconstr, :);
 
-	err = [partial_err; err];
-	energy = [partial_energy; energy];
+		%% Now run the Split Bregman Algorithm to reconstruct u from A and g.
+		[partial_uguess partial_err partial_energy] = splitBregmanSolve( partial_A, partial_g, u0, scaled_dim, param );
+
+		err = [partial_err; err];
+		energy = [partial_energy; energy];
+
+		scaled_dim_old = scaled_dim;
+	end
+
+	uguess = partial_uguess;
 
 	times(i)=toc;
 	solveTime = times(i);
@@ -150,7 +160,7 @@ for i = 1:num_tests
 	title('scaled down uguess');
 
 	subplot(3,3,8);
-	imagesc(reshape(better_u0, dim));
+	imagesc(reshape(u0, dim));
 	title('better u0');
 
 	hold off
