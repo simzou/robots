@@ -1,4 +1,4 @@
-function paths = generatePaths(num_paths, dim, path_type)
+function paths = generatePaths(num_paths, dim, path_type, center)
 	% by default, generate random paths
     
 	paths = zeros(num_paths,4);
@@ -79,16 +79,60 @@ function paths = generatePaths(num_paths, dim, path_type)
         
     elseif strcmp(path_type, 'centered')
         
-        theta = 2*pi*rand(1);
-        thetaMod = mod(theta+pi/4, pi/2) - pi/4;
-        r = abs((N-n)./cos(thetaMod));
-    
+        M = dim(1);
+        N = dim(2);
+        m0 = center(1);
+        n0 = center(2);
+        
+        paths( 1, : ) = [ m0 n0 0 0 ];
+        
+        % Use disk point picking to choose the next point we go to.
+        for i = 1:num_paths-1
+            % Choose an angle to go in.
+            theta = 2*pi*rand(1);
+            
+            % Find the maximum distance we can go in that direction.
+            if 0 < theta && theta < pi/2
+                rmax = min( m0/sin(theta), (N-n0)/cos(theta) );
+            elseif pi/2 < theta && theta < pi
+                rmax = min( m0/sin(theta), -n0/cos(theta) );
+            elseif pi < theta && theta < (3/2)*pi
+                rmax = min( -(M-m0)/sin(theta), -n0/cos(theta) );
+            elseif (3/2)*pi < theta && theta < 2*pi
+                rmax = min( -(M-m0)/sin(theta), (N-n0)/cos(theta) );
+            elseif theta == 0 || theta == 2*pi;
+                rmax = N-n0;
+            elseif theta == pi/2
+                rmax = m0;
+            elseif theta == pi
+                rmax = n0;
+            elseif theta == (3/2)*pi
+                rmax = M-m0;
+            else
+                fprintf('pathing error')
+                rmax = 0;
+            end
+            
+            % Pick a distance to go and go there.
+            r = rmax*rand(1);
+            
+            m = abs(m0 - r*sin(theta));
+            n = abs(n0 + r*cos(theta));
+            
+            paths(i, 3:4) = [m n];
+            paths(i+1, 1:2) = [m n];
+            
+        end
+        
+        paths(num_paths, 3:4) = [m0 n0];
+
     elseif strcmp(path_type, 'randombounce')
-        N = dim(1);
-        M = dim(2);
-    	point1 = [rand(1)*N rand(1)*M];
+        
+        M = dim(1);
+        N = dim(2);
+    	point1 = [rand(1)*M rand(1)*N];
         for i = 1:num_paths
-    		point2 = [rand(1)*N rand(1)*M];
+    		point2 = [rand(1)*M rand(1)*N];
 			paths(i,:) = [point1 point2];
 			point1 = point2;
         end    	
@@ -103,9 +147,9 @@ function point = get_random_point_on_edge(edge_num, dim)
 		y1 = rand(1)*dim(1);
 	case 2
 		x1 = rand(1)*dim(2);
-		y1 = image_dim(1);
+		y1 = dim(1);
 	case 3
-		x1 = image_dim(2);
+		x1 = dim(2);
 		y1 = rand(1)*dim(1);
 	case 4
 		x1 = rand(1)*dim(2);

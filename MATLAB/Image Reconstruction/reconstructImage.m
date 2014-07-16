@@ -49,13 +49,13 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'test100.png';
+file          = 'cornertest.png';
 
-num_paths     = 150;
-num_tests     = 5;
+num_paths     = 100;
+num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
-path_style    = 'randombounce';
+path_style    = 'centered';
 
 param.p       = 1/2;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
@@ -83,7 +83,7 @@ dim = size(u_image);
 for i = 1:num_tests
 
 %% Generate the line-segment paths that we collect data from.
-paths = generatePaths(num_paths, dim, path_style);
+paths = generatePaths(num_paths, dim, path_style, [80 15]);
 
 %% Compute A, our path matrix, convert u to a vector, and compute Au=g.
 [A u g] = generateAug(u_image, paths);
@@ -115,11 +115,6 @@ subplot(2,3,2);
 imagesc(img_guess);
 title({'Reconstructed Image ', strcat('Solve Time = ', num2str(solveTime), 's')});
 
-subplot(2,3,3);
-weights = compute_paths(paths,dim);
-imagesc(weights);
-title('Paths');
-
 subplot(2,3,5);
 plot(err);
 title('Error');
@@ -131,6 +126,11 @@ title('Energy');
 subplot(2,3,6);
 imagesc(reshape(abs(u-uguess), dim));
 title(strcat('True Error = ', num2str(trueError)));
+
+subplot(2,3,3);
+weights = compute_paths(paths,dim);
+imagesc(weights);
+title('Paths');
 
 hold off
 

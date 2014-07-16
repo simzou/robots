@@ -1,12 +1,12 @@
-function [ weights ] = path_weights(ends, dimensions)
+function [ weights ] = path_weights(path, dim)
 % gives weights for a path over an image with given dimensions
 % ends should be a 1x4 matrix with the x and y coordinates of the start
 % point and the x and y coordinates of the end point in that order
 % dimensions should be the size of the image matrix
 
 % A start point of [0 0] will refer to the bottom left corner
-weights = zeros(dimensions);
-x1 = ends(1); x2 = ends(3); y1 = ends(2); y2 = ends(4);
+weights = zeros(dim);
+x1 = path(1); x2 = path(3); y1 = path(2); y2 = path(4);
 
 % yfun and xfun allow you to get y given x or vice versa
 yfun = [(y2-y1)/(x2-x1) ((y1-y2)/(x2-x1)*x1+y1)];
@@ -47,19 +47,19 @@ for i=1:size(intersects,1)-1
         if is_close_to_integer(yy1)
             yint = round(yy1);
             if yy2-yy1<0
-                weights(dimensions(1)-yint+1,xint+1) = weight;
+                weights(dim(1)-yint+1,xint+1) = weight;
             else
-                weights(dimensions(1)-yint,xint+1) = weight;
+                weights(dim(1)-yint,xint+1) = weight;
             end
         else
-            weights(ceil(dimensions(1)-yy1),xint+1) = weight;
+            weights(ceil(dim(1)-yy1),xint+1) = weight;
         end
     else
         yint = round(yy1);
         if yy2-yy1>0
-            weights(dimensions(1)-yint,ceil(xx1)) = weight;
+            weights(dim(1)-yint,ceil(xx1)) = weight;
         else
-            weights(dimensions(1)-yint+1,ceil(xx1)) = weight;
+            weights(dim(1)-yint+1,ceil(xx1)) = weight;
         end
     end
 end
