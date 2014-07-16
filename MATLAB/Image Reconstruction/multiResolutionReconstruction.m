@@ -51,7 +51,7 @@ clc; clear all; close all;
 
 file          = 'test50.png';
 
-num_paths     = 100;
+num_paths     = 300;
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
@@ -151,7 +151,7 @@ for i = 1:num_tests
 
 	subplot(subplot_rows,subplot_cols,5);
 	plot(err);
-	title('Error');
+	title(strcat('Error: ', num2str(size(err,1)), ' iterations'));
 
 	subplot(subplot_rows,subplot_cols,4);
 	plot(energy);

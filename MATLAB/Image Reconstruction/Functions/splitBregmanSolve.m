@@ -48,6 +48,8 @@ by = zeros(n, 1);
 iter = 1; % Iteration we are on.
 last_err = err(iter);
 
+filename = 'split_iter.gif';
+
 %% Begin the Split Bregman algorithm.
 while iter <= param.maxiter && last_err >= param.tol
     for i = 1:param.N
@@ -62,6 +64,16 @@ while iter <= param.maxiter && last_err >= param.tol
         
         % imagesc(reshape(u(:,2), dim)); colormap gray;
         % pause;
+
+        %% code for writing each iteration to a gif
+        % frame = getframe(1);
+        % im = frame2im(frame);
+        % [imind, cm] = rgb2ind(im, 256);
+        % if iter == 1;
+        %     imwrite(imind, cm, filename, 'gif', 'Loopcount', inf, 'DelayTime', 0);
+        % else
+        %     imwrite(imind, cm, filename, 'gif', 'WriteMode', 'append');
+        % end
 
         %% Perform step 2 of the algorithm, p-shrinkage.
         [gradX gradY] = dirGradient(u(:,2), dim);
