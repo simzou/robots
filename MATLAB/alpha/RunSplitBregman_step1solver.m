@@ -1,14 +1,14 @@
 clc; clear all; close all;
 
-dim = 100;
-num_paths = 300;
+dim = 50;
+num_paths = 100;
 
-p = .25;
+p = .5;
 alpha = 1;
 beta = 1;
 mu = 1;
 lambda1 = .1;
-lambda2 = 10;
+lambda2 = 1;
 tol = 1/256;
 N = 1;
 
@@ -31,13 +31,14 @@ weights = compute_paths(paths,[m n]);
 Phi1 = @(u) u;
 Phi2 = @(u) directional_gradient_x(u, m, n);
 Phi3 = @(u) directional_gradient_y(u, m, n);
-tic;
-[uguessp errplotp energyplotp iterplotp] = ...
-                genSplitBregman_step1solver_pshrink( Phi1, Phi2, Phi3, A, g, m, n, p, alpha, beta, mu, lambda1, lambda2, tol, N);
-toc;
+
 tic;
 [uguess errplot energyplot iterplot] = ...
                 genSplitBregman_step1solver( Phi1, Phi2, Phi3, A, g, m, n, alpha, beta, mu, lambda1, lambda2, tol, N);            
+toc;
+tic;
+[uguessp errplotp energyplotp iterplotp] = ...
+                genSplitBregman_step1solver_pshrink( Phi1, Phi2, Phi3, A, g, m, n, p, alpha, beta, mu, lambda1, lambda2, tol, N);
 toc;
             
 error = norm(u - uguess) / norm(u)
@@ -65,6 +66,14 @@ title('Paths')
 subplot(2,3,4);
 imagesc(uguessp);
 title('Reconstructed with p-shrink')
+
+subplot(2,3,5);
+plot(energyplot);
+title('Energy')
+
+subplot(2,3,6);
+plot(energyplotp);
+title('Energy with p-shrink')
 
 % [u uguess]
 %toc;
