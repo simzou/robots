@@ -49,9 +49,9 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'test50.png';
+file          = 'test100.png';
 
-num_paths     = 300;
+num_paths     = 200;
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
@@ -141,7 +141,7 @@ for i = 1:num_tests
 	title(strcat('Original Image: ', num2str(dim(1)), 'x', num2str(dim(2))));
 
 	subplot(subplot_rows,subplot_cols,2);
-	imagesc(img_guess);
+	imagesc(img_guess, [0 255]);
 	title({'Reconstructed Image ', strcat('Solve Time = ', num2str(solveTime), 's')});
 
 	subplot(subplot_rows,subplot_cols,3);
