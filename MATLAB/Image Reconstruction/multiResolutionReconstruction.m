@@ -49,26 +49,26 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'test100.png';
+file          = 'test50.png';
 
-num_paths     = 210;
-num_tests     = 5;
+num_paths     = 300;
+num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 path_style    = 'randombounce';
-num_reconstr  = 3;
+num_reconstr  = 1;
 
 param.p       = 1/2;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
 param.beta    = 1;  % Beta weights towards sparsity of gradient.
 param.mu      = .01;  % Parameter on the fidelity term.
-param.lambda1 = .1; % Coefficient on the regular constraint.
+param.lambda1 = .01; % Coefficient on the regular constraint.
 param.lambda2 = 1;  % Coefficient on the gradient constraints.
 param.N       = 1;  % Number of inner loops.
 param.tol     = 1/255; % We iterate until the rel. err is under this.
 param.maxiter = 100; % Split Bregman performs this many iterations at most.
 
-view_profile  = false;
+view_profile  = true;
 show_all_fig  = true;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -111,6 +111,9 @@ for i = 1:num_tests
 		energy = [partial_energy; energy];
 
 		scaled_dim_old = scaled_dim;
+		% imagesc(reshape(partial_uguess, scaled_dim)); colormap gray;
+		% pause;
+
 	end
 
 	uguess = partial_uguess;
@@ -127,41 +130,36 @@ for i = 1:num_tests
 
 	if show_all_fig, figure; end
 
+	subplot_rows = 2;
+	subplot_cols = 3;
+
 	hold on
 
 	colormap gray;
-	subplot(3,3,1);
+	subplot(subplot_rows,subplot_cols,1);
 	imagesc(img);
-	title('Original Image');
+	title(strcat('Original Image: ', num2str(dim(1)), 'x', num2str(dim(2))));
 
-	subplot(3,3,2);
+	subplot(subplot_rows,subplot_cols,2);
 	imagesc(img_guess);
 	title({'Reconstructed Image ', strcat('Solve Time = ', num2str(solveTime), 's')});
 
-	subplot(3,3,3);
+	subplot(subplot_rows,subplot_cols,3);
 	weights = compute_paths(paths,dim);
 	imagesc(weights);
-	title('Paths');
+	title(strcat(num2str(num_paths), ' Paths'));
 
-	subplot(3,3,5);
+	subplot(subplot_rows,subplot_cols,5);
 	plot(err);
-	title('Error');
+	title(strcat('Error: ', num2str(size(err,1)), ' iterations'));
 
-	subplot(3,3,4);
+	subplot(subplot_rows,subplot_cols,4);
 	plot(energy);
 	title('Energy');
 
-	subplot(3,3,6);
+	subplot(subplot_rows,subplot_cols,6);
 	imagesc(reshape(abs(u-uguess), dim));
 	title(strcat('True Error = ', num2str(trueError)));
-
-	subplot(3,3,7);
-	imagesc(reshape(partial_uguess, scaled_dim));
-	title('scaled down uguess');
-
-	subplot(3,3,8);
-	imagesc(reshape(u0, dim));
-	title('better u0');
 
 	hold off
 

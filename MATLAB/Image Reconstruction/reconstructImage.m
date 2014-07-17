@@ -57,7 +57,7 @@ times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 path_style    = 'centered';
 
-param.p       = 1/2;  % We are using the l^p norm.
+param.p       = 1;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
 param.beta    = 1;  % Beta weights towards sparsity of gradient.
 param.mu      = .01;  % Parameter on the fidelity term.
@@ -104,33 +104,36 @@ img_guess = reshape(uguess, dim);
 
 if show_all_fig, figure; end
 
+subplot_rows = 2;
+subplot_cols = 3;
+
 hold on
 
 colormap gray;
-subplot(2,3,1);
+subplot(subplot_rows,subplot_cols,1);
 imagesc(img);
 title('Original Image');
 
-subplot(2,3,2);
+subplot(subplot_rows,subplot_cols,2);
 imagesc(img_guess);
 title({'Reconstructed Image ', strcat('Solve Time = ', num2str(solveTime), 's')});
 
-subplot(2,3,5);
-plot(err);
-title('Error');
-
-subplot(2,3,4);
-plot(energy);
-title('Energy');
-
-subplot(2,3,6);
-imagesc(reshape(abs(u-uguess), dim));
-title(strcat('True Error = ', num2str(trueError)));
-
-subplot(2,3,3);
+subplot(subplot_rows,subplot_cols,3);
 weights = compute_paths(paths,dim);
 imagesc(weights);
 title('Paths');
+
+subplot(subplot_rows,subplot_cols,5);
+plot(err);
+title('Error');
+
+subplot(subplot_rows,subplot_cols,4);
+plot(energy);
+title('Energy');
+
+subplot(subplot_rows,subplot_cols,6);
+imagesc(reshape(abs(u-uguess), dim));
+title(strcat('True Error = ', num2str(trueError)));
 
 hold off
 
