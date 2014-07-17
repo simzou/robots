@@ -49,13 +49,13 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'SheppLogan.png';
+file          = 'cornertest.png';
 
-num_paths     = 300;
+num_paths     = 100;
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
-path_style    = 'randombounce';
+path_style    = 'centered';
 
 param.p       = 1;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
@@ -83,7 +83,7 @@ dim = size(u_image);
 for i = 1:num_tests
 
 %% Generate the line-segment paths that we collect data from.
-paths = generatePaths(num_paths, dim, path_style);
+paths = generatePaths(num_paths, dim, path_style, [80 15]);
 
 %% Compute A, our path matrix, convert u to a vector, and compute Au=g.
 [A u g] = generateAug(u_image, paths);
