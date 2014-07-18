@@ -22,6 +22,6 @@ function weights = compute_paths(paths, grid_size)
 	end
 
 	if make_gif,
-        imwrite(im, map, 'paths.gif', 'DelayTime', .2, 'LoopCount', inf);
+        imwrite(im, map, 'paths.gif', 'DelayTime', .3, 'LoopCount', inf);
     end
 end

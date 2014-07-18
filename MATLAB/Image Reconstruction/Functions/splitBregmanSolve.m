@@ -29,11 +29,12 @@ end
 if ~isfield(param, 'maxiter')
     param.maxiter = 100;
 end
-if ~isfield(param, 'make_gif')
-    make_gif = false;
-    gif_filename = 'iter.gif';
+if ~isfield(param, 'makegif')
+    param.makegif = false;
 end
-
+if ~isfield(param, 'gifname')
+    param.gifname = 'iter.gif'
+end
 
 %% Initialize our iterates and other variables.
 n = prod(dim);
@@ -65,7 +66,7 @@ while iter <= param.maxiter && last_err >= param.tol
         
         % If make_gif is true, the iterates will be made into an animated gif
         
-        if make_gif,
+        if param.makegif,
 
             imagesc(reshape(u(:,2), dim)); colormap gray;
             % pause;
@@ -102,8 +103,8 @@ while iter <= param.maxiter && last_err >= param.tol
     iter = iter + 1;
 end
 
-if make_gif,
-    imwrite(im, map, gif_filename, 'DelayTime', .3, 'LoopCount', inf);
+if param.makegif,
+    imwrite(im, map, param.gifname, 'DelayTime', .1, 'LoopCount', inf);
 end
 
 % Finally, submit our output.
