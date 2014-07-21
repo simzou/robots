@@ -51,12 +51,12 @@ clc; clear all; close all;
 
 file          = 'test50.png';
 
-num_paths     = 300;
+num_paths     = 100;
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 path_style    = 'randombounce';
-num_reconstr  = 1;
+num_reconstr  = 2;
 
 param.p       = 1/2;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
@@ -108,9 +108,12 @@ for i = 1:num_tests
 
 		%% Now run the Split Bregman Algorithm to reconstruct u from A and g.
 		[partial_uguess partial_err partial_energy] = splitBregmanSolve( partial_A, partial_g, u0, scaled_dim, param );
+		param.lambda1 = param.lambda1 / 4;
+		% param.mu      = param.mu / 4;
+		param.lambda2 = param.lambda2 / 4;
 
-		err = [partial_err; err];
-		energy = [partial_energy; energy];
+		err = [err; partial_err];
+		energy = [energy; partial_energy];
 
 		scaled_dim_old = scaled_dim;
 		% imagesc(reshape(partial_uguess, scaled_dim)); colormap gray;
