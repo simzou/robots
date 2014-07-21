@@ -97,13 +97,8 @@ while iter <= param.maxiter && last_err >= param.tol
     %% Record our progress so far.
     
     err(iter)    = norm( u(:,2)-u(:,1) )/norm(u(:,1));
-<<<<<<< HEAD
     energy(iter) = param.alpha*sum(u(:,2))+param.beta*sum(gradX)+...
         param.beta*sum(gradY)+(param.mu/2)*norm(A*u(:,2)-g)^2;
-=======
-    energy(iter) = param.lambda1*sum(u(:,2))+param.lambda2*sum(gradX)+...
-        param.lambda2*sum(gradY)+(param.mu/2)*norm(A*u(:,2)-g)^2;
->>>>>>> 6591b3276ad0c5329cb68c3f75142e5bd7c17989
     last_err = err(iter);
     iter = iter + 1;
 end

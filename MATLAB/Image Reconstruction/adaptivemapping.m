@@ -49,9 +49,9 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'mulcorner.png';
+file          = 'spreadout.png';
 
-num_paths     = 200;
+num_paths     = 500;
 num_initpaths = num_paths/10;
 recal_after   = num_paths/10;
 
@@ -144,12 +144,12 @@ title('Original Image');
 
 subplot(subplot_rows,subplot_cols,2);
 imagesc(img_guess);
-title({'Reconstructed Image ', strcat('Solve Time = ',' ', num2str(solveTime), 's')});
+title({'Reconstructed Image ', strcat('Solve Time =',[' ' num2str(solveTime)], 's')});
 
 subplot(subplot_rows,subplot_cols,3);
 weights = compute_paths(paths,dim);
 imagesc(weights);
-title({strcat(num2str(num_paths), ' Paths'),'Adaptive Paths'});
+title(strcat(num2str(num_paths),' Adaptive Paths'));
 
 subplot(subplot_rows,subplot_cols,5);
 plot(err);
@@ -161,7 +161,7 @@ title('Energy');
 
 subplot(subplot_rows,subplot_cols,6);
 imagesc(reshape(abs(u-uguess), dim));
-title(strcat('True Error = ', num2str(trueError)));
+title(strcat('True Error =', [' ' num2str(trueError)]));
 
 hold off
 
