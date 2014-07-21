@@ -52,10 +52,12 @@ clc; clear all; close all;
 file          = 'smallareas.png';
 
 num_paths     = 500;
+num_initpaths = num_paths/10;
+recal_after   = num_paths/10;
+
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
-path_style    = 'randombounce';
 
 param.p       = 1;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
@@ -83,15 +85,46 @@ dim = size(u_image);
 for i = 1:num_tests
 
 %% Generate the line-segment paths that we collect data from.
-paths = generatePaths(num_paths, dim, path_style, [80 15 15 80]);
+paths = generatePaths(num_initpaths, dim, 'randombounce', [80 15]);
 
-%% Compute A, our path matrix, convert u to a vector, and compute Au=g.
+%% Compute A0, our path matrix, convert u to a vector, and compute Au=g.
 [A u g] = generateAug(u_image, paths);
 
 %% Now run the Split Bregman Algorithm to reconstruct u from A and g.
-u0 = zeros(prod(dim), 1);
+uguess = zeros(prod(dim), 1);
+centers = dim./2;
+
 tic;
-[uguess err energy] = splitBregmanSolve( A, g, u0, dim, param );
+
+for j = num_initpaths+1:recal_after:num_paths
+
+    newpaths = generatePaths(recal_after, dim, 'centered', centers);
+    paths = [paths ; newpaths];
+    
+    [Anew u gnew] = generateAug(u_image, newpaths);
+    
+    A = [A ; Anew];
+    g = [g ; gnew];
+
+    [uguess err energy] = splitBregmanSolve( A, g, uguess, dim, param );
+
+    img_guess = reshape(uguess, dim);
+
+    level = graythresh(img_guess);
+    bw = im2bw(img_guess, level);
+    bw = bwareaopen(bw, 50);
+    cc = bwconncomp(bw, 4);
+    graindata = regionprops(cc,'basic');
+
+    centers = [centers graindata.Centroid];
+    centers(2:2:end) = dim(2)-centers(2:2:end);
+
+    %[row,col] = find(img_guess == max(img_guess(:)));
+    %coords = [row dim(2)-col];
+    %centers = reshape(coords, 1, numel(coords));
+    
+end
+
 times(i)=toc;
 solveTime = times(i);
 trueError = norm(u-uguess) / norm(u);
@@ -115,13 +148,13 @@ imagesc(img);
 title('Original Image');
 
 subplot(subplot_rows,subplot_cols,2);
-imagesc(img_guess, [0 255]);
+imagesc(img_guess);
 title({'Reconstructed Image ', strcat('Solve Time = ', num2str(solveTime), 's')});
 
 subplot(subplot_rows,subplot_cols,3);
 weights = compute_paths(paths,dim);
 imagesc(weights);
-title({strcat(num2str(num_paths), ' Paths'),path_style});
+title({strcat(num2str(num_paths), ' Paths'),'Adaptive Paths'});
 
 subplot(subplot_rows,subplot_cols,5);
 plot(err);
