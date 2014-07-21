@@ -51,7 +51,7 @@ clc; clear all; close all;
 
 file          = 'mulcorner.png';
 
-num_paths     = 100;
+num_paths     = 200;
 num_initpaths = num_paths/10;
 recal_after   = num_paths/10;
 

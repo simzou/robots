@@ -33,11 +33,7 @@ if ~isfield(param, 'makegif')
     param.makegif = false;
 end
 if ~isfield(param, 'gifname')
-<<<<<<< HEAD
     param.gifname = 'iter.gif';
-=======
-    param.gifname = 'iter.gif'
->>>>>>> 6591b3276ad0c5329cb68c3f75142e5bd7c17989
 end
 
 %% Initialize our iterates and other variables.
