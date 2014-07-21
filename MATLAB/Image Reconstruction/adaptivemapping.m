@@ -114,9 +114,13 @@ for j = num_initpaths+1:recal_after:num_paths
     bw = im2bw(img_guess, level);
     bw = bwareaopen(bw, 50);
     cc = bwconncomp(bw, 4);
-    graindata = regionprops(cc,'basic');
+    %graindata = regionprops(cc,'basic');
+    
+    [j k] = ind2sub(dim,vertcat(cc.PixelIdxList{:}));
+    centers = [j k];
+    centers = reshape( centers', [1 numel(centers)]); 
 
-    centers = [centers graindata.Centroid];
+    %centers = [centers graindata.Centroid];
     centers(2:2:end) = dim(2)-centers(2:2:end);
 
     %[row,col] = find(img_guess == max(img_guess(:)));
