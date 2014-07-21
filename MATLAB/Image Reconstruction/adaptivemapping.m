@@ -49,9 +49,9 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'test10.png';
+file          = 'smallareas.png';
 
-num_paths     = 20;
+num_paths     = 500;
 num_initpaths = num_paths/10;
 recal_after   = num_paths/10;
 

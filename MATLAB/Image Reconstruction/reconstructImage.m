@@ -51,7 +51,7 @@ clc; clear all; close all;
 
 file          = 'smallareas.png';
 
-num_paths     = 200;
+num_paths     = 500;
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
