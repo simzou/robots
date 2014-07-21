@@ -29,6 +29,12 @@ end
 if ~isfield(param, 'maxiter')
     param.maxiter = 100;
 end
+if ~isfield(param, 'makegif')
+    param.makegif = false;
+end
+if ~isfield(param, 'gifname')
+    param.gifname = 'iter.gif'
+end
 
 %% Initialize our iterates and other variables.
 n = prod(dim);
@@ -48,8 +54,6 @@ by = zeros(n, 1);
 iter = 1; % Iteration we are on.
 last_err = err(iter);
 
-filename = 'split_iter.gif';
-
 %% Begin the Split Bregman algorithm.
 while iter <= param.maxiter && last_err >= param.tol
     for i = 1:param.N
@@ -60,20 +64,22 @@ while iter <= param.maxiter && last_err >= param.tol
         %% Perform step 1 of the algorithm, solve for u^{k+1}.
         u(:,2) = solveStep1(A, g, d, b, dx, bx, dy, by, dim, param);
         
-        % Uncomment these to see each iteration of the reconstruction.
+        % If make_gif is true, the iterates will be made into an animated gif
         
-        % imagesc(reshape(u(:,2), dim)); colormap gray;
-        % pause;
+        if param.makegif,
 
-        %% code for writing each iteration to a gif
-        % frame = getframe(1);
-        % im = frame2im(frame);
-        % [imind, cm] = rgb2ind(im, 256);
-        % if iter == 1;
-        %     imwrite(imind, cm, filename, 'gif', 'Loopcount', inf, 'DelayTime', 0);
-        % else
-        %     imwrite(imind, cm, filename, 'gif', 'WriteMode', 'append');
-        % end
+            imagesc(reshape(u(:,2), dim)); colormap gray;
+            % pause;
+
+            %% code for writing each iteration to a gif
+            frame = getframe;
+
+            if iter == 1;
+                [im, map] = rgb2ind(frame.cdata, 256);
+            else
+                im(:,:,1,iter) = rgb2ind(frame.cdata, map);
+            end
+        end
 
         %% Perform step 2 of the algorithm, p-shrinkage.
         [gradX gradY] = dirGradient(u(:,2), dim);
@@ -95,6 +101,10 @@ while iter <= param.maxiter && last_err >= param.tol
         param.beta*sum(gradY)+(param.mu/2)*norm(A*u(:,2)-g)^2;
     last_err = err(iter);
     iter = iter + 1;
+end
+
+if param.makegif,
+    imwrite(im, map, param.gifname, 'DelayTime', .1, 'LoopCount', inf);
 end
 
 % Finally, submit our output.

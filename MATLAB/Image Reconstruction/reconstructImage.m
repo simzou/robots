@@ -115,7 +115,7 @@ imagesc(img);
 title('Original Image');
 
 subplot(subplot_rows,subplot_cols,2);
-imagesc(img_guess);
+imagesc(img_guess, [0 255]);
 title({'Reconstructed Image ', strcat('Solve Time = ', num2str(solveTime), 's')});
 
 subplot(subplot_rows,subplot_cols,3);
