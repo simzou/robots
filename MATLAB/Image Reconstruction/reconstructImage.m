@@ -83,7 +83,7 @@ dim = size(u_image);
 for i = 1:num_tests
 
 %% Generate the line-segment paths that we collect data from.
-paths = generatePaths(num_paths, dim, path_style, [80 15]);
+paths = generatePaths(num_paths, dim, path_style, [80 15 15 80]);
 
 %% Compute A, our path matrix, convert u to a vector, and compute Au=g.
 [A u g] = generateAug(u_image, paths);

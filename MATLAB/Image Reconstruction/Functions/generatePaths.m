@@ -81,37 +81,20 @@ function paths = generatePaths(num_paths, dim, path_type, center)
         
         M = dim(1);
         N = dim(2);
-        m0 = center(1);
-        n0 = center(2);
-        
-        paths( 1, : ) = [ m0 n0 0 0 ];
         
         % Use disk point picking to choose the next point we go to.
-        for i = 1:num_paths-1
+        for i = 1:num_paths
+            
+            % Pick the point we want to be close to.
+            cent_ind = randi(size(center, 2)/2)*2-1;
+            m0 = center(cent_ind);
+            n0 = center(cent_ind+1);
+            
             % Choose an angle to go in.
             theta = 2*pi*rand(1);
             
             % Find the maximum distance we can go in that direction.
-            if 0 < theta && theta < pi/2
-                rmax = min( m0/sin(theta), (N-n0)/cos(theta) );
-            elseif pi/2 < theta && theta < pi
-                rmax = min( m0/sin(theta), -n0/cos(theta) );
-            elseif pi < theta && theta < (3/2)*pi
-                rmax = min( -(M-m0)/sin(theta), -n0/cos(theta) );
-            elseif (3/2)*pi < theta && theta < 2*pi
-                rmax = min( -(M-m0)/sin(theta), (N-n0)/cos(theta) );
-            elseif theta == 0 || theta == 2*pi;
-                rmax = N-n0;
-            elseif theta == pi/2
-                rmax = m0;
-            elseif theta == pi
-                rmax = n0;
-            elseif theta == (3/2)*pi
-                rmax = M-m0;
-            else
-                fprintf('pathing error')
-                rmax = 0;
-            end
+            rmax = find_max_dist( M, N, m0, n0, theta );
             
             % Pick a distance to go and go there.
             r = rmax*rand(1);
@@ -119,8 +102,12 @@ function paths = generatePaths(num_paths, dim, path_type, center)
             m = abs(m0 - r*sin(theta));
             n = abs(n0 + r*cos(theta));
             
-            paths(i, 3:4) = [m n];
-            paths(i+1, 1:2) = [m n];
+            % Connect our paths.
+            if i > 1
+                paths(i-1, 3:4) = [m n];
+            end
+            
+            paths(i, 1:2) = [m n];
             
         end
         
@@ -156,4 +143,29 @@ function point = get_random_point_on_edge(edge_num, dim)
 		y1 = 0;
 	end
 	point = [x1 y1];
+end
+
+function rmax = find_max_dist( M, N, m0, n0, theta )
+
+if 0 < theta && theta < pi/2
+    rmax = min( m0/sin(theta), (N-n0)/cos(theta) );
+elseif pi/2 < theta && theta < pi
+    rmax = min( m0/sin(theta), -n0/cos(theta) );
+elseif pi < theta && theta < (3/2)*pi
+    rmax = min( -(M-m0)/sin(theta), -n0/cos(theta) );
+elseif (3/2)*pi < theta && theta < 2*pi
+    rmax = min( -(M-m0)/sin(theta), (N-n0)/cos(theta) );
+elseif theta == 0 || theta == 2*pi;
+    rmax = N-n0;
+elseif theta == pi/2
+    rmax = m0;
+elseif theta == pi
+    rmax = n0;
+elseif theta == (3/2)*pi
+    rmax = M-m0;
+else
+    fprintf('pathing error')
+    rmax = 0;
+end
+
 end
