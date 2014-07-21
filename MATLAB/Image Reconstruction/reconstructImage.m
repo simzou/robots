@@ -49,13 +49,13 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'cornertest.png';
+file          = 'smallareas.png';
 
-num_paths     = 100;
+num_paths     = 200;
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
-path_style    = 'centered';
+path_style    = 'randombounce';
 
 param.p       = 1;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
@@ -121,7 +121,7 @@ title({'Reconstructed Image ', strcat('Solve Time = ', num2str(solveTime), 's')}
 subplot(subplot_rows,subplot_cols,3);
 weights = compute_paths(paths,dim);
 imagesc(weights);
-title('Paths');
+title({strcat(num2str(num_paths), ' Paths'),path_style});
 
 subplot(subplot_rows,subplot_cols,5);
 plot(err);
