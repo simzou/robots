@@ -49,9 +49,9 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'smallareas.png';
+file          = 'mulcorner.png';
 
-num_paths     = 500;
+num_paths     = 100;
 num_initpaths = num_paths/10;
 recal_after   = num_paths/10;
 
@@ -92,13 +92,16 @@ paths = generatePaths(num_initpaths, dim, 'randombounce', [80 15]);
 
 %% Now run the Split Bregman Algorithm to reconstruct u from A and g.
 uguess = zeros(prod(dim), 1);
-centers = dim./2;
+[uguess err energy] = splitBregmanSolve( A, g, uguess, dim, param );
+
+img_guess = reshape(uguess, dim);
+points = segmentImg(img_guess,dim);
 
 tic;
 
 for j = num_initpaths+1:recal_after:num_paths
 
-    newpaths = generatePaths(recal_after, dim, 'centered', centers);
+    newpaths = generatePaths(recal_after, dim, 'centered', points);
     paths = [paths ; newpaths];
     
     [Anew u gnew] = generateAug(u_image, newpaths);
@@ -109,20 +112,8 @@ for j = num_initpaths+1:recal_after:num_paths
     [uguess err energy] = splitBregmanSolve( A, g, uguess, dim, param );
 
     img_guess = reshape(uguess, dim);
-
-    level = graythresh(img_guess);
-    bw = im2bw(img_guess, level);
-    bw = bwareaopen(bw, 50);
-    cc = bwconncomp(bw, 4);
-    %graindata = regionprops(cc,'basic');
+    points = segmentImg(img_guess,dim);
     
-    [j k] = ind2sub(dim,vertcat(cc.PixelIdxList{:}));
-    centers = [j k];
-    centers = reshape( centers', [1 numel(centers)]); 
-
-    %centers = [centers graindata.Centroid];
-    centers(2:2:end) = dim(2)-centers(2:2:end);
-
     %[row,col] = find(img_guess == max(img_guess(:)));
     %coords = [row dim(2)-col];
     %centers = reshape(coords, 1, numel(coords));
@@ -153,7 +144,7 @@ title('Original Image');
 
 subplot(subplot_rows,subplot_cols,2);
 imagesc(img_guess);
-title({'Reconstructed Image ', strcat('Solve Time = ', num2str(solveTime), 's')});
+title({'Reconstructed Image ', strcat('Solve Time = ',' ', num2str(solveTime), 's')});
 
 subplot(subplot_rows,subplot_cols,3);
 weights = compute_paths(paths,dim);

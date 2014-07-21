@@ -49,7 +49,7 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'smallareas.png';
+file          = 'mulcorner.png';
 
 num_paths     = 500;
 num_tests     = 1;
@@ -116,7 +116,7 @@ title('Original Image');
 
 subplot(subplot_rows,subplot_cols,2);
 imagesc(img_guess, [0 255]);
-title({'Reconstructed Image ', strcat('Solve Time = ', num2str(solveTime), 's')});
+title({'Reconstructed Image ', strcat('Solve Time = ', ' ',num2str(solveTime), 's')});
 
 subplot(subplot_rows,subplot_cols,3);
 weights = compute_paths(paths,dim);
