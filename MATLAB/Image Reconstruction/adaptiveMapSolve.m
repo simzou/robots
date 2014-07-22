@@ -49,15 +49,16 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'test10.png';
+file          = 'smallareas.png';
 
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 
 param.tol       = .01;
-param.maxiter   = 100;
-num_initpaths = 2;
+param.maxpaths  = 1000;
+param.stepsize  = 10;
+num_initpaths   = param.maxpaths/10;
 
 view_profile  = false;
 show_all_fig  = false;
@@ -93,7 +94,6 @@ initenergy = energy(end);
 
 %% Collect some more results.
 
-paths = [initpaths ; paths];
 err = [initerr ; err];
 energy = [initenergy ; energy];
 
@@ -126,11 +126,12 @@ title({'Reconstructed Image ', strcat('Solve Time =',[' ' num2str(solveTime)], '
 subplot(subplot_rows,subplot_cols,3);
 weights = compute_paths(paths,dim);
 imagesc(weights);
-title(strcat(num2str(size(paths,1)),' Adaptive Paths'));
+title({strcat(num2str(size(paths,1)),' Adaptive Paths'),...
+    strcat(num2str(param.stepsize),' Paths/Iter')});
 
 subplot(subplot_rows,subplot_cols,4);
 plot(energy);
-title({'Energy', strcat('Iter =', [' ' num2str(size(err))])});
+title({'Energy', strcat('Iter =', [' ' num2str(size(err,1))])});
 
 subplot(subplot_rows,subplot_cols,5);
 plot(err);

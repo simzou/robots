@@ -4,8 +4,8 @@ function [uguess paths err energy] = adaptiveMapping(uguess, u_image, paths, par
 if ~isfield(param, 'tol')
     param.tol = .1;
 end
-if ~isfield(param, 'maxiter')
-    param.maxiter = .1;
+if ~isfield(param, 'maxpaths')
+    param.maxpaths = numel(u_image)/20;
 end
 if ~isfield(param, 'stepsize')
     param.stepsize = int8((numel(u_image)/200));
@@ -15,11 +15,16 @@ dim = size(u_image);
 [A, ~, g] = generateAug(u_image, paths);
 
 % Preallocating our error and energy vectors.
-err    = param.tol*ones(param.maxiter, 1);
-energy = zeros(param.maxiter, 1);
+maxiter = int8(param.maxpaths/param.stepsize);
 
+err    = param.tol*ones(maxiter, 1);
+energy = zeros(maxiter, 1);
+
+numpaths = size(paths,1);
 iter = 1; % Iteration we are on.
-while iter <= param.maxiter && err(iter) >= param.tol
+lasterr = err(iter);
+
+while numpaths < param.maxpaths && lasterr >= param.tol
     
     points = segmentImg(uguess,dim);
     
@@ -30,6 +35,7 @@ while iter <= param.maxiter && err(iter) >= param.tol
     end
     
     paths = [paths ; newpaths];
+    numpaths = size(paths,1);
     
     [Anew, ~, gnew] = generateAug(u_image, newpaths);
     
@@ -38,10 +44,11 @@ while iter <= param.maxiter && err(iter) >= param.tol
     
     uprev = uguess;
     [uguess, ~ , energies] = splitBregmanSolve( A, g, uguess, dim, param );
-   
+    
     err(iter) = norm(uguess-uprev)/norm(uprev);
     energy(iter) = energies(end);
     
+    lasterr = err(iter);
     iter = iter + 1;
     
 end
