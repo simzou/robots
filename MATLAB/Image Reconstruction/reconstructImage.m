@@ -49,7 +49,7 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'spreadout.png';
+file          = 'test50.png';
 
 num_paths     = 500;
 num_tests     = 1;
@@ -79,14 +79,18 @@ if view_profile, profile on; end
 %% Read our image in.
 u_image = rgb2gray(imread(file));
 dim = size(u_image);
+dim = [800 600];
+dim = dim/20
 
 for i = 1:num_tests
 
 %% Generate the line-segment paths that we collect data from.
-paths = generatePaths(num_paths, dim, path_style, [80 15 15 80]);
+%paths = generatePaths(num_paths, dim, path_style, [80 15 15 80]);
 
 %% Compute A, our path matrix, convert u to a vector, and compute Au=g.
-[A u g] = generateAug(u_image, paths);
+[paths g] = paths_g_from_csv('data_collection.csv')
+paths = paths/20;
+[A, u, ~] = generateAug(zeros(dim), paths);
 
 %% Now run the Split Bregman Algorithm to reconstruct u from A and g.
 u0 = zeros(prod(dim), 1);
