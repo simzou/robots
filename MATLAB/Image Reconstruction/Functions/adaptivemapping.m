@@ -1,56 +1,53 @@
-function [uguess err energy] = adaptiveMapping(A, g, uguess, dim, param)
+function [uguess paths err energy] = adaptiveMapping(uguess, u_image, paths, param)
 
 %% If certain parameters aren't specified, use these defaults.
 if ~isfield(param, 'tol')
     param.tol = .1;
 end
 if ~isfield(param, 'maxiter')
-    param.tol = .1;
-end
-if ~isfield(param, 'initpaths')
-    param.num_initpaths = 50;
+    param.maxiter = .1;
 end
 if ~isfield(param, 'stepsize')
-    param.recal_after = 50;
+    param.stepsize = int8((numel(u_image)/200));
 end
+
+dim = size(u_image);
+[A, ~, g] = generateAug(u_image, paths);
 
 % Preallocating our error and energy vectors.
 err    = param.tol*ones(param.maxiter, 1);
 energy = zeros(param.maxiter, 1);
 
-%% Generate the line-segment paths that we collect data from.
-paths = generatePaths(param.initpaths, dim, 'randombounce', [80 15]);
-
-%% Compute A0, our path matrix, convert u to a vector, and compute Au=g.
-[A u g] = generateAug(u_image, paths);
-
-%% Now run the Split Bregman Algorithm to reconstruct u from A and g.
-uguess = zeros(prod(dim), 1);
-[uguess err energy] = splitBregmanSolve( A, g, uguess, dim, param );
-
-points = segmentImg(uguess,dim);
-
-tic;
-
-for j = num_initpaths+1:recal_after:num_paths
-
-    newpaths = generatePaths(recal_after, dim, 'centered', points);
+iter = 1; % Iteration we are on.
+while iter <= param.maxiter && err(iter) >= param.tol
+    
+    points = segmentImg(uguess,dim);
+    
+    if isempty(points)
+        newpaths = generatePaths(param.stepsize, dim, 'randombounce');
+    else
+        newpaths = generatePaths(param.stepsize, dim, 'centered', points);
+    end
+    
     paths = [paths ; newpaths];
     
-    [Anew u gnew] = generateAug(u_image, newpaths);
+    [Anew, ~, gnew] = generateAug(u_image, newpaths);
     
     A = [A ; Anew];
     g = [g ; gnew];
-
-    [uguess err energy] = splitBregmanSolve( A, g, uguess, dim, param );
-
-    points = segmentImg(uguess,dim);
+    
+    uprev = uguess;
+    [uguess, ~ , energies] = splitBregmanSolve( A, g, uguess, dim, param );
+   
+    err(iter) = norm(uguess-uprev)/norm(uprev);
+    energy(iter) = energies(end);
+    
+    iter = iter + 1;
     
 end
 
-times(i)=toc;
-solveTime = times(i);
-trueError = norm(u-uguess) / norm(u);
-errors(i) = trueError;
+% Finally, submit our output.
+err = err(1:iter-1);
+energy = energy(1:iter-1);
 
 end

@@ -12,7 +12,5 @@ u = zeros(dim);
 
 [A, ~, ~] = generateAug( u, paths);
 
-
-
 end
 
