@@ -1,4 +1,4 @@
-#!C:\Python27\python.exe
+#!/usr/bin/python
 
 ## Author: Siddarth Srinivasan, UCLA REU 2014
 ## Date Created: 8th July 2014
@@ -23,8 +23,8 @@ import cgi, cgitb
 cgitb.enable()
 
 import sys
-sys.path.append("/Library/Frameworks/Python.framework/Versions/2.7/lib/" + 
-                "python2.7/site-packages/")
+#sys.path.append("/Library/Frameworks/Python.framework/Versions/2.7/lib/" + 
+#               "python2.7/site-packages/")
 
 import mysql.connector as conn
 import time
@@ -166,7 +166,7 @@ def connectDB(dbName):
     """
 
     db = conn.connect(host = 'localhost', user = 'root', \
-                      passwd = '19*geroniMO', db = dbName)
+                      passwd = 'uclaRobots14', db = dbName)
     cursor = db.cursor()
     return db,cursor
 
