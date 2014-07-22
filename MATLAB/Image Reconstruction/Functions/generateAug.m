@@ -13,7 +13,7 @@ siglength = size(u,1)*size(u,2);
 A = zeros(size(paths,1),siglength);
 
 utemp = zeros(size(u)+[1 1]);
-utemp(2:size(u,1)+1,1:size(u,2)) = u(:,:);
+utemp(2:size(u,1)+1,1:size(u,2)) = u;
 
 for i=2:size(u,1)+1
     for j=1:size(u,2)
@@ -23,9 +23,9 @@ end
 
 for i=1:size(paths,1)
     
-    path = paths(i,:);
+    path = round(paths(i,1:end));
     pathmat = zeros(size(u));
-    
+
     xstart = path(1,1); xend = path(1,3); 
     ystart = path(1,2); yend = path(1,4);
     
@@ -43,7 +43,7 @@ for i=1:size(paths,1)
     end
     
     if xstart==xend && ystart==yend
-        fprintf('hi')
+        % Do nothing here.
     elseif xstart==xend && ystart~=yend
         pathmat(ystart:yend, xstart) = 1;
     elseif ystart==yend && xstart~=xend

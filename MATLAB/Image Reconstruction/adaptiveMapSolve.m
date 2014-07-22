@@ -51,23 +51,13 @@ clc; clear all; close all;
 
 file          = 'test10.png';
 
-num_paths     = 100;
-param.initpaths = num_paths/10;
-param.stepsize = num_paths/10;
-
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 
-param.p         = 1;  % We are using the l^p norm.
-param.alpha     = 1;  % Alpha weights towards sparsity of the signal.
-param.beta      = 1;  % Beta weights towards sparsity of gradient.
-param.mu        = .01;  % Parameter on the fidelity term.
-param.lambda1   = .1; % Coefficient on the regular constraint.
-param.lambda2   = 1;  % Coefficient on the gradient constraints.
-param.N         = 1;  % Number of inner loops.
-param.tolSB     = 1/255; % We iterate until the rel. err is under this.
-param.maxiterSB = 100; % Split Bregman performs this many iterations at most.
+param.tol       = .01;
+param.maxiter   = 100;
+num_initpaths = 2;
 
 view_profile  = false;
 show_all_fig  = false;
@@ -76,51 +66,44 @@ show_all_fig  = false;
 % Do not touch below here unless you know what you are doing. %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-if view_profile, profile on; end
+if view_profile profile on; end
 
 %% Read our image in.
 u_image = rgb2gray(imread(file));
 dim = size(u_image);
 
 for i = 1:num_tests
-
+tic;
+    
 %% Generate the line-segment paths that we collect data from.
-paths = generatePaths(param.initpaths, dim, 'randombounce');
+initpaths = generatePaths(num_initpaths, dim, 'randombounce');
 
 %% Compute A0, our path matrix, convert u to a vector, and compute Au=g.
-[A u g] = generateAug(u_image, paths);
+[A, u, g] = generateAug(u_image, initpaths);
 
 %% Now run the Split Bregman Algorithm to reconstruct u from A and g.
-u0 = zeros(prod(dim), 1);
-[uguess err energy] = splitBregmanSolve( A, g, u0, dim, param );
+uguess = zeros(prod(dim), 1); uold = uguess;
+[uguess, ~, energy] = splitBregmanSolve( A, g, uguess, dim, param );
 
-points = segmentImg(uguess,dim);
+initerr = norm(u-uguess) / norm(u);
+initenergy = energy(end);
 
-tic;
+%% Run the adaptive reconstruction.
+[uguess paths err energy] = adaptiveMapping(uguess, u_image, initpaths, param);
 
-for j = param.initpaths+1:param.stepsize:num_paths
+%% Collect some more results.
 
-    newpaths = generatePaths(param.stepsize, dim, 'centered', points);
-    paths = [paths ; newpaths];
-    
-    [Anew u gnew] = generateAug(u_image, newpaths);
-    
-    A = [A ; Anew];
-    g = [g ; gnew];
-
-    [uguess err energy] = splitBregmanSolve( A, g, uguess, dim, param );
-
-    points = segmentImg(uguess,dim);
-    
-end
+paths = [initpaths ; paths];
+err = [initerr ; err];
+energy = [initenergy ; energy];
 
 times(i)=toc;
+
 solveTime = times(i);
 trueError = norm(u-uguess) / norm(u);
 errors(i) = trueError;
 
-%% Now plot our results.
-
+%% Now plot our findings.
 img = reshape(u, dim);
 img_guess = reshape(uguess, dim);
 
@@ -143,19 +126,20 @@ title({'Reconstructed Image ', strcat('Solve Time =',[' ' num2str(solveTime)], '
 subplot(subplot_rows,subplot_cols,3);
 weights = compute_paths(paths,dim);
 imagesc(weights);
-title(strcat(num2str(num_paths),' Adaptive Paths'));
+title(strcat(num2str(size(paths,1)),' Adaptive Paths'));
+
+subplot(subplot_rows,subplot_cols,4);
+plot(energy);
+title({'Energy', strcat('Iter =', [' ' num2str(size(err))])});
 
 subplot(subplot_rows,subplot_cols,5);
 plot(err);
 title('Error');
 
-subplot(subplot_rows,subplot_cols,4);
-plot(energy);
-title('Energy');
-
 subplot(subplot_rows,subplot_cols,6);
 imagesc(reshape(abs(u-uguess), dim));
-title(strcat('True Error =', [' ' num2str(trueError)]));
+title({strcat('True Error =', [' ' num2str(trueError)]), ...
+    strcat('Tol =', [' ' num2str(param.tol)])});
 
 hold off
 

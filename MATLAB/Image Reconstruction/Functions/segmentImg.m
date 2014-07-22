@@ -1,4 +1,6 @@
-function points = segmentImg(img_guess,dim)
+function points = segmentImg(uguess,dim)
+
+img_guess = reshape(uguess, dim);
 
 level = graythresh(img_guess);
 bw = im2bw(img_guess, level);
