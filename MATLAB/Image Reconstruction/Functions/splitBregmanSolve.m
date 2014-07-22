@@ -23,11 +23,11 @@ end
 if ~isfield(param, 'N')
     param.N = 1;
 end
-if ~isfield(param, 'tol')
-    param.tol = 1/250;
+if ~isfield(param, 'tolSB')
+    param.tolSB = 1/250;
 end
-if ~isfield(param, 'maxiter')
-    param.maxiter = 100;
+if ~isfield(param, 'maxiterSB')
+    param.maxiterSB = 100;
 end
 if ~isfield(param, 'makegif')
     param.makegif = false;
@@ -40,8 +40,8 @@ end
 n = prod(dim);
 
 % Preallocating our error and energy vectors.
-err    = param.tol*ones(param.maxiter, 1);
-energy = zeros(param.maxiter, 1);
+err    = param.tolSB*ones(param.maxiterSB, 1);
+energy = zeros(param.maxiterSB, 1);
 
 u  = [zeros(n,1) u0];
 d  = zeros(n, 1);
@@ -55,7 +55,7 @@ iter = 1; % Iteration we are on.
 last_err = err(iter);
 
 %% Begin the Split Bregman algorithm.
-while iter <= param.maxiter && last_err >= param.tol
+while iter <= param.maxiterSB && last_err >= param.tolSB
     for i = 1:param.N
         
         % Save our previous iteration's value for u.

@@ -23,7 +23,7 @@ function lhs = makeLHS(A, u, dim, param)
 
 [gradX gradY] = dirGradient(u, dim);
 
-term1 = A' * (A * u);
+term1 = A'*(A*u);
 term2 = u;
 term3 = dirGradient(gradX, dim, 'transpose');
 [~, term4] = dirGradient(gradY, dim, 'transpose');

@@ -49,7 +49,7 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'spreadout.png';
+file          = 'smallareas.png';
 
 num_paths     = 500;
 num_tests     = 1;

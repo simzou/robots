@@ -49,25 +49,25 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'spreadout.png';
+file          = 'test10.png';
 
-num_paths     = 500;
-num_initpaths = num_paths/10;
-recal_after   = num_paths/10;
+num_paths     = 100;
+param.initpaths = num_paths/10;
+param.stepsize = num_paths/10;
 
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 
-param.p       = 1;  % We are using the l^p norm.
-param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
-param.beta    = 1;  % Beta weights towards sparsity of gradient.
-param.mu      = .01;  % Parameter on the fidelity term.
-param.lambda1 = .1; % Coefficient on the regular constraint.
-param.lambda2 = 1;  % Coefficient on the gradient constraints.
-param.N       = 1;  % Number of inner loops.
-param.tol     = 1/255; % We iterate until the rel. err is under this.
-param.maxiter = 100; % Split Bregman performs this many iterations at most.
+param.p         = 1;  % We are using the l^p norm.
+param.alpha     = 1;  % Alpha weights towards sparsity of the signal.
+param.beta      = 1;  % Beta weights towards sparsity of gradient.
+param.mu        = .01;  % Parameter on the fidelity term.
+param.lambda1   = .1; % Coefficient on the regular constraint.
+param.lambda2   = 1;  % Coefficient on the gradient constraints.
+param.N         = 1;  % Number of inner loops.
+param.tolSB     = 1/255; % We iterate until the rel. err is under this.
+param.maxiterSB = 100; % Split Bregman performs this many iterations at most.
 
 view_profile  = false;
 show_all_fig  = false;
@@ -85,23 +85,22 @@ dim = size(u_image);
 for i = 1:num_tests
 
 %% Generate the line-segment paths that we collect data from.
-paths = generatePaths(num_initpaths, dim, 'randombounce', [80 15]);
+paths = generatePaths(param.initpaths, dim, 'randombounce');
 
 %% Compute A0, our path matrix, convert u to a vector, and compute Au=g.
 [A u g] = generateAug(u_image, paths);
 
 %% Now run the Split Bregman Algorithm to reconstruct u from A and g.
-uguess = zeros(prod(dim), 1);
-[uguess err energy] = splitBregmanSolve( A, g, uguess, dim, param );
+u0 = zeros(prod(dim), 1);
+[uguess err energy] = splitBregmanSolve( A, g, u0, dim, param );
 
-img_guess = reshape(uguess, dim);
-points = segmentImg(img_guess,dim);
+points = segmentImg(uguess,dim);
 
 tic;
 
-for j = num_initpaths+1:recal_after:num_paths
+for j = param.initpaths+1:param.stepsize:num_paths
 
-    newpaths = generatePaths(recal_after, dim, 'centered', points);
+    newpaths = generatePaths(param.stepsize, dim, 'centered', points);
     paths = [paths ; newpaths];
     
     [Anew u gnew] = generateAug(u_image, newpaths);
@@ -111,12 +110,7 @@ for j = num_initpaths+1:recal_after:num_paths
 
     [uguess err energy] = splitBregmanSolve( A, g, uguess, dim, param );
 
-    img_guess = reshape(uguess, dim);
-    points = segmentImg(img_guess,dim);
-    
-    %[row,col] = find(img_guess == max(img_guess(:)));
-    %coords = [row dim(2)-col];
-    %centers = reshape(coords, 1, numel(coords));
+    points = segmentImg(uguess,dim);
     
 end
 
