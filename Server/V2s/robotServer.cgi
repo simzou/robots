@@ -23,12 +23,13 @@ import cgi, cgitb
 cgitb.enable()
 
 import sys
-#sys.path.append("/Library/Frameworks/Python.framework/Versions/2.7/lib/" + 
-#               "python2.7/site-packages/")
+sys.path.append("/Library/Frameworks/Python.framework/Versions/2.7/lib/" + 
+                "python2.7/site-packages/")
 
 import mysql.connector as conn
 import time
 import math
+import random
 import json
 import serial
 
@@ -89,14 +90,15 @@ def jsonResponse(response):
     """
 
     j = {
-            'Response': response[0]
+            'Response': response[0],
+            'Time': response[1]
         }
 
     print json.dumps(j, indent = 4, separators=(',', ': '))
 
 
 ################################################################################
-#                               CAMERA HANDLER
+#                               CAMERA HANDLERS
 ################################################################################
 
 def locate():
@@ -136,7 +138,7 @@ def locate():
             # looking for
             if raw_data[loopIndex] == "*":
                 startData = True
-            # Upon entering data 'reading' mode, check for end-of-data-packet and
+            # Upon entering data 'reading' mode check for end-of-data-packet and
             # end of single piece of data
             elif startData:
                 if raw_data[loopIndex] == "|":
@@ -151,9 +153,36 @@ def locate():
         #print locationData              ## FIXME! - Unnecessary printing
         ser.close()
 
-        return locationData[1], locationData[2]
+        return locationData[1], locationData[2], locationData[3]
     else:
-        return None, None
+        return None, None, None
+
+
+def findMaxTime(x, y, theta):
+    """
+        Given the robot's position and heading, the function returns the max
+        time for which the robot can travel before it will go off the edge.
+        The time returned is expected to be the value used by the motors in
+        driving the robot.
+    """
+
+    x_min = 60
+    y_min = 80
+    x_max = 600
+    y_max = 800
+
+    pixelsPerSecond = 150.0
+    newX = x
+    newY = y
+    c = 0.5
+
+    while (newX > x_min and newX < x_max and newY > y_min and newY < y_max):
+        newX = x + c * math.cos(theta)
+        newY = y + c * math.sin(theta)
+        c = c + 0.5
+
+    # return the magnitude, converted to milliseconds
+    return int((c - 0.5)/pixelsPerSecond * 1000)
 
 
 ################################################################################
@@ -257,10 +286,13 @@ def inNewLocation(dbName, x, y, numDataPt):
 if __name__ == "__main__":
     try:       
         # The database to save to
-        dbName = "Log1"
+        dbName = "Log2"
 
         # The number of data points collected
         numDataPt = numDataCollected(dbName)
+
+        # The minimum time the robot will travel in any path
+        minTimeToTravel = 700
 
         # See if any form data about the has been submitted
         submittedData = cgi.FieldStorage()
@@ -273,26 +305,33 @@ if __name__ == "__main__":
             state = int(state)
             saveStateToDB(dbName, state)   # Record the state in the database
         
-            x, y = locate()
+            x, y, theta = locate()
 
             # If the camera has located the Arduino
-            if x and y:
+            if x and y and theta:
                 x = int(x)
                 y = int(y)
+                theta = float(theta)
                 # Save its position to the database, along with data if it has
                 # been collected, and let the robot know.
                 if state == 0:
                     saveStartToDB(dbName, x, y)
-                    jsonResponse([True])
-                    #print x, y
+
+                    maxTime = findMaxTime(x, y, theta)
+                    if maxTime < minTimeToTravel:
+                        time = maxTime
+                    else:
+                        time = random.randint(minTimeToTravel, maxTime)
+                    jsonResponse([True, time])
+                    # print x, y
 
                 elif state == 1:
                     if inNewLocation(dbName, x, y, numDataPt):
                         data = int(submittedData.getvalue("data"))
                         saveEndDataToDB(dbName, x, y, data, numDataPt)
-                        jsonResponse([True])
+                        jsonResponse([True, 1000])
                     else:
-                        jsonResponse([False])
+                        jsonResponse([False, 0])
 
                 else:
                     print "Error: Unknown State"
@@ -300,7 +339,7 @@ if __name__ == "__main__":
             # If the robot has sent a request but it has not been located,
             # respond to let it know not to move.
             else:
-                jsonResponse([False])
+                jsonResponse([False, 0])
 
         # This is for the human-reader case, when no state has been submitted.
         else:
