@@ -23,8 +23,8 @@ import cgi, cgitb
 cgitb.enable()
 
 import sys
-sys.path.append("/Library/Frameworks/Python.framework/Versions/2.7/lib/" + 
-                "python2.7/site-packages/")
+# sys.path.append("/Library/Frameworks/Python.framework/Versions/2.7/lib/" + 
+#                 "python2.7/site-packages/")
 
 import mysql.connector as conn
 import time
@@ -111,14 +111,14 @@ def locate():
                 *|x|y|theta!---------------------------...
     """
 
-    ser = serial.Serial('COM8', 115200, timeout=2, xonxoff=False,
+    ser = serial.Serial('/dev/tty.PL2303-00001014', 115200, timeout=2, xonxoff=False,
                                                      rtscts=False, dsrdtr=False)
     ser.flushInput()
     ser.flushOutput()
 
     raw_data = ser.readline()
     t = time.time()
-    TIMEOUT = 5
+    TIMEOUT = 3
     # Read data
     while not raw_data and (time.time() - t < TIMEOUT):
         raw_data = ser.readline()
@@ -166,12 +166,12 @@ def findMaxTime(x, y, theta):
         driving the robot.
     """
 
-    x_min = 60
+    x_min = 40
     y_min = 80
     x_max = 600
     y_max = 800
 
-    pixelsPerSecond = 150.0
+    pixelsPerSecond = 160.0
     newX = x
     newY = y
     c = 0.5
@@ -286,13 +286,13 @@ def inNewLocation(dbName, x, y, numDataPt):
 if __name__ == "__main__":
     try:       
         # The database to save to
-        dbName = "Log2"
+        dbName = "Log1"
 
         # The number of data points collected
         numDataPt = numDataCollected(dbName)
 
         # The minimum time the robot will travel in any path
-        minTimeToTravel = 700
+        minTimeToTravel = 1500
 
         # See if any form data about the has been submitted
         submittedData = cgi.FieldStorage()
