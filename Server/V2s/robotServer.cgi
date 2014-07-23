@@ -23,16 +23,27 @@ import cgi, cgitb
 cgitb.enable()
 
 import sys
-# sys.path.append("/Library/Frameworks/Python.framework/Versions/2.7/lib/" + 
-#                 "python2.7/site-packages/")
+sys.path.append("/Library/Frameworks/Python.framework/Versions/2.7/lib/" + 
+                "python2.7/site-packages/")
 
 import mysql.connector as conn
 import time
 import math
+import operator
 import random
 import json
 import serial
 
+target = [
+            (80, 100),
+            (580, 200),
+            (80, 300),
+            (580, 400),
+            (80, 500),
+            (580, 600),
+            (80, 700)
+         ]
+numTargets = len(target)
 
 ################################################################################
 #                             HTML HANDLERS
@@ -119,6 +130,7 @@ def locate():
     raw_data = ser.readline()
     t = time.time()
     TIMEOUT = 3
+
     # Read data
     while not raw_data and (time.time() - t < TIMEOUT):
         raw_data = ser.readline()
@@ -184,6 +196,66 @@ def findMaxTime(x, y, theta):
     # return the magnitude, converted to milliseconds
     return int((c - 0.5)/pixelsPerSecond * 1000)
 
+
+def findNextTime(startX, startY, theta, endX, endY):
+    """
+        Function takes in the robot's starting position and heading and the 
+        ending location and returns the angle to turn (between -pi to pi) and 
+        the distance between the two points (i.e. the distance for the robot
+        to travel)
+    """
+
+    pixelsPerSecond = 160.0
+    radsPerSecond = 1.25
+
+    # a is the unit vector for the direction the robot is facing
+    a = [math.cos(theta), math.sin(theta), 0]
+
+    # b is the vector from start point to end point
+    b = [endX - startX, endY - startY, 0]
+    b_mag = math.sqrt(b[0]**2 + b[1]**2)
+
+    # shouldn't happen, but in case our start and end points are the same
+    if b_mag == 0:
+        amountToTurn = 0.0
+        return 1000, 1000
+    else:
+        distanceToTravel = b_mag
+
+        # normalizing b
+        b = [elem / float(b_mag) for elem in b]
+
+        # a dot b = |a||b| cos (theta)
+        amountToTurn = math.acos(dotProduct(a,b))
+
+        # if the direction of the third element of the cross product is
+        # negative, we turn right (so angle is negative), else we turn left
+        c = crossProduct(a,b)
+        if c[2] < 0:
+            print "Here", startX, startY, theta, endX, endY
+            return (int((-amountToTurn)/radsPerSecond * 1000),
+                    int(distanceToTravel/pixelsPerSecond * 1000))
+        else:
+            print "There", startX, startY, theta, endX, endY
+            return (int((amountToTurn)/radsPerSecond * 1000),
+                    int(distanceToTravel/pixelsPerSecond * 1000))
+
+
+def dotProduct(a, b):
+    """
+        Helper function - dot product of two vectors a and b
+    """
+    return sum(map( operator.mul, a, b))
+
+def crossProduct(a, b):
+    """
+        Helper function - cross product of two vectors a and b
+    """
+    c = [a[1]*b[2] - a[2]*b[1],
+         a[2]*b[0] - a[0]*b[2],
+         a[0]*b[1] - a[1]*b[0]]
+    return c
+    
 
 ################################################################################
 #                             MySQL DATABASE HANDLERS
@@ -317,19 +389,32 @@ if __name__ == "__main__":
                 if state == 0:
                     saveStartToDB(dbName, x, y)
 
-                    maxTime = findMaxTime(x, y, theta)
-                    if maxTime < minTimeToTravel:
-                        time = maxTime
-                    else:
-                        time = random.randint(minTimeToTravel, maxTime)
-                    jsonResponse([True, time])
+                    # maxTime = findMaxTime(x, y, theta)
+                    # if maxTime < minTimeToTravel:
+                    #     time = maxTime
+                    # else:
+                    #     time = random.randint(minTimeToTravel, maxTime)
+                    # jsonResponse([True, time])
                     # print x, y
+
+                    _, timeToTravel = findNextTime(x, y, theta, 
+                                  target[numDataPt % numTargets][0],
+                                  target[numDataPt % numTargets][1])
+                    jsonResponse([True, timeToTravel])
 
                 elif state == 1:
                     if inNewLocation(dbName, x, y, numDataPt):
                         data = int(submittedData.getvalue("data"))
                         saveEndDataToDB(dbName, x, y, data, numDataPt)
-                        jsonResponse([True, 1000])
+                        # jsonResponse([True, 1000])
+
+                        # When the robot makes the request, it has not yet
+                        # confirmed the travel of a new path, which is why
+                        # we have numDataPt + 1
+                        timeToTurn, _ = findNextTime(x, y, theta,
+                                        target[numDataPt % numTargets][0],
+                                        target[numDataPt % numTargets][1])
+                        jsonResponse([True, timeToTurn])
                     else:
                         jsonResponse([False, 0])
 
