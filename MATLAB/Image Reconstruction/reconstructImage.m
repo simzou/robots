@@ -88,7 +88,7 @@ for i = 1:num_tests
 %paths = generatePaths(num_paths, dim, path_style, [80 15 15 80]);
 
 %% Compute A, our path matrix, convert u to a vector, and compute Au=g.
-[paths g] = paths_g_from_csv('data_collection.csv')
+[paths g] = paths_g_from_csv('data_collection1+2.csv')
 paths = paths/20;
 [A, u, ~] = generateAug(zeros(dim), paths);
 
