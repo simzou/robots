@@ -1,4 +1,3 @@
-from __future__ import division
 import math
 import operator
 
@@ -31,7 +30,7 @@ def determineRobotMovement(startX, startY, theta, endX, endY):
 		amountToTurn = 0.0
 	else:
 		# normalizing b
-		b = [elem / b_mag for elem in b]
+		b = [elem / float(b_mag) for elem in b]
 
 		# a dot b = |a||b| cos (theta)
 		amountToTurn = math.acos(dotProduct(a,b))
@@ -41,11 +40,13 @@ def determineRobotMovement(startX, startY, theta, endX, endY):
 		c = crossProduct(a,b)
 		if c[2] < 0:
 			amountToTurn = amountToTurn * -1;
-		# 	print "turn right"
-		# else:
-		# 	print "turn left"
-		
+			print "turn right"
+		else:
+			print "turn left"
+	
 	distanceToTravel = b_mag
+	print ("amountToTurn: %f" % amountToTurn)
+	print ("distanceToTravel: %f" % distanceToTravel)
 	return (amountToTurn, distanceToTravel)
 
 
@@ -61,3 +62,4 @@ if __name__ == "__main__":
     assert (determineRobotMovement(0,0,math.pi/4,6,-5)[0] < 0)
     assert (determineRobotMovement(0,0,math.pi/4,-5,7)[0] > 0)
 
+    determineRobotMovement(53, 74, 5.06, 360, 360)
