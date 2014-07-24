@@ -51,17 +51,19 @@ clc; clear all; close all;
 
 file          = 'test100.png';
 
-num_paths     = 150;
+num_paths     = 180;
+recal_after   = 10;
+
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 path_style    = 'randombounce';
-num_reconstr  = 2;
+num_reconstr  = 3;
 
-param.p       = 1/2;  % We are using the l^p norm.
+param.p       = 1;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
 param.beta    = 1;  % Beta weights towards sparsity of gradient.
-param.mu      = .1;  % Parameter on the fidelity term.
+param.mu      = .01;  % Parameter on the fidelity term.
 param.lambda1 = .1; % Coefficient on the regular constraint.
 param.lambda2 = 1;  % Coefficient on the gradient constraints.
 param.N       = 1;  % Number of inner loops.
@@ -70,7 +72,7 @@ param.maxiter = 100; % Split Bregman performs this many iterations at most.
 param.makegif = false; % determines if a gif of the iterations will be made
 param.gifname = 'iter_50.gif';
 
-view_profile  = true;
+view_profile  = false;
 show_all_fig  = false;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -92,56 +94,46 @@ for i = 1:num_tests
 	for j = 1:num_reconstr
 		scaling_factor = 2^(num_reconstr-j);
 		scaled_dim = 1/scaling_factor * dim;
-		if j == 1
-			u0 = zeros(prod(scaled_dim),1);
-			partial_paths = generatePaths(num_paths / num_reconstr, dim, 'bouncy');
-		else
-			u0 = resizeu(partial_uguess, scaled_dim_old, 2);
-			new_paths = generatePaths(num_paths / num_reconstr, dim, 'centered', centers);
-			partial_paths = [partial_paths; new_paths];
-		end
-		[~, u, g] = generateAug(u_image, partial_paths);
+        for k = (j-1)*num_paths/num_reconstr+recal_after:recal_after:j*num_paths/num_reconstr
+            if j == 1 && k == recal_after
+                u0 = zeros(prod(scaled_dim),1);
+                partial_paths = generatePaths(recal_after, dim, 'bouncy');
+            else
+                u0 = partial_uguess;
+                new_paths = generatePaths(recal_after, dim, 'centered', centers);
+                partial_paths = [partial_paths; new_paths];
+            end
+            [~, u, g] = generateAug(u_image, partial_paths);
 
-		%% Generate the line-segment paths that we collect data from.
-		%partial_paths = paths(1:j*num_paths/num_reconstr, :);
-		scaled_partial_paths = 1/scaling_factor * partial_paths;
+            %% Generate the line-segment paths that we collect data from.
+            %partial_paths = paths(1:j*num_paths/num_reconstr, :);
+            scaled_partial_paths = 1/scaling_factor * partial_paths;
 
-		%% Compute A, our path matrix, convert u to a vector, and compute Au=g.
-		partial_A = generateAug(zeros(scaled_dim), scaled_partial_paths);
-		partial_g = 1/scaling_factor * g;
+            %% Compute A, our path matrix, convert u to a vector, and compute Au=g.
+            partial_A = generateAug(zeros(scaled_dim), scaled_partial_paths);
+            partial_g = 1/scaling_factor * g;
 
-		%% Now run the Split Bregman Algorithm to reconstruct u from A and g.
-		[partial_uguess partial_err partial_energy] = splitBregmanSolve( partial_A, partial_g, u0, scaled_dim, param );
-		param.lambda1 = param.lambda1 / 4;
-		% param.mu      = param.mu / 4;
-		param.lambda2 = param.lambda2 / 4;
+            %% Now run the Split Bregman Algorithm to reconstruct u from A and g.
+            [partial_uguess partial_err partial_energy] = splitBregmanSolve( partial_A, partial_g, u0, scaled_dim, param );
+            % param.lambda1 = param.lambda1 / 4;
+            % param.mu      = param.mu / 4;
+            % param.lambda2 = param.lambda2 / 2;
 
+            centers = segmentImg(reshape(resizeu(partial_uguess,scaled_dim,scaling_factor),dim),dim);
 
+            % keyboard;
 
-	    level = graythresh(partial_uguess);
-	    bw = im2bw(partial_uguess, level);
-	    bw = bwareaopen(bw, 5);
-	    cc = bwconncomp(bw, 4);
-	    %graindata = regionprops(cc,'basic');
-	    
-	    [jj kk] = ind2sub(scaled_dim,vertcat(cc.PixelIdxList{:}));
-	    centers = [jj kk];
-	    centers = reshape( centers', [1 numel(centers)]); 
+            err = [err; partial_err];
+            energy = [energy; partial_energy];
 
-	    %centers = [centers graindata.Centroid];
-	    centers(2:2:end) = scaled_dim(2)-centers(2:2:end);
-	    centers = centers * scaling_factor;
-
-		% keyboard;
-
-		err = [err; partial_err];
-		energy = [energy; partial_energy];
-
-		scaled_dim_old = scaled_dim;
-		% imagesc(reshape(partial_uguess, scaled_dim)); colormap gray;
-		% pause;
-
-	end
+            scaled_dim_old = scaled_dim;
+            % imagesc(reshape(partial_uguess, scaled_dim)); colormap gray;
+            % pause;
+        end
+        if j~=num_reconstr
+            partial_uguess = resizeu(partial_uguess, scaled_dim, 2);
+        end
+    end
 	paths = partial_paths;
 	uguess = partial_uguess;
 
