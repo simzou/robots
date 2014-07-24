@@ -20,19 +20,25 @@ using namespace ArduinoJson::Parser;
 #define ADAFRUIT_CC3000_IRQ   3 
 #define ADAFRUIT_CC3000_VBAT  5
 #define ADAFRUIT_CC3000_CS    10
-#define IR 9
 #define LED 13
+#define LPLUS 6
+#define LMINUS 7
+#define RPLUS 8
+#define RMINUS 9
+#define IR 4
 
 // WiFi Network Username/Pwd/Security
 #define WLAN_SSID       "UCLA-MATHNET"
-#define WLAN_PASS       ""
 #define WLAN_SECURITY   WLAN_SEC_WEP
 
 // Memory to allocate for the char array that stores the  server response
-#define PREALLOC 512
+#define PREALLOC 256
 
 // Number of paths to travel on, also equal to number of data points
-#define NUM_PATHS 3
+#define NUM_PATHS 6
+
+// Number of failed attempts before restarting internet connection
+#define MAX_FAILS 3
 
 // Instantiate the AdaFruit WiFi shield object and the client object
 Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, 
@@ -42,18 +48,20 @@ Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS,
 Adafruit_CC3000_Client client;
 
 // Variables for connecting to the network and server
-uint32_t ip = cc3000.IP2U32(169,232,149,167);
-int port = 93;
-String repository = "/projects/Robots14/";
+uint32_t ip = cc3000.IP2U32(169,232,149,143);
+int port = 80;
+String repository = "/V2/";
 
 // Connection Timeout Variable
-const unsigned long connectTimeout = 15L * 100L;
+int connectTimeout = 15L * 10000L;
 
 // Variables specific to the robot's functioning
 bool state = false;             // Will be 0 or 1, refer to robotServer.cgi
 bool oldState = false;          // Stores the state before update
 uint16_t data = 0;              // The summed reflectance sensor readings
 uint16_t paths = 0;             // The number of measurements taken
+
+int numFails = 0;
 
 // Objects to parse the Json Response
 JsonParser<8> parser;
@@ -71,10 +79,22 @@ JsonHashTable root;
  */
 void setup(void)
 {
-    Serial.begin(9600);
-    pinMode(IR, INPUT);
+    Serial.begin(115200);
     pinMode(LED, OUTPUT);
+    initPins();
     setupConnection();
+}
+
+
+///< Initializes the relevant pins on the arduino
+void initPins()
+{
+  pinMode(LPLUS, OUTPUT);
+  pinMode(LMINUS, OUTPUT);
+  pinMode(RPLUS, OUTPUT);
+  pinMode(RMINUS, OUTPUT);
+  
+  pinMode(IR, INPUT);
 }
 
 
@@ -104,19 +124,17 @@ void loop(void)
         if (send_request(request)) {
             get_response();
         }
-
+        
+        // State will only change if response obtained
         if ((oldState == 1) && (state == 0)) {
             // We have just travelled a path and data needs to be reset
             ++paths;
             data = 0;
-            // moveToNewStart()
+            moveNext(state);
         }
         else if ((oldState == 0) && (state == 1)){
-            Serial.println("Collecting Data");
-            digitalWrite(LED, HIGH);
-            for (uint16_t i = 0; i < 50000 ; ++i )
-                data += digitalRead(IR);
-            digitalWrite(LED, LOW);
+            Serial.println(F("Collecting Data"));
+            data = moveNext(state);
         }
     }
     else if (paths == NUM_PATHS) {
@@ -145,22 +163,29 @@ void loop(void)
  */
 bool send_request (String request)
 {
-    Serial.print("Connecting to server...");
+    Serial.print(F("Connecting to server..."));
     int t = millis();
     do {
         client = cc3000.connectTCP(ip, port);
+        Serial.println(client.connected());
+        Serial.println((millis()-t) < connectTimeout);
     } while ((!client.connected()) && ((millis() - t) < connectTimeout));
 
     // Send request
     if (client.connected()) {
       Serial.print(F("OK\r\nIssuing HTTP request..."));
       client.println(request);      
-      client.println(F(""));
-      Serial.println("Connected & Sent data");
+      Serial.println(F("Connected & Sent data"));
       return true;
     } 
     else {
+      ++numFails;
       Serial.println(F("Connection failed"));
+      if (numFails >= MAX_FAILS) {
+        client.close();
+        cc3000.disconnect();
+        setupConnection();
+      }
       return false;
     }
 }
@@ -179,8 +204,10 @@ bool send_request (String request)
  *          file. IT WILL NOT WORK FOR ALL JSON RESPONSES.
  */
 void get_response() {
+  
+    numFails = 0;
 
-    Serial.println("\nGetting response");
+    Serial.println(F("\nGetting response"));
 
     // Counters and Arrays to store the response
     static uint16_t resHIndex = 0;
@@ -220,14 +247,82 @@ void get_response() {
     resHIndex = 0;
     resJIndex = 0;
 
-    Serial.println("");
-    Serial.println("Closing connection to server and parsing response...");
+    Serial.println(F(""));
+    Serial.println(F("Closing connection to server and parsing response..."));
     client.close();
 
     root = parser.parseHashTable(responseJSON);
     if (root.getBool("Response")) {
         state = !state;
     }
+}
+
+
+/*******************************************************************************
+ *                                  PERIPHERALS                                *
+ ******************************************************************************/
+
+///< Motor control method to drive forward
+void forward(){
+  digitalWrite(LPLUS, HIGH);
+  digitalWrite(LMINUS, LOW);
+  digitalWrite(RPLUS, HIGH);
+  digitalWrite(RMINUS, LOW);
+}
+
+///< Motor control method to drive backward
+void backward(){
+  digitalWrite(LPLUS, LOW);
+  digitalWrite(LMINUS, HIGH);
+  digitalWrite(RPLUS, LOW);
+  digitalWrite(RMINUS, HIGH);
+}
+
+///< Motor control method to rotate left
+void rotateLeft() {
+  digitalWrite(LPLUS, LOW);
+  digitalWrite(LMINUS, HIGH);
+  digitalWrite(RPLUS, HIGH);
+  digitalWrite(RMINUS, LOW);
+}
+
+///< Motor control method to rotate right
+void rotateRight() {
+  digitalWrite(LPLUS, HIGH);
+  digitalWrite(LMINUS, LOW);
+  digitalWrite(RPLUS, LOW);
+  digitalWrite(RMINUS, HIGH);
+}
+
+///< Motor control method to stop moving
+void halt() {
+  digitalWrite(LPLUS, LOW);
+  digitalWrite(LMINUS, LOW);
+  digitalWrite(RPLUS, LOW);
+  digitalWrite(RMINUS, LOW);
+}
+
+///< Function to direct motors and sensor in collecting data
+uint16_t moveNext(boolean state)
+{
+  uint16_t data = 0;
+  if (state) {
+      forward();
+  }
+  else {
+    rotateLeft();
+  }
+  unsigned long t = millis();
+  while (millis() - t < 1500) {
+      if (state) {
+          uint16_t raw = analogRead(IR);
+          if (raw < 800)
+            data += 1;
+       }
+  }
+  
+  halt();
+  return data;
 }
 
 
@@ -245,7 +340,7 @@ void get_response() {
 void setupConnection(void)
 {
     Serial.println(F("Hello, CC3000!\n")); 
-    Serial.print("Free RAM: "); 
+    Serial.print(F("Free RAM: ")); 
     Serial.println(getFreeRam(), DEC);
     
     // Initialise the module
