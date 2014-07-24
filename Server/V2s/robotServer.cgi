@@ -34,15 +34,35 @@ import random
 import json
 import serial
 
+# target = [
+#             (512, 100),
+#             (307, 712),
+#             (492, 263),
+#             (58,  544),
+#             (222, 628),
+#             (400, 139),
+#             (200, 252),
+#             (430, 673),
+#             (172, 401),
+#             (316, 629),
+#             (45, 138)
+#          ]
 target = [
-            (80, 100),
-            (580, 200),
-            (80, 300),
-            (580, 400),
-            (80, 500),
-            (580, 600),
-            (80, 700)
-         ]
+            (160, 160), #1
+            (160, 660), #2
+            (240, 660), #3
+            (240, 160), #4
+            (320, 160), #5
+            (320, 660), #6
+            (400, 660), #7
+            (400, 160), #8
+            (480, 160), #9
+            (480, 660), #10
+            (560, 660), #11
+            (560, 160), #12
+            (300, 300)  #13
+
+        ]
 numTargets = len(target)
 
 ################################################################################
@@ -192,7 +212,7 @@ def findMaxTime(x, y, theta):
         newX = x + c * math.cos(theta)
         newY = y + c * math.sin(theta)
         c = c + 0.5
-
+    print c, newX, newY
     # return the magnitude, converted to milliseconds
     return int((c - 0.5)/pixelsPerSecond * 1000)
 
@@ -347,7 +367,7 @@ def inNewLocation(dbName, x, y, numDataPt):
     newX = result[0]
     newY = result[1]
     mag = math.sqrt((newX - x)**2 + (newY - y)**2)
-
+    print "numDataPt", numDataPt, "result", result, "newX", newX, "newY", newY, "mag", mag
     return mag > RADIUS_CUTOFF
 
 
@@ -389,18 +409,22 @@ if __name__ == "__main__":
                 if state == 0:
                     saveStartToDB(dbName, x, y)
 
-                    # maxTime = findMaxTime(x, y, theta)
-                    # if maxTime < minTimeToTravel:
-                    #     time = maxTime
-                    # else:
-                    #     time = random.randint(minTimeToTravel, maxTime)
-                    # jsonResponse([True, time])
-                    # print x, y
+                    print "x: ", x, " y: ", y
+                    maxTime = findMaxTime(x, y, theta)
 
                     _, timeToTravel = findNextTime(x, y, theta, 
                                   target[numDataPt % numTargets][0],
                                   target[numDataPt % numTargets][1])
-                    jsonResponse([True, timeToTravel])
+
+                    if maxTime < timeToTravel:
+                        time = maxTime
+                        print "maxtime was less than time to travel"
+                    else:
+                        # time = random.randint(minTimeToTravel, maxTime)
+                        time = timeToTravel
+                    print maxTime, timeToTravel
+                    jsonResponse([True, time])
+
 
                 elif state == 1:
                     if inNewLocation(dbName, x, y, numDataPt):
@@ -416,6 +440,7 @@ if __name__ == "__main__":
                                         target[numDataPt % numTargets][1])
                         jsonResponse([True, timeToTurn])
                     else:
+                        print "Not a new location error"
                         jsonResponse([False, 0])
 
                 else:
@@ -424,6 +449,7 @@ if __name__ == "__main__":
             # If the robot has sent a request but it has not been located,
             # respond to let it know not to move.
             else:
+                print "timeout/serial error"
                 jsonResponse([False, 0])
 
         # This is for the human-reader case, when no state has been submitted.
