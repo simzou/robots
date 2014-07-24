@@ -54,7 +54,7 @@ for i=1:size(paths,1)
     
     % siglength
     % size(pathmat)
-    path
+    %path
     A(i,:) = reshape(pathmat,1,siglength);
     
 end

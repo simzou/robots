@@ -51,12 +51,12 @@ clc; clear all; close all;
 
 file          = 'testbed_small.png';
 
-num_paths     = 100;
+num_paths     = 25;
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 path_style    = 'randombounce';
-num_reconstr  = 2;
+num_reconstr  = 1;
 
 param.p       = 1;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
@@ -126,7 +126,7 @@ for i = 1:num_tests
 		energy = [energy; partial_energy];
 
 		scaled_dim_old = scaled_dim;
-		imagesc(reshape(partial_uguess, scaled_dim)); colormap gray;
+		%imagesc(reshape(partial_uguess, scaled_dim)); colormap gray;
 		pause;
 
 	end

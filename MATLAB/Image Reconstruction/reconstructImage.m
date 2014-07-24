@@ -88,9 +88,14 @@ for i = 1:num_tests
 %paths = generatePaths(num_paths, dim, path_style, [80 15 15 80]);
 
 %% Compute A, our path matrix, convert u to a vector, and compute Au=g.
-[paths g] = paths_g_from_csv('data_collection3+4.csv')
+[paths g] = paths_g_from_csv('data_collection5+6+7.csv')
+scale = 30;
+%g = g*scale;
 paths = paths/20;
 [A, u, ~] = generateAug(zeros(dim), paths);
+param.mu = param.mu / scale^2;
+param.lambda1 = param.lambda1 / scale;
+param.lambda2 = param.lambda2 / scale;
 
 %% Now run the Split Bregman Algorithm to reconstruct u from A and g.
 u0 = zeros(prod(dim), 1);
