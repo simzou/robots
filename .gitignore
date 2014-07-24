@@ -4,4 +4,5 @@
 *.blg
 *.aux
 *.log
-compressedSensing.ino
+*.fdb_latexmk
+*.synctex.gz

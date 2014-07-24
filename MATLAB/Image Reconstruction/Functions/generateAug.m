@@ -52,6 +52,9 @@ for i=1:size(paths,1)
         pathmat = path_weights(path,size(u));
     end
     
+    % siglength
+    % size(pathmat)
+    path
     A(i,:) = reshape(pathmat,1,siglength);
     
 end
