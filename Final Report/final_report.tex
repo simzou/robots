@@ -1,0 +1,184 @@
+\documentclass[english]{article}\usepackage[]{graphicx}\usepackage[]{color}
+\usepackage{alltt}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{geometry}
+\geometry{verbose}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{esint}
+\usepackage{babel}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+\title{Problem description and current progress}
+
+
+\author{Mitchell Horning, Matthew Lin, Siddarth Srinivasan, Simon Zou}
+
+\maketitle
+
+\section{Introduction}
+
+Mapping environment variables by robots has drawn a lot of interests
+these days. In particular, we want to identify the regions of interest,
+where the values of certain environment variable is significantly
+different from surrounging area, though almost uniform inside each
+region. Normally the programmed robots are sent out in the field,
+moving along designated paths and collecting the measurements of the
+environment variable on the way. Each robot is equipped with a positioning
+device and are able to get measurements at a given frequency. It can
+also send stored data back to the base by wireless communication.
+If the coordinates at every point on the path can be recorded and
+the robot can send measurements back in real time, then theoretically
+the values of the environment variable at every point can be obtained.
+However, it is impractical due to limited bandwith. To address the
+bandwith limitation, we propose a different strategy. The robot is
+programmed to perform on-board summation of the measurements obtained
+along each path (so-called path integral), and only sending the path
+integral to the base. Ideally the paths are line segments, so only
+the coordinates of begin and end of each line segment are needed in
+order to determine the paths. These path integrals of measurements
+along with the path information are post-processed using the reconstruction
+techniques of computed tomography and compressed sensing. Hopefully
+we are able to reconstruct the environment variables in the field.
+
+
+\section{Experiment settings}
+
+To be added.
+
+
+\section{Models and assumptions}
+
+Without loss of generality, we assume the area to be explored is a
+rectangle denoted by $\Omega$, and the interested environment variable
+$u(x,y)$ is a piece-wise constant function defined on $\Omega$.
+See Figure \ref{fig:An-illustration-of-paths} for an illustration.
+Assume the robot travels through $n$ different paths, which are denoted
+by $C_{1},\ldots,C_{n}$. Along each path $C_{k}$, the integral of
+environment variable $u$ is obtained, which is denoted by $g_{k}$.
+The path integrals are written as
+\begin{equation}
+g_{k}=\int_{C_{k}}u(x,y)\mathrm{\,{d}\Gamma},\; k=1,\ldots,n.\label{eq:path-integral}
+\end{equation}
+
+
+\begin{figure}[h]
+\begin{centering}
+\par\end{centering}
+
+\caption{\label{fig:An-illustration-of-paths}An illustration of the paths
+of robots. The shaded regions denote the area of interest (unknown),
+where the values of environment variable $u$ is significantly different
+from the surroundings. The size of the unit voxel (each small rectangle)
+is determined by the accuracy of the positioning system.}
+\end{figure}
+
+
+For computational purpose, the whole domain is discretized into rectangular
+voxels (See Figure \ref{fig:An-illustration-of-paths}). Each path
+$C_{k}$ defines a weight $a_{k,ij}$ for each voxel $(i,j)$. If
+$C_{k}$ does not intersect with voxel $(i,j)$, then $a_{k,ij}=0$,
+otherwise $a_{k,ij}$ is defined to be proportional to the length
+of the part of $C_{k}$ that falls within voxel $(i,j)$. It is also
+assumed that the value of $u$ is a constant within each voxel $(i,j)$,
+which is denoted by $u_{ij}$. After discretization, Eq (\ref{eq:path-integral})
+becomes
+
+\begin{equation}
+g_{k}=\sum_{i}\sum_{j}a_{k,ij}u_{ij}.\label{eq:path-integral-discrete}
+\end{equation}
+Let $g=(g_{1},\ldots,g_{n})^{t}$, $u=(u_{ij})$, then $g$ and $u$
+have a linear relation, which is written as 
+\begin{equation}
+g=Au,\label{eq:system-eq}
+\end{equation}
+where the linear operator $A$ is specified in Eq (\ref{eq:path-integral-discrete}).
+Eq (\ref{eq:system-eq}) is the model equation, which poses an inverse
+problem. In this equation, $g$ can be obtained from the experiment,
+$A$ is determined by user-specified paths for the robot, which can
+be calculated offline. $u$ is the variable that we want to solve.
+Of course, if the paths form a complete raster scan over the whole
+domain, then theoretically Eq (\ref{eq:system-eq}) has a unique solution.
+For economical reasons, it is desirable to use much fewer paths and
+still being able to reconstruct a solution for $u$. Inspired by compresed
+sensing based image reconstruction techniques, it is hopeful that
+reconstruction for our under-determined system can be done.
+
+
+\section{Algorithm for solving the inverse problem}
+
+Based on the observation that the image $u$ to be reconstructed is
+piecewise constant, it's gradient $\nabla u$ is sparse over
+the domain. Inspired by the compressed sensing theory, we postulate
+that the actual solution $u$ should minimize the energy functional 
+
+\begin{equation}
+J(u)=\frac{\mu}{2}\|Au-g\|_{2}^{2}+\alpha|u|_{1}+\beta(|\nabla_{x}u|_{1}+|\nabla_{y}u|_{1}),\label{eq:energy-functional}
+\end{equation}
+where $\alpha,\beta$ are some constants to be tuned depending on
+applications. Here we use Split-Bregman method to solve the problem
+$\underset{u}{{\text{{min}}}}J(u)$. More exactly, we rewrite minimization
+of (\ref{eq:energy-functional}) as a constraint problem 
+\[
+\underset{u,d,d_{x},d_{y}}{{\text{{min}}}}\frac{\mu}{2}\|Au-g\|_{2}^{2}+\alpha|d|_{1}+\beta(|d_{x}|_{1}+|d_{y}|_{1})\quad\text{such that}\; d=u,\, d_{x}=\nabla_{x}u,\, d_{y}=\nabla_{y}u.
+\]
+And its associated Augmented Lagrangian functional $L(u,\, d,\, d_{x,}\, d_{y},\, b,\, b_{x},\, b_{y})$ is 
+\[
+\frac{\mu}{2}\|Au-g\|_{2}^{2}+\alpha|d|_{1}+\beta(|d_{x}|_{1}+|d_{y}|_{1})+\frac{1}{2}\lambda_{1}\|d-u+b\|_{2}^{2}+\frac{{1}}{2}\lambda_{2}(\|d_{x}-\nabla_{x}u+b_{x}\|_{2}^{2}+\|d_{y}-\nabla_{y}u+b_{y}\|_{2}^{2}).
+\]
+ The solution process is iterative, with each iteration consisting
+of three major steps:
+\begin{enumerate}
+\item Update $u$ by solving the Least-Squares problem
+\begin{equation}
+\underset{u}{{\text{{min}}}}\frac{\mu}{2}\|Au-g\|_{2}^{2}+\frac{1}{2}\lambda_{1}\|d-u+b\|_{2}^{2}+\frac{{1}}{2}\lambda_{2}(\|d_{x}-\nabla_{x}u+b_{x}\|_{2}^{2}+\|d_{y}-\nabla_{y}u+b_{y}\|_{2}^{2}).\label{eq:LS-problem}
+\end{equation}
+
+\item Update $d,\, d_{x},\, d_{y}$ by soft-thresholding (shrinkage)
+\[
+d=\text{{sign}}(u-b)\cdot\text{{max}}(|u-b|-\frac{\alpha}{\lambda_{1}},0).
+\]
+\[
+d_{x}=\text{{sign}}(\nabla_{x}u-b_{x})\cdot\text{{max}}(|\nabla_{x}u-b_{x}|-\frac{\beta}{\lambda_{2}},0).
+\]
+\[
+d_{y}=\text{{sign}}(\nabla_{y}u-b_{y})\cdot\text{{max}}(|\nabla_{y}u-b_{y}|-\frac{\beta}{\lambda_{2}},0).
+\]
+\[
+\]
+
+\item Update auxillary variables $b,\, b_{x},\, b_{y}$
+\[
+b=d-u+b.
+\]
+\[
+b_{x}=d_{x}-\nabla_{x}u+b_{x}.
+\]
+\[
+b_{y}=d_{y}-\nabla_{y}u+b_{y}.
+\]
+
+\end{enumerate}
+In step 1, we need to solve following linear equation
+\begin{equation}
+(\mu A^{T}A+\lambda_{1}I+\lambda_{2}\nabla_{x}^{T}\nabla_{x}+\lambda_{2}\nabla_{y}^{T}\nabla_{y})u=\mu A^{T}g+\lambda_{1}(d+b)+\lambda_{2}\nabla_{x}^{T}(d_{x}+b_{x})+\lambda_{2}\nabla_{y}^{T}(d_{y}+b_{y}).\label{eq:Laplace-equation}
+\end{equation}
+Since it is a positive-definite system, it can be solved by Conjugate
+Gradient method, with the preconditioner give by the linear operator
+\begin{equation}
+(\lambda_{1}I+\lambda_{2}\nabla_{x}^{T}\nabla_{x}+\lambda_{2}\nabla_{y}^{T}\nabla_{y})^{-1}.\label{eq:inverse_Laplace}
+\end{equation}
+Because $\nabla_{x},\,\nabla_{y}$ are both circulant matrices using
+finite-difference approximation assuming periodic boundary condition,
+(\ref{eq:inverse_Laplace}) can be solved by Fourier transform and
+its inverse. 
+\[
+\]
+\[
+\]
+
+\end{document}
