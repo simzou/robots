@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!C:\Python27\python.exe
 
 ## Author: Siddarth Srinivasan, UCLA REU 2014
 ## Date Created: 8th July 2014
@@ -69,7 +69,7 @@ def connectDB():
         Function that connects to the database
     """
 
-    db = conn.connect(host = 'localhost', user = 'root', passwd = 'uclaRobots14')
+    db = conn.connect(host = 'localhost', user = 'root', passwd = '19*geroniMO')
     cursor = db.cursor()
     return db,cursor
 
@@ -79,29 +79,38 @@ def createDB(db, cursor, dbname):
         Function that creates a database with name 'dbname'
     """
 
-    sql = "create database " + dbname
+    sql = "CREATE DATABASE " + dbname
     cursor.execute(sql)
 
-    sql = "use " + dbname
+    sql = "USE " + dbname
     cursor.execute(sql)
 
     # Create Table that records the states that the Arduino has submitted
-    sql = '''create table State_Record
-             (stateid int not null auto_increment,
-             timestamp varchar(25) not null,
-             state int not null,
-             primary key(stateid))'''
+    sql = '''CREATE TABLE State_Record
+             (StateID int not null auto_increment,
+             Timestamp varchar(25) not null,
+             State int not null,
+             Data int not null,
+             currentX int not null,
+             currentY int not null,
+             theta float not null,
+             destX int not null,
+             destY int not null,
+             Response bool not null,
+             Duration int not null,
+             Error_Code int not null,
+             primary key(StateID))'''
     cursor.execute(sql)
 
     # Create table that records the data the arduino has collected
-    sql = '''create table Data_Collection
-             (dataptid int not null auto_increment,
+    sql = '''CREATE table Data_Collection
+             (DataPtID int not null auto_increment,
              startX int not null,
              startY int not null,
              endX int not null,
              endY int not null,
-             data int not null,
-             primary key(dataptid))'''
+             Data int not null,
+             primary key(DataPtID))'''
     cursor.execute(sql)
 
     db.commit()
@@ -112,14 +121,14 @@ def clearDB(db, cursor, dbname, tables):
         Function that clears the database with name 'dbname' of all 'tables'
     """
 
-    sql = "use " + dbname
+    sql = "USE " + dbname
     cursor.execute(sql)
 
     for table in tables:
-        sql = "truncate table " + table
+        sql = "TRUNCATE TABLE " + table
         cursor.execute(sql)
 
-        sql = "delete from " + table
+        sql = "DELETE FROM " + table
         cursor.execute(sql)
 
     db.commit()
@@ -130,7 +139,7 @@ def deleteDB(db, cursor, dbname):
         Function that deletes the database with name 'dbname'
     """
     
-    sql = "drop database " + dbname
+    sql = "DROP DATABASE " + dbname
     cursor.execute(sql)
     db.commit()
 

@@ -121,13 +121,17 @@ and it worked.
 
 12. VOLATILE THINGS: 
 
-Arduino:
-Network
-Password
-Security
-IP
-Port
+Network, Password, Security, IP, Port, System Path to Python, Serial port
 
-Server:
-System Path to Python
-Serial port
+13. Overcoming some problems:
+
+I added a MAX_FAILS condition to the arduino, where if it couldn't connect to the server after
+MAX_FAILS attempts, disconnect and reconnect to the internet.
+
+14. Making the server capable of determining the farthest the robot can go in any particular
+direction helped make the paths more random.
+
+15. The server also checks that the location the video camera gives it is not the same as the
+start location. This made the video tracking HELLA more accurate, now it actually requests the
+server again for its position if the position the first time round was imprecise causing the 
+server to respond "False" the first time round.

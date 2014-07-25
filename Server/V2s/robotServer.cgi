@@ -19,6 +19,17 @@
 #          send a json response "False" telling the robot that it has not
 #          been located, and so it should wait.
 
+
+## Error Codes:
+#
+# NO_ERROR_M -1     : No Error, but will travel a "maximum" distance instead of
+#                    the directed distance. Note: If this error code is obtained
+#                    time sent to the robot is 0, the robot is out of bounds.
+# NO_ERROR_T 0      : No Error, robot should travel distnace to next point
+# NNL_ERROR  1      : Not a New Location Error
+# S_TIMEOUT_ERROR 2 : Serial Timeout Error
+
+
 import cgi, cgitb
 cgitb.enable()
 
@@ -34,42 +45,73 @@ import random
 import json
 import serial
 
-# target = [
-#             (512, 100),
-#             (307, 712),
-#             (492, 263),
-#             (58,  544),
-#             (222, 628),
-#             (400, 139),
-#             (200, 252),
-#             (430, 673),
-#             (172, 401),
-#             (316, 629),
-#             (45, 138)
-#          ]
-target = [
-            (160, 160), #1
-            (160, 660), #2
-            (240, 660), #3
-            (240, 160), #4
-            (320, 160), #5
-            (320, 660), #6
-            (400, 660), #7
-            (400, 160), #8
-            (480, 160), #9
-            (480, 660), #10
-            (560, 660), #11
-            (560, 160), #12
-            (300, 300)  #13
+## Path Directions for the Robot
 
-        ]
-numTargets = len(target)
+target = [
+            (512, 100),
+            (307, 712),
+            (492, 263),
+            (58,  544),
+            (222, 628),
+            (400, 139),
+            (200, 252),
+            (430, 673),
+            (172, 401),
+            (316, 629),
+            (45, 138)
+         ]
+# target = [
+#             (160, 160), #1
+#             (160, 660), #2
+#             (240, 660), #3
+#             (240, 160), #4
+#             (320, 160), #5
+#             (320, 660), #6
+#             (400, 660), #7
+#             (400, 160), #8
+#             (480, 160), #9
+#             (480, 660), #10
+#             (560, 660), #11
+#             (560, 160), #12
+#             (300, 300)  #13
+
+#         ]
+numTargets = len(target) - 1
+
+## Constants Definitions
+
+# Error Codes
+NO_ERROR_M = -1
+NO_ERROR_T = 0
+NNL_ERROR = 1
+S_TIMEOUT_ERROR = 2
+
+TIMEOUT = 3          # Time in seconds to wait for serial data to be read
+NUM_SERIAL_DATA = 4  # The number of points of information serial data carries
+
+# Boundaries of the Test Bed
+X_MIN = 40
+Y_MIN = 80
+X_MAX = 600
+Y_MAX = 800
+
+PXIELS_PER_SECOND = 160.0   # Pixels the robot covers in moving straight for 1s
+RADS_PER_SECOND = 1.25      # Radians the robot covers in turning for 1s
+
+RADIUS_CUTOFF = 25   # The minimum radius the robot needs to be from its start
+                     # before its new position is registered
+
+MIN_TIME_TO_TRAVEL = 1500  # The minimum time the robot will travel in any path
+
+dbName = "Log1"  # The database to save to
+
+NO_DATA = -1     # The dummy value to store in database if no data was collected
 
 ################################################################################
 #                             HTML HANDLERS
 ################################################################################
 
-## Eventually, we should not even need these.
+## This is essentially for debugging purposes and browser interaction
 def htmlForm():
     """
         Function that generates the html form if a state hasn't been submitted
@@ -122,7 +164,8 @@ def jsonResponse(response):
 
     j = {
             'Response': response[0],
-            'Time': response[1]
+            'Duration': response[1],
+            'Error Code': response[2]
         }
 
     print json.dumps(j, indent = 4, separators=(',', ': '))
@@ -139,17 +182,18 @@ def locate():
         serial port, which comes in from the Wi232 transceiver which is
         transmitting data from the video camera. The data comes in the following
         format:
-                *|x|y|theta!---------------------------...
+                *|x|y|theta|!---------------------------...
     """
 
-    ser = serial.Serial('/dev/tty.PL2303-00001014', 115200, timeout=2, xonxoff=False,
+    ser = serial.Serial('COM8', 115200, timeout=2, xonxoff=False,
                                                      rtscts=False, dsrdtr=False)
     ser.flushInput()
     ser.flushOutput()
 
     raw_data = ser.readline()
+
+    # Set variables for timeout in case serial cable isn't connected
     t = time.time()
-    TIMEOUT = 3
 
     # Read data
     while not raw_data and (time.time() - t < TIMEOUT):
@@ -157,21 +201,15 @@ def locate():
 
     if raw_data:
         ## Now, begin parsing the data
-        startData = False  # whether we are in 'reading' data mode
+        startData = False  # Whether we are in 'reading' data mode
         locationIndex = 0  # Tracks entries from raw_data going to location_data
-        numCamData = 4     # The number of data points we will be tracking
-        
-        # List that stores the data from the camera
-        locationData = [""] * numCamData
+        locationData = [""] * NUM_SERIAL_DATA   # List for data read from serial
+        loopIndex = 0
 
-        loopIndex = 0       # Loop over all of raw_data
+        # Loop over all of raw_data
         while loopIndex < len(raw_data):
-            # Only enter data 'reading' mode if raw_data contains the car we are
-            # looking for
             if raw_data[loopIndex] == "*":
                 startData = True
-            # Upon entering data 'reading' mode check for end-of-data-packet and
-            # end of single piece of data
             elif startData:
                 if raw_data[loopIndex] == "|":
                     locationIndex += 1
@@ -182,11 +220,10 @@ def locate():
                     locationData[locationIndex] += raw_data[loopIndex]
             loopIndex += 1
 
-        #print locationData              ## FIXME! - Unnecessary printing
         ser.close()
-
         return locationData[1], locationData[2], locationData[3]
     else:
+        ## Unable to read data from serial, so return None
         return None, None, None
 
 
@@ -198,23 +235,17 @@ def findMaxTime(x, y, theta):
         driving the robot.
     """
 
-    x_min = 40
-    y_min = 80
-    x_max = 600
-    y_max = 800
-
-    pixelsPerSecond = 160.0
     newX = x
     newY = y
     c = 0.5
 
-    while (newX > x_min and newX < x_max and newY > y_min and newY < y_max):
+    while (newX > X_MIN and newX < X_MAX and newY > Y_MIN and newY < Y_MAX):
         newX = x + c * math.cos(theta)
         newY = y + c * math.sin(theta)
         c = c + 0.5
-    print c, newX, newY
+
     # return the magnitude, converted to milliseconds
-    return int((c - 0.5)/pixelsPerSecond * 1000)
+    return int((c - 0.5)/PXIELS_PER_SECOND * 1000)
 
 
 def findNextTime(startX, startY, theta, endX, endY):
@@ -225,40 +256,35 @@ def findNextTime(startX, startY, theta, endX, endY):
         to travel)
     """
 
-    pixelsPerSecond = 160.0
-    radsPerSecond = 1.25
-
     # a is the unit vector for the direction the robot is facing
     a = [math.cos(theta), math.sin(theta), 0]
 
-    # b is the vector from start point to end point
+    # b is the vector from robot to destination
     b = [endX - startX, endY - startY, 0]
     b_mag = math.sqrt(b[0]**2 + b[1]**2)
 
-    # shouldn't happen, but in case our start and end points are the same
+    # Shouldn't happen, but in case our start and end points are the same
     if b_mag == 0:
         amountToTurn = 0.0
-        return 1000, 1000
+        return 1000, 1000           # dummy values, no reason for 1000
     else:
         distanceToTravel = b_mag
 
-        # normalizing b
+        # Normalizing b
         b = [elem / float(b_mag) for elem in b]
 
         # a dot b = |a||b| cos (theta)
         amountToTurn = math.acos(dotProduct(a,b))
 
-        # if the direction of the third element of the cross product is
+        # If the direction of the third element of the cross product is
         # negative, we turn right (so angle is negative), else we turn left
         c = crossProduct(a,b)
         if c[2] < 0:
-            print "Here", startX, startY, theta, endX, endY
-            return (int((-amountToTurn)/radsPerSecond * 1000),
-                    int(distanceToTravel/pixelsPerSecond * 1000))
+            return (int((-amountToTurn)/RADS_PER_SECOND * 1000),
+                    int(distanceToTravel/PXIELS_PER_SECOND * 1000))
         else:
-            print "There", startX, startY, theta, endX, endY
-            return (int((amountToTurn)/radsPerSecond * 1000),
-                    int(distanceToTravel/pixelsPerSecond * 1000))
+            return (int((amountToTurn)/RADS_PER_SECOND * 1000),
+                    int(distanceToTravel/PXIELS_PER_SECOND * 1000))
 
 
 def dotProduct(a, b):
@@ -289,20 +315,26 @@ def connectDB(dbName):
     db = conn.connect(host = 'localhost', user = 'root', \
                       passwd = 'uclaRobots14', db = dbName)
     cursor = db.cursor()
-    return db,cursor
+    return db, cursor
 
 
-def saveStateToDB(dbName, state):
+def saveStateToDB(dbName, State, Data, currentX, currentY, theta, destX, destY,\
+                  Response, Duration, Error_Code):
     """
         Called when the robot has contacted the server, it stores the state that
-        the robot sent
+        the robot sent, along with other useful information to keep track of the
+        robot's actions
     """
 
     db, cursor = connectDB(dbName)
     currentTime = time.ctime(time.time())
 
-    sql = "INSERT INTO State_Record(timestamp, state) VALUES('" + currentTime +\
-          "' , " + str(state) + " ) "
+    sql = "INSERT INTO State_Record(Timestamp, State, Data, currentX, " + \
+          "currentY, theta, destX, destY, Response, Duration, Error_Code) " + \
+          "VALUES('" + currentTime + "' , " + str(State) + ", " + str(Data) + \
+          ", " + str(currentX) + ", " + str(currentY) + ", " + str(theta) + \
+          ", " + str(destX) + ", " + str(destY) + ", " + str(Response) + \
+          ", " + str(Duration) + ", " + str(Error_Code) + ") "
     cursor.execute(sql)
     db.commit()
 
@@ -332,7 +364,7 @@ def saveEndDataToDB(dbName, endX, endY, data, numDataPt):
 
     db, cursor = connectDB(dbName)
     sql = "update Data_Collection set endX = " + str(endX) + ", endY = " + \
-          str(endY) + ", data = " + str(data) + " where dataptid = " + \
+          str(endY) + ", data = " + str(data) + " where DataPtID = " + \
           str(numDataPt)
     cursor.execute(sql)
     db.commit()
@@ -345,7 +377,7 @@ def numDataCollected(dbName):
     """
 
     db, cursor = connectDB(dbName)
-    sql = "SELECT COUNT(dataptid) FROM Data_Collection"
+    sql = "SELECT COUNT(DataPtID) FROM Data_Collection"
     cursor.execute(sql)
     return cursor.fetchone()[0]
 
@@ -357,17 +389,15 @@ def inNewLocation(dbName, x, y, numDataPt):
         if so
     """
     db, cursor = connectDB(dbName)
-    sql = "SELECT startX, startY FROM `data_collection` WHERE dataptid=" + \
+    sql = "SELECT startX, startY FROM `data_collection` WHERE DataPtID =" + \
           str(numDataPt)
     cursor.execute(sql)
-
-    RADIUS_CUTOFF = 75
 
     result = cursor.fetchone()
     newX = result[0]
     newY = result[1]
     mag = math.sqrt((newX - x)**2 + (newY - y)**2)
-    print "numDataPt", numDataPt, "result", result, "newX", newX, "newY", newY, "mag", mag
+
     return mag > RADIUS_CUTOFF
 
 
@@ -377,71 +407,76 @@ def inNewLocation(dbName, x, y, numDataPt):
 
 if __name__ == "__main__":
     try:       
-        # The database to save to
-        dbName = "Log1"
-
-        # The number of data points collected
+        # Find the number of data points collected
         numDataPt = numDataCollected(dbName)
-
-        # The minimum time the robot will travel in any path
-        minTimeToTravel = 1500
 
         # See if any form data about the has been submitted
         submittedData = cgi.FieldStorage()
         state = submittedData.getvalue("state")
 
-        # If we do know the state, then Arduino has made a successful request
-        if state:                          # state is a string here, not bool
+        # If we do know the state, then a successful request has been made
+        if state:
             htmlResponse()
-
             state = int(state)
-            saveStateToDB(dbName, state)   # Record the state in the database
-        
             x, y, theta = locate()
 
-            # If the camera has located the Arduino
             if x and y and theta:
                 x = int(x)
                 y = int(y)
                 theta = float(theta)
-                # Save its position to the database, along with data if it has
-                # been collected, and let the robot know.
+
                 if state == 0:
-                    saveStartToDB(dbName, x, y)
-
-                    print "x: ", x, " y: ", y
                     maxTime = findMaxTime(x, y, theta)
-
                     _, timeToTravel = findNextTime(x, y, theta, 
                                   target[numDataPt % numTargets][0],
                                   target[numDataPt % numTargets][1])
 
-                    if maxTime < timeToTravel:
-                        time = maxTime
-                        print "maxtime was less than time to travel"
-                    else:
-                        # time = random.randint(minTimeToTravel, maxTime)
-                        time = timeToTravel
-                    print maxTime, timeToTravel
-                    jsonResponse([True, time])
+                    saveStartToDB(dbName, x, y)
 
+                    # Check whether the robot can actually move 'timeToTravel'
+                    # to the next point, and respond appropriately. The reason
+                    # the robot might have to travel for just maxTime instead of
+                    # timeToTravel is that it might not have changed its heading
+                    # very accurately.
+                    if maxTime < timeToTravel:
+                        nextTime = maxTime
+                        saveStateToDB(dbName, state, NO_DATA, x, y, theta, \
+                                      target[numDataPt % numTargets][0],   \
+                                      target[numDataPt % numTargets][1],   \
+                                      True, nextTime, NO_ERROR_M)
+                        jsonResponse([True, nextTime, NO_ERROR_M])
+                    else:
+                        # time = random.randint(MIN_TIME_TO_TRAVEL, maxTime)
+                        nextTime = timeToTravel
+                        saveStateToDB(dbName, state, NO_DATA, x, y, theta, \
+                                      target[numDataPt % numTargets][0],   \
+                                      target[numDataPt % numTargets][1],   \
+                                      True, nextTime, NO_ERROR_T)
+                        jsonResponse([True, nextTime, NO_ERROR_T])
 
                 elif state == 1:
-                    if inNewLocation(dbName, x, y, numDataPt):
-                        data = int(submittedData.getvalue("data"))
-                        saveEndDataToDB(dbName, x, y, data, numDataPt)
-                        # jsonResponse([True, 1000])
+                    data = int(submittedData.getvalue("data"))
 
-                        # When the robot makes the request, it has not yet
-                        # confirmed the travel of a new path, which is why
-                        # we have numDataPt + 1
+                    # Check whether the camera has recognized that the robot has
+                    # moved to a new location -- there is some lag between the
+                    # robot moving and the camera locating it.
+                    if inNewLocation(dbName, x, y, numDataPt):
                         timeToTurn, _ = findNextTime(x, y, theta,
                                         target[numDataPt % numTargets][0],
                                         target[numDataPt % numTargets][1])
-                        jsonResponse([True, timeToTurn])
+
+                        saveEndDataToDB(dbName, x, y, data, numDataPt)
+                        saveStateToDB(dbName, state, data, x, y, theta,    \
+                                      target[numDataPt % numTargets][0],   \
+                                      target[numDataPt % numTargets][1],   \
+                                      True, timeToTurn, NO_ERROR_T)
+                        jsonResponse([True, timeToTurn, NO_ERROR_T])
                     else:
-                        print "Not a new location error"
-                        jsonResponse([False, 0])
+                        saveStateToDB(dbName, state, data, x, y, theta, \
+                                      target[numDataPt % numTargets][0],   \
+                                      target[numDataPt % numTargets][1],   \
+                                      False, 0, NNL_ERROR)
+                        jsonResponse([False, 0, NNL_ERROR])
 
                 else:
                     print "Error: Unknown State"
@@ -449,8 +484,11 @@ if __name__ == "__main__":
             # If the robot has sent a request but it has not been located,
             # respond to let it know not to move.
             else:
-                print "timeout/serial error"
-                jsonResponse([False, 0])
+                saveStateToDB(dbName, state, NO_DATA, NO_DATA, NO_DATA,    \
+                              NO_DATA, target[numDataPt % numTargets][0],  \
+                              target[numDataPt % numTargets][1],           \
+                              False, 0, S_TIMEOUT_ERROR)
+                jsonResponse([False, 0, S_TIMEOUT_ERROR])
 
         # This is for the human-reader case, when no state has been submitted.
         else:
