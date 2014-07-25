@@ -1,4 +1,4 @@
-#!C:\Python27\python.exe
+#!/usr/bin/python
 
 ## Author: Siddarth Srinivasan, UCLA REU 2014
 ## Date Created: 8th July 2014
@@ -69,7 +69,7 @@ def connectDB():
         Function that connects to the database
     """
 
-    db = conn.connect(host = 'localhost', user = 'root', passwd = '19*geroniMO')
+    db = conn.connect(host = 'localhost', user = 'root', passwd = 'uclaRobots14')
     cursor = db.cursor()
     return db,cursor
 

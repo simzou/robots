@@ -185,7 +185,7 @@ def locate():
                 *|x|y|theta|!---------------------------...
     """
 
-    ser = serial.Serial('COM8', 115200, timeout=2, xonxoff=False,
+    ser = serial.Serial('/dev/tty.PL2303-00001014', 115200, timeout=2, xonxoff=False,
                                                      rtscts=False, dsrdtr=False)
     ser.flushInput()
     ser.flushOutput()
