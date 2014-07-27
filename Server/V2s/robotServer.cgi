@@ -47,19 +47,22 @@ import serial
 
 ## Path Directions for the Robot
 
-target = [
-            (512, 100),
-            (307, 712),
-            (492, 263),
-            (58,  544),
-            (222, 628),
-            (400, 139),
-            (200, 252),
-            (430, 673),
-            (172, 401),
-            (316, 629),
-            (45, 138)
-         ]
+# random
+# target = [
+#             (512, 100), #1
+#             (307, 712), #2
+#             (492, 263), #3
+#             (58,  544), #4
+#             (222, 628), #5
+#             (400, 139), #6
+#             (200, 252), #7
+#             (430, 673), #8
+#             (172, 401), #9
+#             (316, 629), #10
+#             (45, 138)   #dummy
+#          ]
+
+#grid like
 # target = [
 #             (160, 160), #1
 #             (160, 660), #2
@@ -73,9 +76,33 @@ target = [
 #             (480, 660), #10
 #             (560, 660), #11
 #             (560, 160), #12
-#             (300, 300)  #13
-
+#             (300, 300)  #dummy
 #         ]
+
+# target = [
+#             (560, 160), #1
+#             (160, 760), #2
+#             (560, 760), #3
+#             (230, 360), #4
+#             (460, 460), #5
+#             (460, 760), #6
+#             (560, 160), #7
+#             (300, 400), #8
+#             (600, 400), #9
+#             (160, 630), #10
+#             (520, 590), #11
+#             (230, 180), #12
+#             (250, 580), #13
+#             (423, 220), #14
+#             (570, 630), #15
+#             (555, 150), #16
+#             (150, 280), #17
+#             (45, 138)   #dummy
+#          ]
+
+target = [(416, 578), (194, 357), (503, 627), (477, 196), (419, 568), 
+    (116, 455), (320, 659), (374, 263), (445, 488), (323, 598), (225, 289), 
+    (499, 452), (201, 195), (419, 207), (91, 267), (382, 241), (477, 164)]
 numTargets = len(target) - 1
 
 ## Constants Definitions
@@ -98,7 +125,7 @@ Y_MAX = 800
 PXIELS_PER_SECOND = 160.0   # Pixels the robot covers in moving straight for 1s
 RADS_PER_SECOND = 1.25      # Radians the robot covers in turning for 1s
 
-RADIUS_CUTOFF = 25   # The minimum radius the robot needs to be from its start
+RADIUS_CUTOFF = 75   # The minimum radius the robot needs to be from its start
                      # before its new position is registered
 
 MIN_TIME_TO_TRAVEL = 1500  # The minimum time the robot will travel in any path
@@ -398,6 +425,7 @@ def inNewLocation(dbName, x, y, numDataPt):
     newY = result[1]
     mag = math.sqrt((newX - x)**2 + (newY - y)**2)
 
+    print "mag:", mag, "x:", x, "y:", y, "newX:", newX, "newY:", newY
     return mag > RADIUS_CUTOFF
 
 
@@ -438,21 +466,21 @@ if __name__ == "__main__":
                     # the robot might have to travel for just maxTime instead of
                     # timeToTravel is that it might not have changed its heading
                     # very accurately.
-                    if maxTime < timeToTravel:
-                        nextTime = maxTime
-                        saveStateToDB(dbName, state, NO_DATA, x, y, theta, \
-                                      target[numDataPt % numTargets][0],   \
-                                      target[numDataPt % numTargets][1],   \
-                                      True, nextTime, NO_ERROR_M)
-                        jsonResponse([True, nextTime, NO_ERROR_M])
-                    else:
+                    # if maxTime < timeToTravel:
+                    #     nextTime = maxTime
+                    #     saveStateToDB(dbName, state, NO_DATA, x, y, theta, \
+                    #                   target[numDataPt % numTargets][0],   \
+                    #                   target[numDataPt % numTargets][1],   \
+                    #                   True, nextTime, NO_ERROR_M)
+                    #     jsonResponse([True, nextTime, NO_ERROR_M])
+                    # else:
                         # time = random.randint(MIN_TIME_TO_TRAVEL, maxTime)
-                        nextTime = timeToTravel
-                        saveStateToDB(dbName, state, NO_DATA, x, y, theta, \
-                                      target[numDataPt % numTargets][0],   \
-                                      target[numDataPt % numTargets][1],   \
-                                      True, nextTime, NO_ERROR_T)
-                        jsonResponse([True, nextTime, NO_ERROR_T])
+                    nextTime = timeToTravel
+                    saveStateToDB(dbName, state, NO_DATA, x, y, theta, \
+                                  target[numDataPt % numTargets][0],   \
+                                  target[numDataPt % numTargets][1],   \
+                                  True, nextTime, NO_ERROR_T)
+                    jsonResponse([True, nextTime, NO_ERROR_T])
 
                 elif state == 1:
                     data = int(submittedData.getvalue("data"))
