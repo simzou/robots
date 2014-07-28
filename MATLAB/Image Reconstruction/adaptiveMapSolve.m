@@ -127,7 +127,8 @@ subplot(subplot_rows,subplot_cols,3);
 weights = compute_paths(paths,dim);
 imagesc(weights);
 title({strcat(num2str(size(paths,1)),' Adaptive Paths'),...
-    strcat(num2str(param.stepsize),' Paths/Iter')});
+    strcat(num2str(param.stepsize),' Paths/Iter'), ...
+    strcat(num2str(size(paths,1)/prod(dim)), ' Path to Pixel Ratio')});
 
 subplot(subplot_rows,subplot_cols,4);
 plot(energy);

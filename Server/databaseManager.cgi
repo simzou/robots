@@ -1,4 +1,4 @@
-#!/usr/local/bin/python2.7
+#!/usr/bin/python
 
 ## Author: Siddarth Srinivasan, UCLA REU 2014
 ## Date Created: 8th July 2014

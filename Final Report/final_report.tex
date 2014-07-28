@@ -1,0 +1,68 @@
+\documentclass[english]{article}\usepackage[]{graphicx}\usepackage[]{color}
+\usepackage{alltt}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{geometry}
+\geometry{verbose}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{esint}
+\usepackage{babel}
+\usepackage{verbatim} % for \begin{comment}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+\title{Autonomous Robots and Environmental Mapping}
+
+\author{Mitchell Horning, Matthew Lin, Siddarth Srinivasan, Simon Zou}
+
+\maketitle
+
+\begin{abstract}
+
+In the field of signal processing, compressed sensing is a technique used for 
+reconstructing signals and images from very few samples and is commonly used in 
+fMRIs and medical imaging. We aim to apply compressed sensing to allow 
+autonomous robots to map an environment and identify areas of interest which 
+are significantly different from the surrounding area. In our experiment, we 
+program a robot equipped with sensors to travel along a path, do on-board 
+summation of sensor readings, and send that sum (or path integral) to a 
+server. We then apply reconstruction algorithms to the data, which consists of sensor readings 
+and the travelled paths, to reconstruct the environment.
+
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+\begin{comment}
+Discuss Compressed Sensing
+
+\end{comment}
+
+\section{Experiment settings}
+\subsection{Testbed}
+\subsection{Vehicle hardware}
+\subsection{Server}
+\begin{comment}
+Description of testbed, hardware, software, logic
+Sid's flowchart
+\end{comment}
+
+\section{Models and assumptions}
+\subsection{Constraints}
+\begin{comment}
+Description of constraints for our problem
+limited bandwidth, data storage
+Also assumptions about simple piecewise environments
+\end{comment}
+
+\section{Algorithm for solving the inverse problem}
+\begin{comment}
+\end{comment}
+\section{Conclusions and Further Work}
+
+\end{document}

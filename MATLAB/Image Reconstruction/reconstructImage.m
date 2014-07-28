@@ -57,7 +57,7 @@ times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 path_style    = 'randombounce';
 
-param.p       = 1;  % We are using the l^p norm.
+param.p       = 1/2;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
 param.beta    = 1;  % Beta weights towards sparsity of gradient.
 param.mu      = .01;  % Parameter on the fidelity term.
@@ -79,7 +79,7 @@ if view_profile, profile on; end
 %% Read our image in.
 u_image = rgb2gray(imread(file));
 dim = size(u_image);
-dim = [800 600];
+dim = [900 900];
 dim = dim/20
 
 for i = 1:num_tests
@@ -88,9 +88,14 @@ for i = 1:num_tests
 %paths = generatePaths(num_paths, dim, path_style, [80 15 15 80]);
 
 %% Compute A, our path matrix, convert u to a vector, and compute Au=g.
-[paths g] = paths_g_from_csv('data_collection.csv')
+[paths g] = paths_g_from_csv('04.csv')
+scale = 1.5;
+%g = g*scale;
 paths = paths/20;
 [A, u, ~] = generateAug(zeros(dim), paths);
+% param.mu = param.mu / scale^2;
+% param.lambda1 = param.lambda1 / scale;
+% param.lambda2 = param.lambda2 / scale;
 
 %% Now run the Split Bregman Algorithm to reconstruct u from A and g.
 u0 = zeros(prod(dim), 1);
