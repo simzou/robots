@@ -8,7 +8,7 @@ if ~isfield(param, 'maxpaths')
     param.maxpaths = numel(u_image)/20;
 end
 if ~isfield(param, 'stepsize')
-    param.stepsize = int8((numel(u_image)/200));
+    param.stepsize = 10;
 end
 
 dim = size(u_image);

@@ -49,16 +49,16 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'smallareas.png';
+file          = 'SheppLogan128.png';
 
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 
-param.tol       = .01;
-param.maxpaths  = 1000;
+param.tol       = -.01;
+param.maxpaths  = 200;
 param.stepsize  = 10;
-num_initpaths   = param.maxpaths/10;
+num_initpaths   = param.maxpaths/20;
 
 view_profile  = false;
 show_all_fig  = false;
