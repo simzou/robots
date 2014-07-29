@@ -24,16 +24,14 @@
 
 In the field of signal processing, compressed sensing is a technique used for 
 reconstructing sparse signals and images from very few samples and is commonly 
-used in fMRIs and medical imaging. We aim to apply compressed sensing to allow 
-autonomous robots to map an environment and identify areas of interest which 
+used in fMRIs and medical imaging. We aim to use this technique to allow 
+autonomous robots to map an environment and identify areas of interest that 
 are significantly different from the surrounding area. In our experiment, we 
-program a robot equipped with a reflectance sensor to travel along several 
-paths, do on-board summations of sensor readings, and send those sums (or path 
-integrals) to a server. We then apply reconstruction algorithms to the data,  
-which consists of the travelled paths and their integrals, to reconstruct the 
-environment. Preliminary simulations of our experiment show faithful 
-reconstruction of 100x100 images with only 100 data points (err. = 0.28) when 
-using an adaptive pathing scheme, and our hardware is prepared to begin 
+programmed a robot equipped with a reflectance sensor to travel along predetermined
+straight-line paths, perform on-board summations of sensor readings along that path, and send that sum to a remote server after each path. An overhead video camera is used to track
+the robot's position as it travels on the test bed. Each data point consists of
+the robot's start position, end position and the sum of sensor readings along
+that path. Once all the data has been collected, we applied reconstruction algorithms to the data, to reconstruct the environment. When using an adaptive pathing scheme, preliminary simulations of our experiment show faithful reconstruction of 100x100 images with only 100 data points (err. = 0.28). and our hardware is prepared to begin 
 performing the proposed task.
 
 \end{abstract}
