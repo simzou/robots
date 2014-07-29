@@ -49,19 +49,19 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'testbed_small.png';
+file          = 'testbed_small_square.png';
 
-num_paths     = 25;
+num_paths     = 100;
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 path_style    = 'randombounce';
 num_reconstr  = 1;
 
-param.p       = 1;  % We are using the l^p norm.
+param.p       = 1/2;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
 param.beta    = 1;  % Beta weights towards sparsity of gradient.
-param.mu      = .01;  % Parameter on the fidelity term.
+param.mu      = 1;  % Parameter on the fidelity term.
 param.lambda1 = .1; % Coefficient on the regular constraint.
 param.lambda2 = 1;  % Coefficient on the gradient constraints.
 param.N       = 1;  % Number of inner loops.
@@ -106,9 +106,9 @@ for i = 1:num_tests
 			u0 = resizeu(partial_uguess, scaled_dim_old, 2);
 		end
 
-		param.lambda1 = lambda1 / scaling_factor^2;
+		%param.lambda1 = lambda1 / scaling_factor^2;
 		% param.mu      = param.mu / 4;
-		param.lambda2 = lambda2 / scaling_factor;
+		%param.lambda2 = lambda2 / scaling_factor;
 
 		%% Generate the line-segment paths that we collect data from.
 		partial_paths = paths(1:j*num_paths/num_reconstr, :);
@@ -127,7 +127,7 @@ for i = 1:num_tests
 
 		scaled_dim_old = scaled_dim;
 		%imagesc(reshape(partial_uguess, scaled_dim)); colormap gray;
-		pause;
+		%pause;
 
 	end
 

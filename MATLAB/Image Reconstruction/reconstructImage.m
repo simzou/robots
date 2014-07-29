@@ -79,8 +79,9 @@ if view_profile, profile on; end
 %% Read our image in.
 u_image = rgb2gray(imread(file));
 dim = size(u_image);
-dim = [900 900];
-dim = dim/20
+dim = [1000 1000];
+downscale = 10;
+dim = dim/downscale
 
 for i = 1:num_tests
 
@@ -88,10 +89,10 @@ for i = 1:num_tests
 %paths = generatePaths(num_paths, dim, path_style, [80 15 15 80]);
 
 %% Compute A, our path matrix, convert u to a vector, and compute Au=g.
-[paths g] = paths_g_from_csv('04.csv')
-scale = 1.5;
-%g = g*scale;
-paths = paths/20;
+[paths g] = paths_g_from_csv('test.csv');
+scale = 1;
+g = g/scale;
+paths = paths/downscale
 [A, u, ~] = generateAug(zeros(dim), paths);
 % param.mu = param.mu / scale^2;
 % param.lambda1 = param.lambda1 / scale;
@@ -124,7 +125,7 @@ imagesc(img);
 title('Original Image');
 
 subplot(subplot_rows,subplot_cols,2);
-imagesc(img_guess, [0 255]);
+imagesc(img_guess);
 title({'Reconstructed Image ', strcat('Solve Time = ', [' ' num2str(solveTime)], 's')});
 
 subplot(subplot_rows,subplot_cols,3);
