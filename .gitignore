@@ -5,6 +5,7 @@
 *.aux
 *.log
 *.toc
+*.psd
 *.fdb_latexmk
 *.synctex.gz
 *.sync.ffs_db
