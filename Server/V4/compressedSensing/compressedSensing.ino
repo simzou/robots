@@ -30,14 +30,14 @@ using namespace ArduinoJson::Parser;
 
 // WiFi Network Username/Pwd/Security
 #define WLAN_SSID       "UCLA-MATHNET"
-#define WLAN_PASS       ""
+#define WLAN_PASS       "5Dog+8Cat<Ape"
 #define WLAN_SECURITY   WLAN_SEC_WEP
 
 // Memory to allocate for the char array that stores the  server response
 #define PREALLOC 256
 
 // Number of paths to travel on, also equal to number of data points
-#define NUM_PATHS 17
+#define NUM_PATHS 225
 
 // Number of failed attempts before restarting internet connection
 #define MAX_FAILS 2
@@ -54,7 +54,7 @@ Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS,
 Adafruit_CC3000_Client client;
 
 // Variables for connecting to the network and server
-uint32_t ip = cc3000.IP2U32(169,232,149,158);
+uint32_t ip = cc3000.IP2U32(169,232,149,145);
 int port = 80;
 String repository = "/V4/";
 
@@ -334,6 +334,7 @@ uint16_t moveNext(boolean state)
   }
   
   halt();
+  delay(2000);
   return data;
 }
 
