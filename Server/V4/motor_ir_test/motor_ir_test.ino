@@ -4,7 +4,7 @@
 #define RMINUS 9
 #define IR 4
 
-int data;
+  int data;
   
 void setup()
 {
@@ -20,10 +20,7 @@ void setup()
   int t = millis();
   while (millis()  - t < time)
   {
-    int dataToAdd = 710 - analogRead(IR);
-    Serial.println(dataToAdd);
-    data += dataToAdd;
-    
+    data += (710 - analogRead(IR));
   }
   halt();
   Serial.println(data);

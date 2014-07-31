@@ -54,7 +54,7 @@ Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS,
 Adafruit_CC3000_Client client;
 
 // Variables for connecting to the network and server
-uint32_t ip = cc3000.IP2U32(169,232,149,145);
+uint32_t ip = cc3000.IP2U32(169,232,149,132);
 int port = 80;
 String repository = "/V4/";
 
@@ -334,7 +334,7 @@ uint16_t moveNext(boolean state)
   }
   
   halt();
-  delay(2000);
+  delay(1500);
   return data;
 }
 

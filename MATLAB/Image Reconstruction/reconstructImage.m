@@ -49,7 +49,7 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'test50.png';
+file          = 'testbed03_aligned_70x90.png';
 
 num_paths     = 500;
 num_tests     = 1;
@@ -60,8 +60,8 @@ path_style    = 'randombounce';
 param.p       = 1/2;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
 param.beta    = 1;  % Beta weights towards sparsity of gradient.
-param.mu      = .01;  % Parameter on the fidelity term.
-param.lambda1 = .1; % Coefficient on the regular constraint.
+param.mu      = .001;  % Parameter on the fidelity term.
+param.lambda1 = .01; % Coefficient on the regular constraint.
 param.lambda2 = 1;  % Coefficient on the gradient constraints.
 param.N       = 1;  % Number of inner loops.
 param.tol     = 1/255; % We iterate until the rel. err is under this.
@@ -79,7 +79,7 @@ if view_profile, profile on; end
 %% Read our image in.
 u_image = rgb2gray(imread(file));
 dim = size(u_image);
-dim = [1000 1000];
+dim = [900 700];
 downscale = 10;
 dim = dim/downscale
 
@@ -90,10 +90,13 @@ for i = 1:num_tests
 
 %% Compute A, our path matrix, convert u to a vector, and compute Au=g.
 [paths g] = paths_g_from_csv('test.csv');
-scale = 1;
+scale = 2.2;
 g = g/scale;
+
+% USING ROBOT COLLECTED DATA
+
 paths = paths/downscale
-[A, u, ~] = generateAug(zeros(dim), paths);
+[A, u, ~] = generateAug(u_image, paths);
 % param.mu = param.mu / scale^2;
 % param.lambda1 = param.lambda1 / scale;
 % param.lambda2 = param.lambda2 / scale;
@@ -125,13 +128,14 @@ imagesc(img);
 title('Original Image');
 
 subplot(subplot_rows,subplot_cols,2);
-imagesc(img_guess);
+imagesc(img_guess,[0 255]);
+% imagesc(img_guess);
 title({'Reconstructed Image ', strcat('Solve Time = ', [' ' num2str(solveTime)], 's')});
 
 subplot(subplot_rows,subplot_cols,3);
 weights = compute_paths(paths,dim);
 imagesc(weights);
-title(strcat(num2str(num_paths), [' ' path_style], ' Paths'));
+title(strcat(num2str(size(paths,1)), [' ' path_style], ' Paths'));
 
 subplot(subplot_rows,subplot_cols,5);
 plot(err);
