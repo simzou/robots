@@ -9,3 +9,5 @@
 *.fdb_latexmk
 *.synctex.gz
 *.sync.ffs_db
+*.asv
+*.db
