@@ -49,13 +49,13 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'testbed_small_square.png';
+file          = 'testbed03_aligned_70x90.png';
 
-num_paths     = 100;
+num_paths     = 50;
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
-path_style    = 'randombounce';
+path_style    = 'points';
 num_reconstr  = 1;
 
 param.p       = 1/2;  % We are using the l^p norm.
@@ -82,18 +82,10 @@ if view_profile, profile on; end
 %% Read our image in.
 u_image = rgb2gray(imread(file));
 dim = size(u_image);
-lambda1 = param.lambda1;
-lambda2 = param.lambda2;
 
 for i = 1:num_tests
 	paths = generatePaths(num_paths, dim, path_style);
 	[A u g] = generateAug(u_image, paths);
-	% scale = 3;
-	% u = u*scale;
-	% param.mu = param.mu / scale^2;
-	% param.lambda1 = param.lambda1 / scale;
-	% param.lambda2 = param.lambda2 / scale;
-	% g = g * scale;
 	err = [];
 	energy = [];
 	tic
@@ -105,10 +97,6 @@ for i = 1:num_tests
 		else
 			u0 = resizeu(partial_uguess, scaled_dim_old, 2);
 		end
-
-		%param.lambda1 = lambda1 / scaling_factor^2;
-		% param.mu      = param.mu / 4;
-		%param.lambda2 = lambda2 / scaling_factor;
 
 		%% Generate the line-segment paths that we collect data from.
 		partial_paths = paths(1:j*num_paths/num_reconstr, :);

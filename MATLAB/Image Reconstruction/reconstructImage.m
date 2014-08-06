@@ -59,9 +59,9 @@ path_style    = 'robot';
 param.p       = 1/2;  % We are using the l^p norm.
 param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
 param.beta    = 1;  % Beta weights towards sparsity of gradient.
-param.mu      = .001;  % Parameter on the fidelity term.
-param.lambda1 = .01; % Coefficient on the regular constraint.
-param.lambda2 = 1;  % Coefficient on the gradient constraints.
+param.mu      = .0005;  % Parameter on the fidelity term.
+param.lambda1 = .1; % Coefficient on the regular constraint.
+param.lambda2 = 1.5;  % Coefficient on the gradient constraints.
 param.N       = 1;  % Number of inner loops.
 param.tol     = 1/255; % We iterate until the rel. err is under this.
 param.maxiter = 100; % Split Bregman performs this many iterations at most.
@@ -93,6 +93,8 @@ end
 num_paths = size(paths,1);
 % g is scaled to more closely match the values expected in g
 scale = .22*downscale;
+% g = (g > 500) .* g;
+% keyboard;
 g = g/scale;
 
 % USING ROBOT COLLECTED DATA
