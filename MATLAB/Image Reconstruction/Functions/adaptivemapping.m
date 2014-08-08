@@ -26,7 +26,7 @@ lasterr = err(iter);
 
 while numpaths < param.maxpaths && lasterr >= param.tol
     
-    points = segmentImg(uguess,dim);
+    points = segmentImgGradient(uguess,dim);
     
     if isempty(points)
         newpaths = generatePaths(param.stepsize, dim, 'randombounce');

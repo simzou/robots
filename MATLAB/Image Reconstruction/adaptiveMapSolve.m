@@ -49,7 +49,7 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'SheppLogan128.png';
+file          = 'cornertest.png';
 
 num_tests     = 1;
 times         = zeros(num_tests, 1);

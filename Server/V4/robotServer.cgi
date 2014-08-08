@@ -46,10 +46,12 @@ import serial
 
 ## Path Directions for the Robot
 
-target = [ (232, 261), (169, 422), (361, 259), (241, 478), (506, 400),
-           (405, 176), (252, 470), (274, 723), (546, 476), (464, 325),
-           (171, 634), (441, 626), (262, 623), (466, 527), (342, 402),
-           (180, 352), (182, 714), (332, 316) ]
+
+target = [(171, 476), (302, 750), (136, 150), (165, 578), (304, 284), (472, 579), (214, 287), (107, 638), (463, 197), (415, 508), (469, 151), (191, 700), (322, 175), (106, 468), (496, 150), (191, 239), (258, 548), (368, 130), (220, 423), (428, 176), (128, 349), (462, 433), (157, 557), (535, 536), (334, 759), (118, 342), (396, 746), (281, 196), (402, 577), (255, 226), (217, 755), (146, 144), (518, 183), (498, 623), (457, 325), (425, 667), (337, 143), (410, 517), (248, 178), (434, 699), (515, 170), (179, 245), (480, 480), (509, 168), (339, 623), (128, 314), (539, 700), (240, 396), (483, 649), (324, 214), (165, 583), (344, 298), (452, 732), (409, 261), (206, 520), (300, 190), (152, 739), (343, 242), (124, 463), (318, 696), (135, 247), (525, 328), (119, 326), (415, 175), (110, 707), (417, 123), (119, 738), (223, 180), (392, 580), (143, 242), (331, 516), (505, 252), (485, 581), (196, 341), (344, 703), (246, 416), (473, 681), (145, 392), (397, 558), (107, 212), (455, 710), (140, 231), (497, 684), (186, 434), (459, 688), (273, 328), (406, 601), (167, 138), (368, 444), (156, 146), (465, 471), (152, 216), (352, 593), (314, 234), (155, 659), (397, 374), (531, 658), (216, 159), (385, 630), (163, 163), (170, 636), (501, 200), (216, 335), (516, 350), (210, 527), (476, 377), (164, 650), (500, 512), (267, 190), (391, 624), (276, 321), (475, 686), (103, 186), (401, 317), (317, 622), (506, 175), (101, 574), (326, 347), (398, 746), (152, 398), (493, 406), (191, 553), (538, 347), (206, 681), (465, 527), (295, 143), (209, 523), (319, 138), (539, 703), (453, 152), (523, 584), (316, 214), (312, 667), (285, 312), (195, 691), (506, 610), (200, 351), (238, 685), (165, 126), (232, 660), (474, 248), (467, 731), (182, 448), (427, 665), (428, 225), (260, 663), (370, 217), (468, 605), (511, 181), (483, 751), (396, 365), (142, 196), (454, 326), (528, 648), (236, 325), (331, 736), (353, 157), (161, 699), (166, 351), (469, 710), (123, 214), (219, 524), (514, 436), (282, 707), (400, 369), (320, 677), (494, 365), (151, 601), (530, 542), (152, 628), (165, 169), (129, 706), (215, 349), (119, 675), (385, 159), (418, 523), (439, 148), (334, 451), (446, 155), (340, 609), (529, 134), (322, 495), (524, 158), (453, 453), (168, 608), (143, 195), (526, 145), (259, 338), (534, 657), (113, 657), (505, 674), (297, 414), (248, 727), (485, 504), (158, 304), (431, 148), (512, 619), (196, 157), (186, 486), (441, 679), (302, 178), (345, 580), (535, 259), (195, 704), (501, 133), (174, 744), (227, 285), (323, 756), (114, 441), (485, 687), (109, 240), (527, 602), (454, 231), (137, 730), (534, 496), (177, 296), (500, 354), (106, 328), (214, 754), (467, 188), (197, 652), (124, 263), (427, 203), (339, 640), (254, 307), (525, 644)]
+
+# target = [(357, 444), (214, 290), (125, 600), (237, 338), (483, 603), (202, 485), (222, 186), (228, 580), (279, 596), (473, 727), (234, 396), (474, 241), (321, 237), (500, 133), (503, 516), (323, 329), (295, 605), (496, 473), (140, 255), (104, 466), (315, 658), (470, 485), (515, 280), (491, 394), (127, 182), (459, 171), (122, 577), (373, 528), (326, 226), (333, 326), (130, 261), (533, 551), (216, 157), (402, 625), (424, 236), (454, 394), (116, 238), (510, 270), (347, 627), (261, 219), (377, 343), (117, 198), (494, 518), (130, 566), (239, 714), (105, 610), (282, 496), (236, 263), (505, 657), (471, 567), (430, 243), (514, 330), (174, 742), (391, 615), (423, 681), (506, 457), (491, 641), (259, 619), (385, 532), (204, 234), (465, 275), (465, 235), (497, 304), (375, 595), (391, 302), (522, 373), (170, 284), (528, 645), (109, 328), (309, 139), (158, 138), (348, 476), (437, 231), (167, 496), (340, 591), (235, 580), (480, 289), (465, 440), (127, 333), (322, 724), (305, 416), (255, 742), (304, 393), (249, 739), (236, 335), (435, 481), (423, 713), (262, 378), (468, 121), (411, 381), (497, 718), (249, 467), (270, 715), (528, 609), (186, 157), (158, 530), (480, 287), (362, 519), (221, 721), (463, 458), (228, 604), (200, 328), (229, 430), (144, 712), (240, 479), (223, 386), (182, 637), (510, 616), (528, 696), (500, 545), (222, 146), (401, 576), (220, 224), (167, 205), (226, 177), (520, 419), (492, 661), (365, 480), (352, 614), (243, 187), (423, 723), (458, 198), (343, 310), (404, 747), (385, 555), (231, 518), (295, 259), (442, 747), (119, 594), (410, 486), (532, 722), (160, 361), (166, 193), (527, 354), (183, 330), (427, 231), (414, 209), (109, 494), (336, 746), (326, 589), (258, 229), (289, 160), (175, 394), (158, 281), (122, 262), (108, 182), (280, 390), (215, 253), (537, 407), (283, 752), (479, 639), (473, 215), (187, 505), (364, 707), (477, 392), (265, 548), (246, 717), (170, 286), (148, 210), (374, 120), (245, 551), (183, 612), (213, 166), (307, 148), (377, 579), (422, 367), (126, 354), (270, 149), (462, 407), (203, 566), (327, 209), (352, 560), (277, 631), (527, 687), (190, 120), (180, 424), (258, 120), (492, 593), (353, 504), (496, 186)]
+
+
 # target = [
 #             (81, 476),
 #             (307, 712),
@@ -98,7 +100,7 @@ Y_MIN = 80
 X_MAX = 600
 Y_MAX = 800
 
-PXIELS_PER_SECOND = 160.0   # Pixels the robot covers in moving straight for 1s
+PIXELS_PER_SECOND = 150.0   # Pixels the robot covers in moving straight for 1s
 RADS_PER_SECOND = 1.25      # Radians the robot covers in turning for 1s
 
 RADIUS_CUTOFF = 75   # The minimum radius the robot needs to be from its start
@@ -106,7 +108,7 @@ RADIUS_CUTOFF = 75   # The minimum radius the robot needs to be from its start
 
 MIN_TIME_TO_TRAVEL = 1500  # The minimum time the robot will travel in any path
 
-dbName = "Log1"  # The database to save to
+dbName = "Log5"  # The database to save to
 
 NO_DATA = -1     # The dummy value to store in database if no data was collected
 
@@ -188,12 +190,20 @@ def locate():
                 *|x|y|theta|!---------------------------...
     """
 
-    ser = serial.Serial('COM4', 115200, timeout=2, xonxoff=False,
+    ser = serial.Serial('COM6', 115200, timeout=2, xonxoff=False,
                                                      rtscts=False, dsrdtr=False)
     ser.flushInput()
     ser.flushOutput()
 
     raw_data = ser.readline()
+
+    ser.flushInput()
+    ser.flushOutput()
+
+    raw_data = ser.readline()
+
+    ser.flushInput()
+    ser.flushOutput()
 
     # Set variables for timeout in case serial cable isn't connected
     t = time.time()
@@ -207,7 +217,7 @@ def locate():
         startData = False  # Whether we are in 'reading' data mode
         locationIndex = 0  # Tracks entries from raw_data going to location_data
         locationData = [""] * NUM_SERIAL_DATA   # List for data read from serial
-        loopIndex = 0
+        loopIndex = len(raw_data)/2
 
         # Loop over all of raw_data
         while loopIndex < len(raw_data):
@@ -248,7 +258,7 @@ def findMaxTime(x, y, theta):
         c = c + 0.5
 
     # return the magnitude, converted to milliseconds
-    return int((c - 0.5)/PXIELS_PER_SECOND * 1000)
+    return int((c - 0.5)/PIXELS_PER_SECOND * 1000)
 
 
 def findNextTime(startX, startY, theta, endX, endY):
@@ -284,10 +294,10 @@ def findNextTime(startX, startY, theta, endX, endY):
         c = crossProduct(a,b)
         if c[2] < 0:
             return (int((-amountToTurn)/RADS_PER_SECOND * 1000),
-                    int(distanceToTravel/PXIELS_PER_SECOND * 1000))
+                    int(distanceToTravel/PIXELS_PER_SECOND * 1000))
         else:
             return (int((amountToTurn)/RADS_PER_SECOND * 1000),
-                    int(distanceToTravel/PXIELS_PER_SECOND * 1000))
+                    int(distanceToTravel/PIXELS_PER_SECOND * 1000))
 
 
 def dotProduct(a, b):
@@ -385,6 +395,18 @@ def numDataCollected(dbName):
     return cursor.fetchone()[0]
 
 
+def findCurrentEntry(dbName):
+    """
+        Given the name of the database, returns the DataPtID of the most recent
+        entry in the database. DataPtID is the primary key for the database.
+    """
+
+    db, cursor = connectDB(dbName)
+    sql = "SELECT MAX(DataPtID) FROM Data_Collection"
+    cursor.execute(sql)
+    return cursor.fetchone()[0]
+
+
 def inNewLocation(dbName, x, y, numDataPt):
     """
         Checks if the given x, y coordinates are outside some radius from the
@@ -412,6 +434,9 @@ if __name__ == "__main__":
     try:
         # Find the number of data points collected
         numDataPt = numDataCollected(dbName)
+
+        # Find the current entry in which data is being stored
+        currDataEntry = findCurrentEntry(dbName)
 
         # See if any form data about the has been submitted
         submittedData = cgi.FieldStorage()
@@ -475,7 +500,7 @@ if __name__ == "__main__":
                     # Check whether the camera has recognized that the robot has
                     # moved to a new location -- there is some lag between the
                     # robot moving and the camera locating it.
-                    if inNewLocation(dbName, x, y, numDataPt):
+                    if inNewLocation(dbName, x, y, currDataEntry):
                         timeToTurn, _ = findNextTime(x, y, theta,
                                         target[numDataPt % numTargets][0],
                                         target[numDataPt % numTargets][1])
@@ -483,7 +508,7 @@ if __name__ == "__main__":
                         resp = True
                         nextTime = timeToTurn                    
                         errorCode = NO_ERROR_T
-                        saveEndDataToDB(dbName, x, y, data, numDataPt)
+                        saveEndDataToDB(dbName, x, y, data, currDataEntry)
 
                     else:
                         errorCode = NNL_ERROR

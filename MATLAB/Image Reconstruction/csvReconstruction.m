@@ -51,26 +51,23 @@ clc; clear all; close all;
 
 file          = 'testbed03_aligned_70x90.png';
 
-num_paths     = 50;
+num_paths     = 500;
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
-path_style    = 'points';
-num_reconstr  = 1;
+path_style    = 'randombounce';
 
 param.p       = 1/2;  % We are using the l^p norm.
-param.alpha   = .5;  % Alpha weights towards sparsity of the signal.
-param.beta    = 1.5;  % Beta weights towards sparsity of gradient.
-param.mu      = 1;  % Parameter on the fidelity term.
+param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
+param.beta    = 1;  % Beta weights towards sparsity of gradient.
+param.mu      = .01;  % Parameter on the fidelity term.
 param.lambda1 = .1; % Coefficient on the regular constraint.
 param.lambda2 = 1;  % Coefficient on the gradient constraints.
 param.N       = 1;  % Number of inner loops.
 param.tol     = 1/255; % We iterate until the rel. err is under this.
 param.maxiter = 100; % Split Bregman performs this many iterations at most.
-param.makegif = false; % determines if a gif of the iterations will be made
-param.gifname = 'iter_50.gif';
 
-view_profile  = true;
+view_profile  = false;
 show_all_fig  = false;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -82,89 +79,77 @@ if view_profile, profile on; end
 %% Read our image in.
 u_image = rgb2gray(imread(file));
 dim = size(u_image);
+%dim = [1000 1000];
+downscale = 10;
+%dim = dim/downscale
 
 for i = 1:num_tests
-	paths = generatePaths(num_paths, dim, path_style);
-	[A u g] = generateAug(u_image, paths);
-	err = [];
-	energy = [];
-	tic
-	for j = 1:num_reconstr
-		scaling_factor = 2^(num_reconstr-j);
-		scaled_dim = 1/scaling_factor * dim;
-		if j == 1
-			u0 = zeros(prod(scaled_dim),1);
-		else
-			u0 = resizeu(partial_uguess, scaled_dim_old, 2);
-		end
 
-		%% Generate the line-segment paths that we collect data from.
-		partial_paths = paths(1:j*num_paths/num_reconstr, :);
-		scaled_partial_paths = 1/scaling_factor * partial_paths;
+%% Generate the line-segment paths that we collect data from.
+%paths = generatePaths(num_paths, dim, path_style, [80 15 15 80]);
 
-		%% Compute A, our path matrix, convert u to a vector, and compute Au=g.
-		partial_A = generateAug(zeros(scaled_dim), scaled_partial_paths);
-		partial_A = 1/scaling_factor * partial_A;
-		% partial_g = 1/scaling_factor * g(1:j*num_paths/num_reconstr, :);
-		partial_g = g(1:j*num_paths/num_reconstr, :);
+%% Compute A, our path matrix, convert u to a vector, and compute Au=g.
+[paths, ~] = paths_g_from_csv('test.csv');
+% scale = 3;
+% g = g/scale;
 
-		%% Now run the Split Bregman Algorithm to reconstruct u from A and g.
-		[partial_uguess partial_err partial_energy] = splitBregmanSolve( partial_A, partial_g, u0, scaled_dim, param );
-		err = [err; partial_err];
-		energy = [energy; partial_energy];
+% APPLIES ROBOT PATHS TO IMAGE
 
-		scaled_dim_old = scaled_dim;
-		%imagesc(reshape(partial_uguess, scaled_dim)); colormap gray;
-		%pause;
+paths = paths/downscale
+[A, u, g] = generateAug(u_image, paths);
+% param.mu = param.mu / scale^2;
+% param.lambda1 = param.lambda1 / scale;
+% param.lambda2 = param.lambda2 / scale;
 
-	end
+%% Now run the Split Bregman Algorithm to reconstruct u from A and g.
+u0 = zeros(prod(dim), 1);
+tic;
+[uguess err energy] = splitBregmanSolve( A, g, u0, dim, param );
+times(i)=toc;
+solveTime = times(i);
+trueError = norm(u-uguess) / norm(u);
+errors(i) = trueError;
 
-	uguess = partial_uguess;
+%% Now plot our results.
 
-	times(i)=toc;
-	solveTime = times(i);
-	trueError = norm(u-uguess) / norm(u);
-	errors(i) = trueError;
+img = reshape(u, dim);
+img_guess = reshape(uguess, dim);
 
-	%% Now plot our results.
+if show_all_fig, figure; end
 
-	img = reshape(u, dim);
-	img_guess = reshape(uguess, dim);
+subplot_rows = 2;
+subplot_cols = 3;
 
-	if show_all_fig, figure; end
+hold on
 
-	subplot_rows = 2;
-	subplot_cols = 3;
+colormap gray;
+subplot(subplot_rows,subplot_cols,1);
+imagesc(img);
+title('Original Image');
 
-	hold on
+subplot(subplot_rows,subplot_cols,2);
+% imagesc(img_guess,[0 255]);
+imagesc(img_guess);
+title({'Reconstructed Image ', strcat('Solve Time = ', [' ' num2str(solveTime)], 's')});
 
-	colormap gray;
-	subplot(subplot_rows,subplot_cols,1);
-	imagesc(img);
-	title(strcat('Original Image: ', num2str(dim(1)), 'x', num2str(dim(2))));
+subplot(subplot_rows,subplot_cols,3);
+weights = compute_paths(paths,dim);
+imagesc(weights);
+title(strcat(num2str(num_paths), [' ' path_style], ' Paths'));
 
-	subplot(subplot_rows,subplot_cols,2);
-	imagesc(img_guess, [0 255]);
-	title({'Reconstructed Image ', strcat('Solve Time = ', num2str(solveTime), 's')});
+subplot(subplot_rows,subplot_cols,5);
+plot(err);
+title('Error');
 
-	subplot(subplot_rows,subplot_cols,3);
-	weights = compute_paths(paths,dim);
-	imagesc(weights);
-	title({strcat(num2str(num_paths), ' Paths'), strcat(num2str(num_paths/prod(dim)), ' Path to Pixel Ratio')});
+subplot(subplot_rows,subplot_cols,4);
+plot(energy);
+title('Energy');
 
-	subplot(subplot_rows,subplot_cols,5);
-	plot(err);
-	title(strcat('Error: ', num2str(size(err,1)), ' iterations'));
+subplot(subplot_rows,subplot_cols,6);
+imagesc(reshape(abs(u-uguess), dim));
+title(strcat('True Error =', [' ' num2str(trueError)]));
 
-	subplot(subplot_rows,subplot_cols,4);
-	plot(energy);
-	title('Energy');
-
-	subplot(subplot_rows,subplot_cols,6);
-	imagesc(reshape(abs(u-uguess), dim));
-	title(strcat('True Error = ', num2str(trueError)));
-
-	hold off
+hold off
 
 end % end of for loop for each test
 

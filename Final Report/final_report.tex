@@ -22,15 +22,7 @@
 
 \begin{abstract}
 
-In the field of signal processing, compressed sensing is a technique used for 
-reconstructing signals and images from very few samples and is commonly used in 
-fMRIs and medical imaging. We aim to apply compressed sensing to allow 
-autonomous robots to map an environment and identify areas of interest which 
-are significantly different from the surrounding area. In our experiment, we 
-program a robot equipped with sensors to travel along a path, do on-board 
-summation of sensor readings, and send that sum (or path integral) to a 
-server. We then apply reconstruction algorithms to the data, which consists of sensor readings 
-and the travelled paths, to reconstruct the environment.
+Compressed sensing is a technique used to reconstruct sparse signals and images while sampling well below the Nyquist rate. Commonly used in fMRIs and medical imaging, we aim to use this technique to allow autonomous robots to map piecewise constant areas of interest within a larger environment. In our experiment, we programmed a robot equipped with a reflectance sensor to travel along straight-line paths on a black testbed with white regions of interest. The robot integrated sensor readings and sent that sum to a remote server after each path. Each data point consists of the robot's start and end positions, tracked by an overhead camera, and the integral found along that path. Once all the data has been collected, the environment is reconstructed by minimizing the sum of the data fitting term and an L1 penalty term. When using an adaptive path selection scheme, preliminary simulations of our experiment show reconstruction of 100x100 images with only 100 data points (relative err. = 0.28), and we have begun trials with data collected by the robot.
 
 \end{abstract}
 
@@ -42,6 +34,10 @@ and the travelled paths, to reconstruct the environment.
 Discuss Compressed Sensing
 
 \end{comment}
+
+Compressed sensing describes a technique in which a signal is reconstructed by 
+solving an underdetermined linear system. Doing so allows a signal to be 
+found from a relatively small amount of data.
 
 \section{Experiment settings}
 \subsection{Testbed}

@@ -99,7 +99,6 @@ function paths = generatePaths(num_paths, dim, path_type, points)
             maxdist = max(dist);
             
             weights = (maxdist-dist)./sum(dist);
-            keyboard
             idx = randsample(size(points,1), 1, 1, weights);
             
             center = points(idx, :);
@@ -130,7 +129,17 @@ function paths = generatePaths(num_paths, dim, path_type, points)
 			paths(i,:) = [point1 point2];
 			point1 = point2;
         end    	
+    
+    elseif strcmp(path_type, 'points')
+        N = dim(1);
+        M = dim(2);
+        for i = 1:num_paths,
+            point1 = [randi(M-1) rand(1)*N];
+            point2 = point1 + [1 0];
+            paths(i,:) = [point1 point2];
+        end
     end
+
 
 end
 

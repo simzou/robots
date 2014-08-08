@@ -137,3 +137,17 @@ direction helped make the paths more random.
 start location. This made the video tracking HELLA more accurate, now it actually requests the
 server again for its position if the position the first time round was imprecise causing the 
 server to respond "False" the first time round.
+
+Bad data: 51, 52, 53, 54, 55?, 81, 82, 91, 92, 95, 96, 109, 110, 117, 118, 125, 133, 134, 135, 136
+
+
+Bad data 2: 7, 8, 9, 15, 23, 38, 39, 53, 55, 59, 69, 70, 71, 79, 80, 85, 87, 89, 90, 95
+
+Bad data 3: 7, 11, 12, 13, 14, 15, 33, 34, 35, 44, 45, 51-55, 60, 61, 62, 63
+
+ Bad Data 4: 32, 36, 37, 53, 54, 71, 72, 78, 79, 81, 82, 114, 115, 116, 123, 124
+
+Current issues with code: 
+
+The theta that gets sent with state 0 is incorrect - it is the theta from before the robot turned
+Possible fix: Change how you parse data 
