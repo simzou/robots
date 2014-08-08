@@ -59,8 +59,8 @@ path_style    = 'randombounce';
 num_reconstr  = 1;
 
 param.p       = 1/2;  % We are using the l^p norm.
-param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
-param.beta    = 1;  % Beta weights towards sparsity of gradient.
+param.alpha   = .5;  % Alpha weights towards sparsity of the signal.
+param.beta    = 1.5;  % Beta weights towards sparsity of gradient.
 param.mu      = 1;  % Parameter on the fidelity term.
 param.lambda1 = .1; % Coefficient on the regular constraint.
 param.lambda2 = 1;  % Coefficient on the gradient constraints.

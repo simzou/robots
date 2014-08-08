@@ -78,10 +78,10 @@ if view_profile, profile on; end
 
 %% Read our image in.
 u_image = rgb2gray(imread(file));
+u_image = imresize(u_image, [1000 1000]);
 dim = size(u_image);
-dim = [1000 1000];
 downscale = 10;
-dim = dim/downscale
+dim = dim/downscale;
 
 for i = 1:num_tests
 
@@ -92,7 +92,8 @@ for i = 1:num_tests
 [paths g] = paths_g_from_csv('test.csv');
 scale = 1;
 g = g/scale;
-paths = paths/downscale
+paths = paths/downscale;
+num_paths = size(paths,1);
 [A, u, ~] = generateAug(zeros(dim), paths);
 % param.mu = param.mu / scale^2;
 % param.lambda1 = param.lambda1 / scale;
