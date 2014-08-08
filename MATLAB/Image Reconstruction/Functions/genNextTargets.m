@@ -17,4 +17,7 @@ else
     newpaths = generatePaths(numpaths, dim, 'centered', points);
 end
 
+newpaths = uint64(newpaths(:,1:2));
+fprintf([repmat('%u,', 1, size(newpaths, 2)-1) '%u\n'], newpaths')
+
 end
