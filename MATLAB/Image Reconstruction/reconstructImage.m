@@ -57,16 +57,18 @@ errors        = [];
 path_style    = 'robot';
 
 param.p       = 1/2;  % We are using the l^p norm.
-param.alpha   = 1;  % Alpha weights towards sparsity of the signal.
+param.alpha   = 0;  % Alpha weights towards sparsity of the signal.
 param.beta    = 1;  % Beta weights towards sparsity of gradient.
-param.mu      = .0005;  % Parameter on the fidelity term.
+param.mu      = 1;  % Parameter on the fidelity term.
 param.lambda1 = .1; % Coefficient on the regular constraint.
-param.lambda2 = 1.5;  % Coefficient on the gradient constraints.
+param.lambda2 = 1.5
+
+;  % Coefficient on the gradient constraints.
 param.N       = 1;  % Number of inner loops.
 param.tol     = 1/255; % We iterate until the rel. err is under this.
 param.maxiter = 100; % Split Bregman performs this many iterations at most.
 
-use_robot_data = true;
+use_robot_data = false;
 
 view_profile  = false;
 show_all_fig  = false;
@@ -80,13 +82,6 @@ if view_profile, profile on; end
 %% Read our image in.
 
 u_image = rgb2gray(imread(file));
-<<<<<<< HEAD
-u_image = imresize(u_image, [1000 1000]);
-dim = size(u_image);
-downscale = 10;
-dim = dim/downscale;
-=======
->>>>>>> ef37a3a76987028b44fad9aa9da1513a8521b963
 
 dim = [900 700]; % Size of the testbed at camera resolution
 dim = dim/downscale; % New size for lower resolution reconstruction
@@ -100,24 +95,13 @@ end
 num_paths = size(paths,1);
 % g is scaled to more closely match the values expected in g
 scale = .22*downscale;
-% g = (g > 500) .* g;
-% keyboard;
 g = g/scale;
-<<<<<<< HEAD
-paths = paths/downscale;
-num_paths = size(paths,1);
-[A, u, ~] = generateAug(zeros(dim), paths);
-% param.mu = param.mu / scale^2;
-% param.lambda1 = param.lambda1 / scale;
-% param.lambda2 = param.lambda2 / scale;
-=======
 
 % USING ROBOT COLLECTED DATA
 
 %% Compute A, our path matrix, convert u to a vector, and compute Au=g.
 paths = paths/downscale;
 [A, u, g_from_image] = generateAug(u_image, paths);
->>>>>>> ef37a3a76987028b44fad9aa9da1513a8521b963
 
 %% Now run the Split Bregman Algorithm to reconstruct u from A and g.
 u0 = zeros(prod(dim), 1);
