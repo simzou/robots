@@ -55,10 +55,10 @@ num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 
-param.tol       = 0;
-param.maxpaths  = 100;
+param.tol       = -.01;
+param.maxpaths  = 200;
 param.stepsize  = 10;
-num_initpaths   = param.maxpaths/10;
+num_initpaths   = param.maxpaths/20;
 
 view_profile  = false;
 show_all_fig  = false;
