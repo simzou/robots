@@ -1,5 +1,5 @@
 clear all; close; clc;
-file =  'test50.png';
+file =  'testbed03_aligned_70x90.png';
 type = 'grid';
 
 image = rgb2gray(imread(file));
@@ -10,10 +10,10 @@ if type == 'rand'
     num_points = 200;
     points = [randi(dim(1),num_points,1) randi(dim(2),num_points,1)];
 elseif type == 'grid'
-    grid_scale = 10;
+    grid_scale = 20;
     points = [];
     for ind = 1:grid_scale:dim(2)
-        points = [points; [1:grid_scale:dim(1)]' ind*ones(ceil(dim(1)/grid_scale),1)];
+        points = [points; [dim(1):-grid_scale:1]' ind*ones(ceil(dim(1)/grid_scale),1)];
     end
     num_points = size(points,1);
 end
@@ -33,9 +33,10 @@ for i = 1:dim(1)
     end
 end
 toc;
-ssim = ssim(double(reshape(image,dim(1)*dim(2),1)),reshape(result,dim(1)*dim(2),1))
+%ssim = ssim(double(reshape(image,dim(1)*dim(2),1)),reshape(result,dim(1)*dim(2),1))
+
 for point = 1:num_points
-    %result(points(point,1),points(point,2)) = 300;
+    result(points(point,1),points(point,2)) = 300;
 end
 
 
