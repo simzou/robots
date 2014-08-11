@@ -1,4 +1,4 @@
-function paths = generatePaths(num_paths, dim, path_type, points)
+function paths = generatePaths(num_paths, dim, bounds, path_type, points)
 	% by default, generate random paths
     
 	paths = zeros(num_paths,4);
@@ -107,7 +107,7 @@ function paths = generatePaths(num_paths, dim, path_type, points)
             theta = 2*pi*rand(1);
             
             % Find the maximum distance we can go in that direction.
-            rmax = find_max_dist( M, N, center, theta );
+            rmax = find_max_dist( bounds, center, theta );
             
             % Pick a distance to go and go there.
             r = rmax*rand(1);
@@ -123,9 +123,13 @@ function paths = generatePaths(num_paths, dim, path_type, points)
         
         N = dim(1);
         M = dim(2);
-    	point1 = [rand(1)*M rand(1)*N];
+        
+        x0 = bounds(1); xF = bounds(3);
+        y0 = bounds(2); yF = bounds(4);
+        
+    	point1 = [x0+rand(1)*xF y0+rand(1)*yF];
         for i = 1:num_paths
-    		point2 = [rand(1)*M rand(1)*N];
+    		point2 = [x0+rand(1)*xF y0+rand(1)*yF];
 			paths(i,:) = [point1 point2];
 			point1 = point2;
         end    	
@@ -161,26 +165,29 @@ function point = get_random_point_on_edge(edge_num, dim)
 	point = [x1 y1];
 end
 
-function rmax = find_max_dist( M, N, center, theta )
+function rmax = find_max_dist( bounds, center, theta )
+
+x0 = bounds(1); xF = bounds(3);
+y0 = bounds(2); yF = bounds(4);
 
 m0 = center(1); n0 = center(2);
 
 if 0 < theta && theta < pi/2
-    rmax = min( m0/sin(theta), (N-n0)/cos(theta) );
+    rmax = min( (m0-y0)/sin(theta), (xF-n0)/cos(theta) );
 elseif pi/2 < theta && theta < pi
-    rmax = min( m0/sin(theta), -n0/cos(theta) );
+    rmax = min( (m0-y0)/sin(theta), -(n0-x0)/cos(theta) );
 elseif pi < theta && theta < (3/2)*pi
-    rmax = min( -(M-m0)/sin(theta), -n0/cos(theta) );
+    rmax = min( -(yF-m0)/sin(theta), -(n0-x0)/cos(theta) );
 elseif (3/2)*pi < theta && theta < 2*pi
-    rmax = min( -(M-m0)/sin(theta), (N-n0)/cos(theta) );
+    rmax = min( -(yF-m0)/sin(theta), (xF-n0)/cos(theta) );
 elseif theta == 0 || theta == 2*pi;
-    rmax = N-n0;
+    rmax = xF-n0;
 elseif theta == pi/2
-    rmax = m0;
+    rmax = m0-y0;
 elseif theta == pi
-    rmax = n0;
+    rmax = n0-x0;
 elseif theta == (3/2)*pi
-    rmax = M-m0;
+    rmax = yF-m0;
 else
     fprintf('pathing error')
     rmax = 0;

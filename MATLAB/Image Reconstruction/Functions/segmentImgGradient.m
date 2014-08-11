@@ -1,4 +1,4 @@
-function points = segmentImg(uguess,dim)
+function points = segmentImgGradient(uguess,dim)
 
 img_guess = reshape(uguess, dim);
 

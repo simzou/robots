@@ -1,4 +1,4 @@
-function [uguess paths err energy] = adaptiveMapping(uguess, u_image, paths, param)
+function [uguess, paths, err, energy] = adaptiveMapping(uguess, u_image, paths, bounds, param)
 
 %% If certain parameters aren't specified, use these defaults.
 if ~isfield(param, 'tol')
@@ -26,12 +26,12 @@ lasterr = err(iter);
 
 while numpaths < param.maxpaths && lasterr >= param.tol
     
-    points = segmentImgGradient(uguess,dim);
+    points = segmentImg(uguess,bounds,dim);
     
     if isempty(points)
-        newpaths = generatePaths(param.stepsize, dim, 'randombounce');
+        newpaths = generatePaths(param.stepsize, dim, bounds, 'randombounce');
     else
-        newpaths = generatePaths(param.stepsize, dim, 'centered', points);
+        newpaths = generatePaths(param.stepsize, dim, bounds, 'centered', points);
     end
     
     paths = [paths ; newpaths];
