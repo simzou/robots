@@ -130,7 +130,7 @@ function paths = generatePaths(num_paths, dim, path_type, points)
 			point1 = point2;
         end    	
     
-    elseif strcmp(path_type, 'points')
+    elseif strcmp(path_type, 'randompoints')
         N = dim(1);
         M = dim(2);
         for i = 1:num_paths,
@@ -138,9 +138,18 @@ function paths = generatePaths(num_paths, dim, path_type, points)
             point2 = point1 + [1 0];
             paths(i,:) = [point1 point2];
         end
+
+    elseif strcmp(path_type, 'gridpoints')
+        M = dim(1);
+        N = dim(2);
+        gridscale = num_paths;
+        paths = [];
+        for i = 0.5:gridscale:N
+            for j = 0.5:gridscale:M
+                paths = [paths; convertPointToPath([i j])];
+            end
+        end
     end
-
-
 end
 
 function point = get_random_point_on_edge(edge_num, dim)
@@ -186,4 +195,12 @@ else
     rmax = 0;
 end
 
+end
+
+function path = convertPointToPath(point)
+    startx = floor(point(1));
+    endx   = ceil(point(1));
+    starty = point(2);
+    endy   = point(2);
+    path = [startx starty endx endy] ;
 end
