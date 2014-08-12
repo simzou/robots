@@ -82,6 +82,8 @@ function paths = generatePaths(num_paths, dim, bounds, path_type, points)
         M = dim(1);
         N = dim(2);
         
+        rmin = 30;
+        
         idx = randsample(size(points,1), 1, 1);
         center = points(idx, :);
         m = center(1); n = center(2);
@@ -110,7 +112,7 @@ function paths = generatePaths(num_paths, dim, bounds, path_type, points)
             rmax = find_max_dist( dim, bounds, center, theta );
             
             % Pick a distance to go and go there.
-            r = rmax*rand(1);
+            r = rmin + (rmax-rmin)*rand(1);
             
             m = abs(center(1) - r*sin(theta));
             n = abs(center(2) + r*cos(theta));
@@ -127,12 +129,20 @@ function paths = generatePaths(num_paths, dim, bounds, path_type, points)
         x0 = bounds(1); xF = bounds(3);
         y0 = bounds(2); yF = bounds(4);
         
+        rmin = 30;
+        
     	point1 = [x0+rand(1)*(xF-x0) y0+rand(1)*(yF-y0)];
         for i = 1:num_paths
+            
     		point2 = [x0+rand(1)*(xF-x0) y0+rand(1)*(yF-y0)];
-			paths(i,:) = [point1 point2];
-			point1 = point2;
-        end 	
+            
+            while norm(point1-point2) < rmin
+                point2 = [x0+rand(1)*(xF-x0) y0+rand(1)*(yF-y0)];
+            end
+            
+            paths(i,:) = [point1 point2];
+            point1 = point2;
+        end
     
     elseif strcmp(path_type, 'randompoints')
         N = dim(1);
