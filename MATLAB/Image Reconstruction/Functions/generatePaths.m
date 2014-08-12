@@ -111,6 +111,11 @@ function paths = generatePaths(num_paths, dim, bounds, path_type, points)
             % Find the maximum distance we can go in that direction.
             rmax = find_max_dist( dim, bounds, center, theta );
             
+            while rmax < rmin
+                theta = 2*pi*rand(1);
+                rmax = find_max_dist( dim, bounds, center, theta );
+            end
+            
             % Pick a distance to go and go there.
             r = rmin + (rmax-rmin)*rand(1);
             
