@@ -121,19 +121,19 @@ function paths = generatePaths(num_paths, dim, bounds, path_type, points)
 
     elseif strcmp(path_type, 'randombounce')
         
-        N = dim(1);
-        M = dim(2);
+        M = dim(1);
+        N = dim(2);
         
         x0 = bounds(1); xF = bounds(3);
         y0 = bounds(2); yF = bounds(4);
         
-    	point1 = [x0+rand(1)*xF y0+rand(1)*yF];
+    	point1 = [x0+rand(1)*(xF-x0) y0+rand(1)*(yF-y0)];
         for i = 1:num_paths
-    		point2 = [x0+rand(1)*xF y0+rand(1)*yF];
+    		point2 = [x0+rand(1)*(xF-x0) y0+rand(1)*(yF-y0)];
 			paths(i,:) = [point1 point2];
 			point1 = point2;
-        end    	
-    
+        end
+
     elseif strcmp(path_type, 'points')
         N = dim(1);
         M = dim(2);

@@ -77,8 +77,8 @@ for i = 1:num_tests
 tic;
     
 %% Generate the line-segment paths that we collect data from.
-bounds = [10 12 54 76];
-initpaths = generatePaths(num_initpaths, dim, bounds, 'randombounce')
+bounds = [10 02 54 76];
+initpaths = generatePaths(num_initpaths, dim, bounds, 'randombounce');
 
 %% Compute A0, our path matrix, convert u to a vector, and compute Au=g.
 [A, u, g] = generateAug(u_image, initpaths);
