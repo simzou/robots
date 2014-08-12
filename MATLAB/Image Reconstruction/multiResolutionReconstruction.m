@@ -51,11 +51,11 @@ clc; clear all; close all;
 
 file          = 'testbed03_aligned_70x90.png';
 
-num_paths     = 50;
+num_paths     = 1000;
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
-path_style    = 'points';
+path_style    = 'randombounce';
 num_reconstr  = 1;
 
 param.p       = 1/2;  % We are using the l^p norm.

@@ -49,7 +49,7 @@ for i=1:size(intersects,1)-1
             if yy2-yy1<0
                 weights(dim(1)-yint+1,xint+1) = weight;
             else
-                weights(dim(1)-yint+1,xint+1) = weight;
+                weights(dim(1)-yint,xint+1) = weight;
             end
         else
             weights(ceil(dim(1)-yy1),xint+1) = weight;

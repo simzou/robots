@@ -47,23 +47,20 @@
 %
 
 %% Define the file path, paths options, and Split Bregman parameters.
-clc; clear all; close all;
+function [err, similarity, time] = runReconstruction(num_paths, path_style)
 
 file          = 'testbed03_aligned_70x90.png'; % Image file for error checking
-downscale     = 10; % Factor to rescale reconstruction by
 
 times         = [];
 errors        = [];
-path_style    = 'robot';
+%path_style    = 'robot';
 
-param.p       = 1/2;  % We are using the l^p norm.
+param.p       = 1;  % We are using the l^p norm.
 param.alpha   = 0;  % Alpha weights towards sparsity of the signal.
 param.beta    = 1;  % Beta weights towards sparsity of gradient.
 param.mu      = 1;  % Parameter on the fidelity term.
 param.lambda1 = .1; % Coefficient on the regular constraint.
-param.lambda2 = 1.5
-
-;  % Coefficient on the gradient constraints.
+param.lambda2 = 10;  % Coefficient on the gradient constraints.
 param.N       = 1;  % Number of inner loops.
 param.tol     = 1/255; % We iterate until the rel. err is under this.
 param.maxiter = 100; % Split Bregman performs this many iterations at most.
@@ -82,25 +79,10 @@ if view_profile, profile on; end
 %% Read our image in.
 
 u_image = rgb2gray(imread(file));
-
-dim = [900 700]; % Size of the testbed at camera resolution
-dim = dim/downscale; % New size for lower resolution reconstruction
-
-if size(u_image)~=dim
-    u_image = zeros(dim);
-end
-
-%% Generate paths and g from .csv file
-[paths g] = paths_g_from_csv('test.csv');
-num_paths = size(paths,1);
-% g is scaled to more closely match the values expected in g
-scale = .22*downscale;
-g = g/scale;
-
-% USING ROBOT COLLECTED DATA
+dim = size(u_image);
+paths = generatePaths(num_paths, dim, path_style, []);
 
 %% Compute A, our path matrix, convert u to a vector, and compute Au=g.
-paths = paths/downscale;
 [A, u, g_from_image] = generateAug(u_image, paths);
 
 %% Now run the Split Bregman Algorithm to reconstruct u from A and g.
@@ -120,6 +102,8 @@ errors = trueError;
 
 img = reshape(u, dim);
 img_guess = reshape(uguess, dim);
+
+num_paths = size(paths,1);
 
 if show_all_fig, figure; end
 

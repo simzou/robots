@@ -77,7 +77,7 @@ for i = 1:num_tests
 tic;
     
 %% Generate the line-segment paths that we collect data from.
-bounds = [10 02 54 76];
+bounds = [40 30 54 76];
 initpaths = generatePaths(num_initpaths, dim, bounds, 'randombounce');
 
 %% Compute A0, our path matrix, convert u to a vector, and compute Au=g.

@@ -107,7 +107,7 @@ function paths = generatePaths(num_paths, dim, bounds, path_type, points)
             theta = 2*pi*rand(1);
             
             % Find the maximum distance we can go in that direction.
-            rmax = find_max_dist( bounds, center, theta );
+            rmax = find_max_dist( dim, bounds, center, theta );
             
             % Pick a distance to go and go there.
             r = rmax*rand(1);
@@ -132,9 +132,9 @@ function paths = generatePaths(num_paths, dim, bounds, path_type, points)
     		point2 = [x0+rand(1)*(xF-x0) y0+rand(1)*(yF-y0)];
 			paths(i,:) = [point1 point2];
 			point1 = point2;
-        end
-
-    elseif strcmp(path_type, 'points')
+        end 	
+    
+    elseif strcmp(path_type, 'randompoints')
         N = dim(1);
         M = dim(2);
         for i = 1:num_paths,
@@ -142,9 +142,18 @@ function paths = generatePaths(num_paths, dim, bounds, path_type, points)
             point2 = point1 + [1 0];
             paths(i,:) = [point1 point2];
         end
+
+    elseif strcmp(path_type, 'gridpoints')
+        M = dim(1);
+        N = dim(2);
+        gridscale = num_paths;
+        paths = [];
+        for i = 0.5:gridscale:N
+            for j = 0.5:gridscale:M
+                paths = [paths; convertPointToPath([i j])];
+            end
+        end
     end
-
-
 end
 
 function point = get_random_point_on_edge(edge_num, dim)
@@ -165,10 +174,10 @@ function point = get_random_point_on_edge(edge_num, dim)
 	point = [x1 y1];
 end
 
-function rmax = find_max_dist( bounds, center, theta )
+function rmax = find_max_dist( dim, bounds, center, theta )
 
 x0 = bounds(1); xF = bounds(3);
-y0 = bounds(2); yF = bounds(4);
+y0 = dim(1) - bounds(4); yF = dim(1) - bounds(2);
 
 m0 = center(1); n0 = center(2);
 
@@ -193,4 +202,12 @@ else
     rmax = 0;
 end
 
+end
+
+function path = convertPointToPath(point)
+    startx = floor(point(1));
+    endx   = ceil(point(1));
+    starty = point(2);
+    endy   = point(2);
+    path = [startx starty endx endy] ;
 end
