@@ -49,16 +49,16 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'testbed03_aligned_70x90.png';
+file          = 'testbedcorner.png';
 
 num_tests     = 1;
 times         = zeros(num_tests, 1);
 errors        = zeros(num_tests, 1);
 
 param.tol       = -.01;
-param.maxpaths  = 10;
-param.stepsize  = 1;
-num_initpaths   = param.maxpaths/20;
+param.maxpaths  = 200;
+param.stepsize  = 20;
+num_initpaths   = 20;
 
 view_profile  = false;
 show_all_fig  = false;
@@ -77,7 +77,7 @@ for i = 1:num_tests
 tic;
     
 %% Generate the line-segment paths that we collect data from.
-bounds = [10 12 54 76];
+bounds = [10 12 54 76]; %12
 initpaths = generatePaths(num_initpaths, dim, bounds, 'randombounce');
 
 %% Compute A0, our path matrix, convert u to a vector, and compute Au=g.

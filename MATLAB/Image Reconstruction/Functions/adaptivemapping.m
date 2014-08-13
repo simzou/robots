@@ -1,4 +1,4 @@
-function [uguess, paths, err, energy] = adaptiveMapping(uguess, u_image, paths, bounds, param)
+function [uguess, paths, err, energy] = adaptivemapping(uguess, u_image, paths, bounds, param)
 
 %% If certain parameters aren't specified, use these defaults.
 if ~isfield(param, 'tol')

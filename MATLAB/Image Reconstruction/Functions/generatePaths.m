@@ -82,7 +82,7 @@ function paths = generatePaths(num_paths, dim, bounds, path_type, points)
         M = dim(1);
         N = dim(2);
         
-        rmin = 30;
+        rmin = 12;
         
         idx = randsample(size(points,1), 1, 1);
         center = points(idx, :);
@@ -92,11 +92,11 @@ function paths = generatePaths(num_paths, dim, bounds, path_type, points)
         for i = 1:num_paths
             
             % Connect our paths.
-            paths(i, 1:2) = [n M-m];
+            paths(i, 1:2) = [n m];
             
             % Pick the point we want to be close to.
             %idx = randi(size(points, 2)/2)*2-1;
-            relpts = bsxfun(@minus, points,center);
+            relpts = bsxfun(@minus, points, center);
             dist = sqrt(sum(relpts.^2,2));
             maxdist = max(dist);
             
@@ -122,7 +122,7 @@ function paths = generatePaths(num_paths, dim, bounds, path_type, points)
             m = abs(center(1) - r*sin(theta));
             n = abs(center(2) + r*cos(theta));
             
-            paths(i, 3:4) = [n M-m];
+            paths(i, 3:4) = [n m];
             
         end
 
@@ -192,7 +192,7 @@ end
 function rmax = find_max_dist( dim, bounds, center, theta )
 
 x0 = bounds(1); xF = bounds(3);
-y0 = dim(1) - bounds(4); yF = dim(1) - bounds(2);
+y0 = bounds(2); yF = bounds(4);
 
 m0 = center(1); n0 = center(2);
 
