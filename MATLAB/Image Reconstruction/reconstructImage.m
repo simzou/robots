@@ -49,7 +49,7 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'testbed03_aligned_70x90.png'; % Image file for error checking
+file          = 'testbed05.png'; % Image file for error checking
 downscale     = 10; % Factor to rescale reconstruction by
 
 times         = [];
@@ -59,7 +59,7 @@ path_style    = 'robot';
 param.p       = 1/2;  % We are using the l^p norm.
 param.alpha   = 0;  % Alpha weights towards sparsity of the signal.
 param.beta    = 1;  % Beta weights towards sparsity of gradient.
-param.mu      = 1;  % Parameter on the fidelity term.
+param.mu      = .001;  % Parameter on the fidelity term.
 param.lambda1 = .1; % Coefficient on the regular constraint.
 param.lambda2 = 1.5
 
@@ -68,7 +68,7 @@ param.N       = 1;  % Number of inner loops.
 param.tol     = 1/255; % We iterate until the rel. err is under this.
 param.maxiter = 100; % Split Bregman performs this many iterations at most.
 
-use_robot_data = false;
+use_robot_data = true;
 
 view_profile  = false;
 show_all_fig  = false;

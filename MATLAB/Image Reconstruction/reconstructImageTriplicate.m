@@ -49,7 +49,7 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'testbed03_aligned_70x90.png'; % Image file for error checking
+file          = 'testbed05_70x90.png'; % Image file for error checking
 downscale     = 10; % Factor to rescale reconstruction by
 
 path_style    = 'robot';
