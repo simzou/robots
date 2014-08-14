@@ -1,0 +1,100 @@
+%% This BibTeX bibliography file was created using BibDesk.
+%% http://bibdesk.sourceforge.net/
+
+
+%% Created for Simon Zou at 2014-07-02 10:12:25 -0700 
+
+
+%% Saved with string encoding Unicode (UTF-8) 
+
+
+
+@inproceedings{chartrand2009fast,
+	Annote = {
+		This article presents an algorithm combining previous work on compressed sensing with Osher and Goldstein's Split Bregman algorithm to achieve faster results for image reconstruction. The Fast nonconvex MRI reconstruction algorithm also uses operator splitting and reconstructs an image from $k$-space data and $k$-space locations projects with $O(n log n)$ time complexity. In our project we may be able to use this algorithm to have a further optimized technique for reconstructing the environment from the robot's data. The algorithm also deals with noise in the image, which we might expect while collecting data from robot sensors.
+	},
+	Author = {Chartrand, Rick},
+	Booktitle = {Biomedical Imaging: From Nano to Macro, 2009. ISBI'09. IEEE International Symposium on},
+	Date-Added = {2014-07-02 17:12:19 +0000},
+	Date-Modified = {2014-07-02 17:12:19 +0000},
+	Organization = {IEEE},
+	Pages = {262--265},
+	Title = {Fast algorithms for nonconvex compressive sensing: MRI reconstruction from very few data},
+	Year = {2009}}
+
+@article{beck2009fast,
+	Annote = {
+		This paper describes an algorithm for solving linear inverse problem with emphasis and examples on the problem of image deblurring. This may be applicable to our problem once we've reconstructed the environment with a compressed sensing algorithm. There will likely be error in making measurements with the robots so this algorithm could be used to deblur a reconstructed environment.
+	},
+	Author = {Beck, Amir and Teboulle, Marc},
+	Date-Added = {2014-06-30 17:50:31 +0000},
+	Date-Modified = {2014-06-30 17:50:31 +0000},
+	Journal = {SIAM Journal on Imaging Sciences},
+	Number = {1},
+	Pages = {183--202},
+	Publisher = {SIAM},
+	Title = {A fast iterative shrinkage-thresholding algorithm for linear inverse problems},
+	Volume = {2},
+	Year = {2009}}
+
+@article{candes2008introduction,
+	Annote = {
+		As suggested by the title, this article presents an introductory examination of compressive sampling, referred to in our project as compressed sensing. The article discusses the manner in which compressed sensing operates and the factors that contribute to successful signal reconstruction. Topics of note include sparsity and incoherence. Sparsity is the idea that most of the important information in a signal occurs in a fairly small number of data points. As such, the unimportant data can be ignored in signal reconstruction without significant effect on the reconstructed signal. This is fundamental to compressed sensing, for it suggests that signal reconstruction requires fairly few samples; as long as the important data is gathered, very little information is lost from the signal. The coherence of two bases is the largest correlation between any two elements in the bases. Incoherence between the basis for the signal and the basis for sensing the signal allows for more accurate reconstruction of signals.
+	},
+	Author = {Cand{\`e}s, Emmanuel J and Wakin, Michael B},
+	Date-Added = {2014-06-30 18:03:10 +0000},
+	Date-Modified = {2014-06-30 18:03:10 +0000},
+	Journal = {Signal Processing Magazine, IEEE},
+	Number = {2},
+	Pages = {21--30},
+	Publisher = {IEEE},
+	Title = {An introduction to compressive sampling},
+	Volume = {25},
+	Year = {2008}}
+
+@techreport{chartrand2006surprising,
+	Annote = {
+		This brief demonstrates the compressive sampling algorithm as applied to the Shepp-Logan Phantom image, which is often used for benchmarking image processing algorithms in radiography. It is able to remarkably reconstruct the image exactly using only 10 projects by minimizing the $l^{\frac{1}{2}}$ norm. In our research, we will be attempting to reconstruct an image/environment using compressed sensing with similarly few projections from data gathered by robot sensors along paths. 
+	},
+	Author = {Rick Chartrand},
+	Date-Added = {2014-06-30 19:53:39 +0000},
+	Date-Modified = {2014-06-30 20:01:26 +0000},
+	Institution = {Los Alamos National Laboratory},
+	Title = {Exact reconstructions from surprisingly little data},
+	Year = {2006}}
+
+@inproceedings{chartrand2008nonconvex,
+	Annote = {
+		This paper details an experiment which compares radial sampling with random sampling for image construction in compressive sensing and discovers that random sampling requires less data points to reconstruct the Shepp-Logan phantom image. It introduces the idea of applying compressive sensing to a signal that is sparse with respect to a basis and thus applies it to the gradient of the Shepp-Logan phantom image. In our research we will be testing a middle ground between the two sampling methods (random paths simulating robot paths). Also, we will be using the implementing the same idea of applying compressed sensing to the gradient of our constructed environment in order to reconstruct it. 
+	},
+	Author = {Chartrand, Rick},
+	Booktitle = {Image Processing, 2008. ICIP 2008. 15th IEEE International Conference on},
+	Date-Added = {2014-06-30 18:04:58 +0000},
+	Date-Modified = {2014-06-30 18:04:58 +0000},
+	Organization = {IEEE},
+	Pages = {2624--2627},
+	Title = {Nonconvex compressive sensing and reconstruction of gradient-sparse images: random vs. tomographic Fourier sampling},
+	Year = {2008}}
+
+@article{goldstein2009split,
+	Annote = {
+		This paper introduces Split Bregman iteration as a method for solving L1-regularized problems. This is especially relevant to our research because the problem that we are working on is an L1-regularized problem. This paper details an algorithm which could be used to find solutions given the data that we collect. We begin with a constrained problem, and the idea behind Split Bregman is that we can turn the problem into an unconstrained problem. Then, the problem can be broken into multiple parts that can be iterated one-by-one until a solution is found. Split Bregman iteration is a powerful tool because it can be used to solve problems that would be otherwise difficult, and it is capable of relatively fast convergence to a solution.
+	},
+	Author = {Goldstein, Tom and Osher, Stanley},
+	Date-Added = {2014-06-30 18:05:27 +0000},
+	Date-Modified = {2014-06-30 20:19:34 +0000},
+	Journal = {SIAM Journal on Imaging Sciences},
+	Number = {2},
+	Pages = {323--343},
+	Publisher = {SIAM},
+	Title = {The split Bregman method for L1-regularized problems},
+	Volume = {2},
+	Year = {2009}}
+	
+@inproceedings{gonzalez2011third,
+  title={A Third Generation Micro-vehicle Testbed for Cooperative Control and Sensing Strategies.},
+  author={Gonzalez, Maximillian and Huang, Xinheng and Martinez, David S Hermina and Hsieh, Chung H and Huang, Yuan R and Irvine, Benjamin and Short, Martin B and Bertozzi, Andrea L},
+  booktitle={ICINCO (2)},
+  pages={14--20},
+  year={2011}
+}
