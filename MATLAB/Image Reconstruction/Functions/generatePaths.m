@@ -82,7 +82,7 @@ function paths = generatePaths(num_paths, dim, bounds, path_type, points)
         M = dim(1);
         N = dim(2);
         
-        rmin = 20;
+        rmin = 12;
         
         idx = randsample(size(points,1), 1, 1);
         center = points(idx, :);
