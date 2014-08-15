@@ -49,7 +49,7 @@
 %% Define the file path, paths options, and Split Bregman parameters.
 clc; clear all; close all;
 
-file          = 'cornertest.png';
+file          = 'testbedcorner.png';
 
 num_tests     = 1;
 times         = zeros(num_tests, 1);
@@ -57,8 +57,8 @@ errors        = zeros(num_tests, 1);
 
 param.tol       = -.01;
 param.maxpaths  = 200;
-param.stepsize  = 10;
-num_initpaths   = param.maxpaths/20;
+param.stepsize  = 20;
+num_initpaths   = 20;
 
 view_profile  = false;
 show_all_fig  = false;
@@ -77,7 +77,8 @@ for i = 1:num_tests
 tic;
     
 %% Generate the line-segment paths that we collect data from.
-initpaths = generatePaths(num_initpaths, dim, 'randombounce');
+bounds = [10 12 54 76]; %12
+initpaths = generatePaths(num_initpaths, dim, bounds, 'randombounce');
 
 %% Compute A0, our path matrix, convert u to a vector, and compute Au=g.
 [A, u, g] = generateAug(u_image, initpaths);
@@ -90,7 +91,7 @@ initerr = norm(u-uguess) / norm(u);
 initenergy = energy(end);
 
 %% Run the adaptive reconstruction.
-[uguess paths err energy] = adaptiveMapping(uguess, u_image, initpaths, param);
+[uguess paths err energy] = adaptiveMapping(uguess, u_image, initpaths, bounds, param);
 
 %% Collect some more results.
 

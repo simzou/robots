@@ -1,4 +1,6 @@
-function paths = generatePaths(num_paths, dim, path_type, points)
+function paths = generatePaths(num_paths, dim, bounds, path_type, points)
+
+    rng('shuffle');
 	% by default, generate random paths
     
 	paths = zeros(num_paths,4);
@@ -82,6 +84,8 @@ function paths = generatePaths(num_paths, dim, path_type, points)
         M = dim(1);
         N = dim(2);
         
+        rmin = 12;
+        
         idx = randsample(size(points,1), 1, 1);
         center = points(idx, :);
         m = center(1); n = center(2);
@@ -90,11 +94,11 @@ function paths = generatePaths(num_paths, dim, path_type, points)
         for i = 1:num_paths
             
             % Connect our paths.
-            paths(i, 1:2) = [n M-m];
+            paths(i, 1:2) = [n m];
             
             % Pick the point we want to be close to.
             %idx = randi(size(points, 2)/2)*2-1;
-            relpts = bsxfun(@minus, points,center);
+            relpts = bsxfun(@minus, points, center);
             dist = sqrt(sum(relpts.^2,2));
             maxdist = max(dist);
             
@@ -107,28 +111,45 @@ function paths = generatePaths(num_paths, dim, path_type, points)
             theta = 2*pi*rand(1);
             
             % Find the maximum distance we can go in that direction.
-            rmax = find_max_dist( M, N, center, theta );
+            rmax = find_max_dist( dim, bounds, center, theta );
+            
+            while rmax < rmin
+                theta = 2*pi*rand(1);
+                rmax = find_max_dist( dim, bounds, center, theta );
+            end
             
             % Pick a distance to go and go there.
-            r = rmax*rand(1);
+            r = rmin + (rmax-rmin)*rand(1);
             
             m = abs(center(1) - r*sin(theta));
             n = abs(center(2) + r*cos(theta));
             
-            paths(i, 3:4) = [n M-m];
+            paths(i, 3:4) = [n m];
             
         end
 
     elseif strcmp(path_type, 'randombounce')
         
-        N = dim(1);
-        M = dim(2);
-    	point1 = [rand(1)*M rand(1)*N];
+        M = dim(1);
+        N = dim(2);
+        
+        x0 = bounds(1); xF = bounds(3);
+        y0 = bounds(2); yF = bounds(4);
+        
+        rmin = 30;
+        
+    	point1 = [x0+rand(1)*(xF-x0) y0+rand(1)*(yF-y0)];
         for i = 1:num_paths
-    		point2 = [rand(1)*M rand(1)*N];
-			paths(i,:) = [point1 point2];
-			point1 = point2;
-        end    	
+            
+    		point2 = [x0+rand(1)*(xF-x0) y0+rand(1)*(yF-y0)];
+            
+            while norm(point1-point2) < rmin
+                point2 = [x0+rand(1)*(xF-x0) y0+rand(1)*(yF-y0)];
+            end
+            
+            paths(i,:) = [point1 point2];
+            point1 = point2;
+        end
     
     elseif strcmp(path_type, 'randompoints')
         N = dim(1);
@@ -170,26 +191,29 @@ function point = get_random_point_on_edge(edge_num, dim)
 	point = [x1 y1];
 end
 
-function rmax = find_max_dist( M, N, center, theta )
+function rmax = find_max_dist( dim, bounds, center, theta )
+
+x0 = bounds(1); xF = bounds(3);
+y0 = bounds(2); yF = bounds(4);
 
 m0 = center(1); n0 = center(2);
 
 if 0 < theta && theta < pi/2
-    rmax = min( m0/sin(theta), (N-n0)/cos(theta) );
+    rmax = min( (m0-y0)/sin(theta), (xF-n0)/cos(theta) );
 elseif pi/2 < theta && theta < pi
-    rmax = min( m0/sin(theta), -n0/cos(theta) );
+    rmax = min( (m0-y0)/sin(theta), -(n0-x0)/cos(theta) );
 elseif pi < theta && theta < (3/2)*pi
-    rmax = min( -(M-m0)/sin(theta), -n0/cos(theta) );
+    rmax = min( -(yF-m0)/sin(theta), -(n0-x0)/cos(theta) );
 elseif (3/2)*pi < theta && theta < 2*pi
-    rmax = min( -(M-m0)/sin(theta), (N-n0)/cos(theta) );
+    rmax = min( -(yF-m0)/sin(theta), (xF-n0)/cos(theta) );
 elseif theta == 0 || theta == 2*pi;
-    rmax = N-n0;
+    rmax = xF-n0;
 elseif theta == pi/2
-    rmax = m0;
+    rmax = m0-y0;
 elseif theta == pi
-    rmax = n0;
+    rmax = n0-x0;
 elseif theta == (3/2)*pi
-    rmax = M-m0;
+    rmax = yF-m0;
 else
     fprintf('pathing error')
     rmax = 0;
