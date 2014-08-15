@@ -26,7 +26,7 @@
 
 \begin{abstract}
 
-Compressed sensing is a technique used to reconstruct sparse signals and images while sampling well below the Nyquist rate. Commonly used in fMRIs and medical imaging, we aim to use this technique to allow autonomous robots to map piecewise constant areas of interest within a larger environment. In our experiment, we programmed a robot equipped with a reflectance sensor to travel along straight-line paths on a black testbed with white regions of interest. The robot integrated sensor readings and sent that sum to a remote server after each path. Each data point consists of the robot's start and end positions, tracked by an overhead camera, and the integral found along that path. Once all the data has been collected, the environment is reconstructed by minimizing the sum of the data fitting term and an L1 penalty term. We also implemented an "adaptive path selection scheme", allowing the robot to more intelligently target regions of interest based on the data collected from an initial set of random paths. Preliminary simulations of our experiment show reconstruction of 100x100 images with only 100 data points (relative err. = 0.28), and we have begun trials with data collected by the robot.
+Compressed sensing is a technique used to reconstruct sparse signals and images while sampling well below the Nyquist rate. Commonly used in fMRIs and medical imaging, we aim to use this technique to allow autonomous robots to map piecewise constant areas of interest within a larger environment. In our experiment, we programmed a robot equipped with a reflectance sensor to travel along straight-line paths on a black testbed with white regions of interest. The robot integrated sensor readings and sent that sum to a remote server after each path. Each data point consists of the robot's start and end positions, tracked by an overhead camera, and the integral found along that path. Once all the data has been collected, the environment is reconstructed by minimizing the sum of the data fitting term and an L1 penalty term. We also implemented an "adaptive path selection scheme", allowing the robot to more intelligently target regions of interest based on the data collected from an initial set of random paths. We have run simulations of adaptive path selection and reconstruction of 100x100 images with only 100 data points gives relative err. = 0.28. We have also carried out experimental trials with the robot and found promising results, but these require further testing.
 
 \end{abstract}
 
@@ -194,7 +194,7 @@ limited bandwidth, data storage
 Also assumptions about simple piecewise environments
 \end{comment}
 
-\section{Algorithm for solving the inverse problem}
+\section{Solving the inverse problem}
 
 Based on the observation that the image $u$ to be reconstructed is
 piecewise constant, its directional gradients, $\nabla_x u$ and $\nabla_y u$, are sparse over
@@ -209,7 +209,7 @@ where $\alpha$ and $\beta$ are parameters specifically chosen based on the natur
 of $u$.
 
 Now, let $A$ be our measurement operator as described in the previous section, and let 
-$b$ be the collected samples. Then, in order to reconstruct $u$, given that we have $A, b$, we must solve the optimization problem
+$b$ be the collected samples. Then, in order to reconstruct $u$, given that we have $A$ and $b$, we must solve the optimization problem
 \[ \underset{u}{{\text{{min }}}} E(u)\quad\text{such that}\; Au=b.\]
 Solving this problem is intractible due to our use of the $\ell^0$ pseudo-norm, but we 
 can relax it to an easily solved optimization problem by using a different sparsity-inducing 
@@ -217,49 +217,121 @@ objective function. We choose to use the $\ell^1$ norm or the nonconvex penalty 
 $\varphi_p$ with $p \leq 1$, as described in the introduction. In order to account for noise 
 in our data, we relax the constraint and instead use a penalty function to enforce data 
 fidelity. Therefore, we can recover $u$ by solving the unconstrained optimization problem 
-\begin{equation}
-\underset{u}{{\text{{min }}}}\alpha\varphi_p\left(u\right)+\beta\varphi_p\left(\nabla_x u + \nabla_y\right)+\frac{\mu}{2}||Au-b||_2^2.\label{eq:minprob}\end{equation}
+\begin{align}
+\underset{u}{\text{min}}\text{\ }&E_{p}(u)+H(u),\label{eq:minprob}\\
+\text{where }&E_{p}(u)=\alpha\varphi_p\left(u\right)+\beta\varphi_p\left(\nabla_x u + \nabla_y\right),\notag\\
+&H(u)=\frac{\mu}{2}\|Au-b\|_2^2.\notag
+\end{align}
 Although this is a nonconvex optimization problem in the case that $p<1$,
-Chartrand \cite{chartrand2009fast} has shown that it can easily be solved, 
+Chartrand \cite{chartrand2009fast} and other numerical and theoretical results have shown that it can easily be solved, 
 and that the solution will converge to the global minimum of the 
 associated $\ell^0$ formulation. Therefore, we use the Split-Bregman method to reconstruct $u$. 
 
-In order to use Split-Bregman, we rewrite \ref{eq:minprob} as
-\begin{equation}
-\underset{u,d,d_{x},d_{y}}{{\text{{min }}}}\alpha\varphi_p\left(d\right)+\beta\varphi_p\left(d_x + d_y\right)+\frac{\mu}{2}||Au-b||_2^2\quad\text{such that}\; d=u,\, d_{x}=\nabla_{x}u,\, d_{y}=\nabla_{y}u.
-\label{eq:sbprob}\end{equation}
+In order to use Split-Bregman, we rewrite Eq~(\ref{eq:minprob}) as
+\begin{align}
+\underset{u,d,d_{x},d_{y}}{{\text{{min }}}}&E_{p}(d,d_x,d_y)+H(u)\quad\text{such that}\; d=u,\, d_{x}=\nabla_{x}u,\, d_{y}=\nabla_{y}u,  \notag\\
+\text{where }&E_p(d,d_x,d_y)=\alpha\varphi_p\left(d\right)+\beta\varphi_p\left(d_x +
+ d_y\right).\notag
+\end{align}
 Then, we relax the constraints to
-\[
-\underset{u,d,d_{x},d_{y}}{{\text{{min }}}}\alpha\varphi_p\left(d\right)+\beta\varphi_p\left(d_x +
- d_y\right)+\frac{\mu}{2}\|Au-b\|_2^2 + \frac{\lambda_1}{2}\|d-u+b\|_{2}^{2}+\frac{\lambda_2}{2}\left(\|d_{x}-\nabla_{x}u+b_{x}\|_{2}^{2}+\|d_{y}-\nabla_{y}u+b_{y}\|_{2}^{2}\right),
-\]
-and then use our algorithm to reconstruct for $u$ through the following process:
+\begin{align*}
+\underset{u,d,d_{x},d_{y}}{{\text{{min }}}}&E_{p}(d,d_x,d_y)+H(u)+B(d,d_x,d_y,u)\\
+\text{where }&B(d,d_x,d_y,u)=\frac{\lambda_1}{2}\|d-u+b\|_{2}^{2}+\frac{\lambda_2}{2}\left(\|d_{x}-\nabla_{x}u+b_{x}\|_{2}^{2}+\|d_{y}-\nabla_{y}u+b_{y}\|_{2}^{2}\right),
+\end{align*}
+and then use our algorithm to reconstruct for $u$ through the following process described in Algorithm~\ref{split-bregman}.
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{Split-Bregman method}\label{split-bregman}
 \begin{algorithmic}[1]
-\Procedure{Split Bregman Solve}{$A,b$}\Comment{Solve \ref{eq:sbprob}}
+\Procedure{Split Bregman Solve}{$A,b$}
 \While{$\|u^k-u^{k-1}\|_2^2 < tol$}
 \For{$n=1$ to $N$}
-\State $u^{k+1}\gets \min_u{\frac{\mu}{2}\|Au-b\|_2^2+\frac{\lambda_1}{2}\|d-u+b\|_{2}^{2}+\frac{\lambda_2}{2}\left(\|d_{x}-\nabla_{x}u+b_{x}\|_{2}^{2}+\|d_{y}-\nabla_{y}u+b_{y}\|_{2}^{2}\right)}$
-\State $d^{k+1}\gets \min_d{\alpha\varphi(d)+\frac{\lambda_1}{2}\|d-u+b\|_2^2}$
-\State $d_x^{k+1}\gets \min_{d_x}{\beta\varphi(d_x)+\frac{\lambda_2}{2}\|d_x-\ \nabla_xu+b\|_2^2}$
-\State $d_y^{k+1}\gets \min_{d_y}{\beta\varphi(d_y)+\frac{\lambda_2}{2}\|d_y-\ \nabla_yu+b\|_2^2}$
+\State $u^{k+1}\gets \min_u{H(u)+B(d,d_x,d_y,u)}$
+\State $d^{k+1}\gets \min_d{\alpha\varphi_p(d)+\frac{\lambda_1}{2}\|d-u+b\|_2^2}$
+\State $d_x^{k+1}\gets \min_{d_x}{\beta\varphi_p(d_x)+\frac{\lambda_2}{2}\|d_x-\ \nabla_xu+b\|_2^2}$
+\State $d_y^{k+1}\gets \min_{d_y}{\beta\varphi_p(d_y)+\frac{\lambda_2}{2}\|d_y-\ \nabla_yu+b\|_2^2}$
 \EndFor
-\State $b^{k+1}\gets b^{k}+\left(-d^{k+1}\right)$
+\State $b^{k+1}\gets b^{k}+\left(u^{k+1}-d^{k+1}\right)$
 \State $b_x^{k+1}\gets b_x^{k}+\left(\nabla_x \left(u^{k+1}\right) - d_x^{k+1}\right)$
 \State $b_y^{k+1}\gets b_y^{k}+\left(\nabla_y \left(u^{k+1}\right) - d_y^{k+1}\right)$
 \EndWhile
+
+\Return{$u\gets u^{k+1}$}
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 
+This algorithm requires us to solve two different subproblems. The first problem, \[u^{k+1}=\min_u{H(u)+B(d,d_x,d_y,u)},\] has optimality condition
+\[\left(\mu A^TA + \lambda_1I - \lambda_2\Delta\right)u^{k+1}=\mu A^Tb + \lambda_1(d-b)+\lambda_2\left(\nabla_x^T(d_x-b_x)+\nabla_y^T(d_y-b_y)\right),\]
+so it may be solved directly. The second set of subproblems is that of computing $d^{k+1},d_x{k+1},d_y^{k+1}$. This step is easily 
+accomplished by applying a generalized $p$-Shrinkage operator
+\[S_\gamma^p(t)=\frac{t}{|t|}\max\left({|x|-\gamma|x|^{p-1},0}\right)\]
+elementwise to $d^k,d_x^k,d_y^k$ with $\gamma = \alpha/\lambda_1, \beta/\lambda_2, \beta/\lambda_2$, respectively.
 
-And its associated Augmented Lagrangian functional $L(u,\, d,\, d_{x},\, d_{y},\, b,\, b_{x},\, b_{y})$ is 
-\[\frac{\mu}{2}\|Au-g\|_{2}^{2}+\alpha|d|_{1}+\beta(|d_{x}|_{1}+|d_{y}|_{1})+\frac{1}{2}\lambda_{1}\|d-u+b\|_{2}^{2}+\frac{{1}}{2}\lambda_{2}(\|d_{x}-\nabla_{x}u+b_{x}\|_{2}^{2}+\|d_{y}-\nabla_{y}u+b_{y}\|_{2}^{2}).
-\]
-The solution process is iterative, with each iteration consisting
-of three major steps:
+The computational bottleneck of Algorithm~\ref{split-bregman} is in fact solving for $u^{k+1}$. However, we make the assumption that 
+our off-board computing power will be much greater than that of our robots. We make this claim based on the intuition that a mobile vehicle will be out collecting data for extended periods of time, during which any image reconstruction can easily be done using the data that has already been collected.
+
+\section{Path Planning}
+
+One of the crucial elements of our algorithm is to intelligently choose a set of paths $C=C_1,C_2,\dots,C_n$. Due to hardware 
+limitations, we assume that each path is a straight-line. In order 
+for accurate reconstructions to be done, it is important for the robot to explore the majority of the area to 
+be mapped, $\Omega$. However, it is also important to explore less-sparse subsets of $u$ in detail, and to have a large number 
+of path intersections in order to include information about specific pixels in multiple data points. We find two path planning schemes 
+to be especially effective. One simply chooses $C$ randomly, and the other utilizes the data collected so far to adaptively choose the next set of samples.
+
+\subsection{Random Paths}
+
+The advantage of the random pathing algorithm is that it requires no off-board computation, and that we are effectively sampling in a 
+random basis. Because we are sampling in a random basis, there is a high probability that our measurement basis is highly incoherent 
+with the image and gradient domains. However, this is not a necessary requirement for our compressive sampling to be successful, 
+because $E(u)$ is strongly convex.
+
+Recall that each element of $C$ is a straight line. It is then simple to develop our pathing algorithm, since each path $C_k$ can be 
+defined by its starting point and ending point. Let $s_k$ be the point that path $C_k$ starts at, and let $e_k$ be the end point. We generate $C$ by using Algorithm~\ref{ranpath}.
+
+\begin{algorithm}[H]
+\caption{Random path selection}\label{ranpath}
+\begin{algorithmic}[1]
+\Procedure{RandomPaths}{$\Omega$}
+\State $s_1\gets \text{rand(}\Omega)$
+\State $e_1\gets \text{rand(}\Omega)$
+\For{$i=2$ to $n$}
+\State $s_k\gets e_{k-1}$\Comment{Robot doesnt need to reposition.}
+\State $e_k\gets \text{rand(}\Omega)$
+\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Adaptive Pathing}
+
+If off-board computing can be done, then we can process the data that has already been collected by our robot while it is collecting 
+more data points. Then, it is natural to want to be able to direct the pathing process such that we are collecting data in areas that 
+have high amounts of information. We propose a method of computing $C$ with such goals in mind in Algorithm~\ref{adaptivepath}. The 
+algorithm is a three-step process. First, the robot collects a constant number of data points and transmits them to the server. Then, 
+the server uses that data and any previously collected data to reconstruct $u$. The reconstruction, $u^*$, is then used to calculate 
+a subset of points $P\subseteq\Omega$ such that each point in $P$ is a possible destination for the robot. Then, we call Algorithm~\ref{ranpath} on $P$ such that $C$ only travels to points specifically chosen based on $u^*$.
+
+\begin{algorithm}[H]
+\caption{Adaptive path selection}\label{adaptivepath}
+\begin{algorithmic}[1]
+\Procedure{AdaptivePaths}{$\Omega$}
+\State $s_1\gets \text{rand(}\Omega)$
+\State $e_1\gets \text{rand(}\Omega)$
+\For{$i=2$ to $n$}
+\State $s_k\gets e_{k-1}$\Comment{Robot doesnt need to reposition.}
+\State $e_k\gets \text{rand(}\Omega)$
+\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+Note that when there is no significant information about $\Omega$ collected so far, such as at the beginning of the data collection, 
+we simply revert to Algorithm~\ref{ranpath} to collect the next set of data points. Also, we find in our experiments that it is 
+important for there to be an element of randomness when constructing $P$. Otherwise, there is the risk that the initial set of random 
+paths does not capture an important feature of $u^*$. If this is the case, then the adaptive pathing will never select those points, and will instead only produce paths where information has already been detected so far. Let us describe the method that we developed  
+for choosing $P$ in more detail.
 
 
 \section{Results}
@@ -355,7 +427,7 @@ Having confirmed that our reconstruction algorithm works, we proceeded to carry 
 
 As a means of comparison, we first carried out the reconstruction as a simulation, shown in Figure ~\ref{fig:experressim}. This simulated reconstruction uses the same set of 178 paths that the robot travelled along. Thus, this reconstruction is an ideal reconstruction. If the robot were able to pick up sensor values exactly as expected and with no noise, this would be the reconstruction found.
 
-However, if we use the robot data alongside the same set of parameters as the simulated reconstruction, we instead find Figure ~\ref{fig:experresrec}. Clearly, this reconstruction is very noisy, giving black spots in the middle of the region and creating white spots where it should be black. This is due to the fact that the data collected by the robot is not as perfect as the data in simulation. As such, we retry the reconstruction, but with a lowered data fidelity parameter. This yields Figure ~\ref{fig:experrestuned}. Because there is less emphasis on fitting the image to the data, the reconstruction does a much better job. It is still not quite as accurate as the simulated reconstruction, but it is much cleaner than ~\ref{experresrec} and it still does a reasonably good job of showing the region of interest.
+However, if we use the robot data alongside the same set of parameters as the simulated reconstruction, we instead find Figure ~\ref{fig:experresrec}. Clearly, this reconstruction is very noisy, giving black spots in the middle of the region and creating white spots where it should be black. This is due to the fact that the data collected by the robot is not as perfect as the data in simulation. As such, we retry the reconstruction, but with a lowered data fidelity parameter. This yields Figure ~\ref{fig:experrestuned}. Because there is less emphasis on fitting the image to the data, the reconstruction does a much better job. It is still not quite as accurate as the simulated reconstruction, but it is much cleaner than ~\ref{fig:experresrec} and it still does a reasonably good job of showing the region of interest.
 
 
 \section{Comparison with Other Approaches}
@@ -478,7 +550,17 @@ To compare these methods, Figure \ref{fig:othermethoderror} plots the error of t
 \label{fig:adp_adpaths_sim_fig}
 
 \end{figure}
+As with the previous reconstruction method, we first ran simulations on a test image to see if this method would provide better results. Figure \ref{fig:adp_sim_orig} is a 100x100 binary image with a white, ellipse shaped area of interest in the bottom right corner that was used as a test image. As a control we first run the simulation with the same algorithm as before to test against the new adaptive pathing algorithm. The expectation is that with the same number of paths the adaptive pathing algorithm yields a lower error (alternatively we could also test to see if we could get the same error with fewer paths).  
 
+Figure \ref{fig:adp_randpaths_sim} shows the 200 random paths taken by the simulation. As before, these are simulated robot paths so the end point of one path is the starting point for the subsequent path. The brightness of each pixel corresponds to how often (and with how much weighting) a path traveled through that area. 
+
+The reconstruction obtained with these paths is shown in Figure \ref{fig:adp_adpaths_sim_rec}. This reconstruction is able to recover successfully generally the region of interest and the size of the area, but is not able to ascertain some of the more detailed information about the shape and boundary of the area accurately. 
+
+Figure \ref{fig:adp_randpaths_diff} shows the difference between the the reconstructed image and the ground truth. The error is primarly along the edges but more prominent along the bottom edge. The norm of the difference divided by the norm of the original is <INSERT VALUE HERE>.
+
+We compare these results against those displayed in Figure \ref{fig:adp_adpaths_sim_fig}, which are generated by the adaptive pathing algorithm on the same test image in \ref{fig:adp_sim_orig}. 
+
+Figure \ref{fig:adp_adpaths} shows the 200 adaptive paths taken by the simulation. There are visibly clustered near the bottom of the image, where it identified early on had the area of interest. Figure \ref{fig:adp_adpaths_sim_rec} then shows the results of the Split Bregman reconstruction with the data collected from the adaptive paths. Because the paths examined the area more closely, the reconstruction is able to more accurately capture the curve along the borders and thus the shape of the area itself. This is illustrated in Figure \ref{fig:adp_adpaths_sim_diff}, which shows the difference between this reconstruction and the original test image. The norm of the difference divided by the norm of the original is <INSERT VALUE HERE>, which is significantly lower than the reconstruction done by purely random paths.
 
 \subsection{Experimental Results}
 
@@ -489,7 +571,7 @@ To compare these methods, Figure \ref{fig:othermethoderror} plots the error of t
     \includegraphics[width=1\linewidth]{figures/adaptiveexperimentalresultoriginal}
   \caption{Image of the testbed, sized at 70x90}
   \vspace{0pt}
-  \label{adp_exp_orig}
+  \label{fig:adp_exp_orig}
 \end{subfigure}%
 \hspace{10pt}
 \begin{subfigure}{.4\textwidth}
@@ -497,7 +579,7 @@ To compare these methods, Figure \ref{fig:othermethoderror} plots the error of t
     \includegraphics[width=1\linewidth]{figures/adaptiveexperimentalresultpath}
   \caption{The 224 adaptive paths traveled by the robot}
   \vspace{0pt}
-  \label{adp_exp_paths}
+  \label{fig:adp_exp_paths}
 \end{subfigure}%
 \hspace{10pt}
 \begin{subfigure}{.3\textwidth}
@@ -505,7 +587,7 @@ To compare these methods, Figure \ref{fig:othermethoderror} plots the error of t
     \includegraphics[width=1\linewidth]{figures/adaptiveexperimentalresultsimulation}
   \caption{Simulated reconstruction for the adaptive paths traveled by the robot}
   \vspace{0pt}
-  \label{}
+  \label{fig:adp_exp_recon_simmed}
 \end{subfigure}%
 \hspace{10pt}
 \begin{subfigure}{.3\textwidth}
@@ -513,7 +595,7 @@ To compare these methods, Figure \ref{fig:othermethoderror} plots the error of t
     \includegraphics[width=1\linewidth]{figures/adaptiveexperimentalresultrec}
   \caption{Image reconstruction using robot collected data}
   \vspace{0pt}
-  \label{adp_exp_recon_untuned}
+  \label{fig:adp_exp_recon_untuned}
 \end{subfigure}%
 \hspace {10pt}
 \begin{subfigure}{.3\textwidth}
@@ -521,12 +603,16 @@ To compare these methods, Figure \ref{fig:othermethoderror} plots the error of t
     \includegraphics[width=1\linewidth]{figures/adaptiveexperimentalresulttunedrec}
   \caption{Image reconstruction using robot collected data with tuned parameters}
   \vspace{0pt}
-  \label{adp_exp_recon_tuned}
+  \label{fig:adp_exp_recon_tuned}
 \end{subfigure}
 \caption{Experimental results of adaptive pathing using robot collected data}
-\label{adp_exp_fig}
+\label{fig:adp_exp_fig}
 \end{figure}
+Once we were able to confirm that adaptive pathing could yield better results, we implemented it in the lab with our robot vehicle and the results are shown in Figure \ref{fig:adp_exp_fig}. Figure \ref{fig:adp_exp_orig} is an image of the original testbed, sized to 70x90, which contains multiple areas of interest that are off center and have sharply defined edges, which tests the adaptive pathing algorithm's ability to distinguish between objects, find areas of interest, and reconstruct them with some detail. 
 
+Figure \ref{fig:adp_adpaths} shows the 224 straight line paths the robot vehicle traveled on the testbed and it can be observed that it did not travel often to black areas or corners where there were no areas of interest.
+
+We then generate Figure \ref{fig:adp_exp_recon_simmed}, which is an ideal reconstruction (how the simulation would run if data could be collected with no noise). If we run the same reconstruction with robot data, the resulting reconstruction is significantly affected by the noise in the data, as shown in Figure \ref{fig:adp_exp_recon_untuned}. Because of the sources of noise described earlier, such as the testbed not being entirely black and the sensor sometimes taking incorrect readings, the resulting reconstruction appears to have streaks of areas that do not exist in the original image. To account for noise in the data, we again tune the parameters in our minimization problem and lower the data fidelity term. With greater importance placed on minimizing the gradient, we obtain \ref{fig:adp_exp_recon_tuned}, which is a more accurate reconstruction and is much closer to reconstruction that assumes no noise.
 \section{Conclusions and Further Work}
 
 \newpage
@@ -535,7 +621,278 @@ To compare these methods, Figure \ref{fig:othermethoderror} plots the error of t
 
 
 \newpage
-\textbf{Appendix}
+\section{Appendix}
 
+\subsection{README.txt for Data Collection}
+
+\begin{verbatim}
+
+FILE: README.txt
+AUTHOR: Siddarth Srinivasan (UCLA REU 2014)
+DATE: 11th August 2014
+
+
+Contents
+--------
+
+I.    Introduction
+II.   Applications Needed to Run this Project
+III.  Libraries
+IV.   Drivers
+V.    Code Documentation
+VI.   Arduino Pins
+VII.  Hardware on Robot
+VIII. Other Hardware
+IX.   Setup
+X.    Run
+XI.   Other Issues
+XII.  Future Improvements
+
+
+I. Introduction
+---------------
+This file details all the applications, libraries and drivers needed to ensure
+the project runs smoothly, and provides instructions to set up and run the
+project. Full code documentation can be found at:
+		C:\REU\2014\Server\Documentation\html\index.html
+"The project" refers to the "Environental Mapping by Autonomous Robots Using
+Compressed Sensing" project completed by the UCLA Computational and Applied Math
+REU 2014 Team consisting of M. Horning, S. Zou, S. Srinivasan and M. Lin.
+
+At the time of writing, all project files are in C:\REU_Server_2014 on
+MUFASA-PC. See setup-server below on what is affected when changes are made.
+
+
+II. Applications Needed to Run this Project
+-------------------------------------------
+1) XAMPP: to set up Apache server and MySQL database
+2) Arduino IDE: to upload programs to the robot and view output on Terminal
+3) Python 2.7: to run vehicle\_tracker.py and the server cgi script
+4) MATLAB: to carry out the image reconstruction
+
+
+III. Libraries
+--------------
+1) Arduino Libraries:
+	*   AdaFruit WiFi Shield Library: to enable the arduino to connect to
+	  wireless networks.
+	*   Arduino Json Library: so that the Arduino can parse the response from
+	  the server.
+
+2) Python Libraries:
+	*   OpenCV: to use the camera to track the robot on the testbed.
+	*   PySerial: to read and write Serial Data to COM ports
+	*   MySQL connector: to enable python to perform SQL commands with databases
+	*   PythonWin: to enable python to commmunicate with MATLAB
+
+
+IV. Drivers
+-----------
+1) Prolific 2303 Serial Driver: To recognize the USB-Serial cable
+	http://www.prolific.com.tw/US/ShowProduct.aspx?p_id=229&pcid=4
+2) Generic 1394 Camera Driver: To recognize the overhead cameras on Firewire
+	http://www.driverscape.com/download/generic-1394-desktop-camera
+
+
+V. Code Documentation
+---------------------
+1) Accessing Documentation/html/index.html should show you the doxygen generated
+  documentation for the project. THE CGI SCRIPTS HAD TO HAVE THEIR EXTENSIONS
+  CHANGED TO .PY BEFORE DOXYGEN COULD BE RUN, SO KEEP THAT IN MIND. 
+2) Doxywizard can be run from cmd to configure the doxygen output, or edit and
+ run doxygen doxygen from C:\REU_2014_Server.
+3) The .cgi and .py scripts are documented under "Packages" and the .ino file is
+  documented under "Files"
+
+
+VI. Arduino Pins
+----------------
+1) The pins used by the WiFi Shield can be found at:
+	https://learn.adafruit.com/adafruit-cc3000-wifi/connections
+2) Digital Pins 6-9 are used to control the motor.
+3) Analog Pin 4 is connected to the reflectance sensor.
+
+
+VII. Hardware on Robot
+----------------------
+1) Arduino Uno
+		http://arduino.cc/en/Main/arduinoBoardUno
+   with AdaFruit WiFi Shield
+   		http://www.adafruit.com/products/1491
+
+2) NEOMART L298N Motor Controller:
+		https://s3.amazonaws.com/tontec/l298n.zip
+
+3) DFRobot 4WD Chassis with 4 motors:
+  		http://www.amazon.com/DFRobot-Pirate-4wd-Mobile-Platform/dp/B009646R3K/ref=sr_1_cc_2?s=aps&ie=UTF8&qid=1408062128&sr=1-2-catcorr&keywords=dfrobot+4wd
+
+4) Rectangular white tag with black boundary and black header strip
+
+5) 5x 1.5V AA Battery to power motors
+		http://www.amazon.com/AmazonBasics-Precharged-Rechargeable-Batteries-16-Pack/dp/B007B9NV8Q/ref=sr_1_2?ie=UTF8&qid=1408062203&sr=8-2&keywords=amazon+batteries+aa
+
+6) 9V EBL battery to power Arduino
+		http://www.amazon.com/EBL%C2%AE-Battery-Charger-Rechargeable-Batteries/dp/B00HV4KFSA/ref=sr_1_1?ie=UTF8&qid=1408062243&sr=8-1&keywords=9v+rechargeable+ebl
+
+
+VIII. Other Hardware
+--------------------
+1) USB to Serial Cable (Use Prolific 2303 Driver):
+		http://www.adafruit.com/blog/wp-content/uploads/2011/01/usbserial_MED.jpg
+
+2) Serial Cable:
+		http://www.homanndesigns.com/store/images/DB9F-DB9M_Serial_cable.jpg
+
+3) Two Wi232 Transceivers: Download configuration tool from here
+		http://mikrokopter.de/ucwiki/RadioTronix#Download_Konfigurationstool
+   It has currently been installed on this computer. It is used to test the 
+   Wi232 transceivers, and set the channel on which the transmit and receive. To
+   configure (it should already be configured, so you wouldn't normally need to
+   do this):
+
+   		a) Switch the jumper on the Wi232 while the transceiver is still on.
+   			When the jumper is on the two pins towards the red LED and away from
+   			the switch, it is in "USE" mode.
+   			When the jumper is on the two pins close to the switch and away from
+   			the LED, it is in "DEBUG" mode.
+   			IMPORTANT: DO NOT SWITCH OFF AND SWITCH ON THE TRANSCEIVER WHEN THE
+   			JUMPER IS IN THIS "DEBUG" MODE, IT WILL RESET THE CHANNELS TO
+   			DEFAULT.
+   		b) Open "Radiotronix Wi.232DTS Evaluation", select the COM port and the
+   		   Baud Rate (should be 115200) and click on "Discover module".
+   		c) Click on "Read" on the Transmit Channel and Receive Channel, and note
+   		   down the channel.
+   		d) Move the jumper back to "USE" mode.
+   		e) Do the same thing with the other transceiver, and check that the
+   		   transmission channel of each transceiver matches the receiving
+   		   channel of the other transceiver.
+
+4) TP-LINK Router: Used to broadcast the private network on which the server
+				   will be hosted. To configure, connect to the computer by
+				   ethernet and go to 192.168.0.1 and enter user: admin and
+				   password: admin.
+
+
+IX. Setup
+---------
+1) Cameras:
+	*   Ensure that the two cameras are plugged into the FireWire ports.
+	*   Check Device Manager -> Imaging Devices to make sure the drivers are
+	  installed and working properly.
+	*   Ensure that the USB-Serial cable is plugged in and connected to the
+	  Wi232 transceiver, and the COM_PORT in vehicle_tracker.py matches the COM
+	  port that shows up in Device Manager. This is the COM port that the
+	  overhead camera will write to.
+	*   Also ensure that the transceiver is powered on.
+	*   You should be able to run vehicle_tracker.py.
+	*   vehicle_tracker.py will quit and restart every so often. (Refer to 
+	  known issues).
+	*	ONLY QUIT vehicle_tracker.py by pressing 'q'. Otherwise, you may get an
+		error (see Known Issues) the next time you try to run it.
+
+2) Server:
+	*   Launch XAMPP and start Apache and MySQL.
+	*   Check that in the file Apache -> Config -> httpd.conf (as accessed from
+	  XAMPP), the DocumentRoot and Directory in Line 242-243 are set to the
+	  folder containing the server files. At the time of writing, it is set to
+	  "C:\REU_2014_Server". If this is changed, the Arduino will also have to
+	  change its request (see Robot).
+	*   The server files are robotServer.cgi and databaseManager.cgi. Both can
+	  be accessed at C:\REU_2014_Server\.
+	*   Login to localhost/phpmyadmin with user: root and password: uclaRobots14
+	  to access the databases.
+	*   Goto localhost/databaseManager.cgi to create, clear or delete databases.
+	*   Ensure that the serial cable is connected to the Wi232 transceiver, and
+	  the transceiver is powered on.
+	*   Also ensure that the COM_PORT in robotServer.cgi matches the COM port
+	  that shows up in Device Manager. This is the COM port to read robot's
+	  position from.
+	*   Check that dbName in robotServer.cgi matches the name of the database
+	  you wish to access.
+	*   Test localhost/robotServer.cgi by entering states 0 or 1 (other states
+	  will not work, and state 1 requires data submission) and checking the
+	  database at localhost/phpmyadmin for changes in State_Record.
+	*   You will want to clear the database after testing.
+	*   'State_Record' keeps track of all communications with the server,
+		'Data_Collection' is the final data table and 'Next_Paths' is the SQL
+		table storing the next set of paths.
+
+3) Robot:
+	*   Launch Arduino IDE, connect the Arduino to the computer and check that
+	  it has been detected on Tools -> Serial Port.
+	*   Use and modify motor_ir_test.ino in Miscellaneous to calibrate
+	  PIXELS_PER_SECOND and RADS_PER_SECOND. Run vehicle_tracker.py and observe
+	  change in x or y as the robot moves vertically or horizontally for 1
+	  second for PIXELS_PER_SECOND and change in theta as the robot rotates for
+	  1 second for RADS_PER_SECOND.
+	*   Use ir_test.ino to verify MAX_SENSOR and WHITE_BOUNDARY by placing the
+	  reflectance sensor of black and white regions on the test bed.
+	*   The file for robot logic is compressedSensing.ino.
+	*	Check that the WLAN_SSID, WLAN_PASS, WLAN_SECURITY, IP, Port and 
+	  repository in compressedSensiong.ino match the network you wish to use.
+	  ipconfig on cmd will give you the ip-address of the network the server is
+	  on.
+	*   Ensure the chassis is covered with black tape, so that the camera
+	  doesn't confuse some part of the chassis for the tag.
+	*   Set NUM_PATHS in compressedSensing.ino to 1 more than the number of
+	  paths you want the robot to travel.
+	*   Upload compressedSensing.ino to the Arduino.
+
+
+X. Run
+------
+1) Launch vehicle_tracker.py.
+2) Launch XAMPP and start Apache and MySQL.
+3) Place the Arduino on the test bed and connect the board to the battery.
+4) Once the data has been collected in MySQL, export it to a csv and put it
+   in the same folder as reconstructImage.m MATLAB script. Edit that file
+   to ensure that the file it's pulling data from is the file you have just
+   downloaded, and run the file.
+
+
+XI. Known Issues
+----------------
+1) Off the test bed: Occasionally, the video camera might make a mistake and
+  					 accidentally send the robot off the test bed. If that
+  					 happens, put the robot back on the test bed and ignore
+  					 that data point.
+2) Select Video Source: If vehicle_tracker.py is not quit properly, the next
+						time it is run, it may ask you to select a video source,
+						but still give you trouble. To solve this, open Task
+						Manager and end pythonw.exe that takes around 30,000 K.
+						If this still doesn't work, end all the pythonw.exe
+						processes and run vehicle_tracker.py again.
+3) Cannot open a camera: Unplug and replug in the firewire connections. Also
+						 check the Device Manager. For some reason, checking
+						 Device Manager makes it work again. 
+4) Shifting image: The video displayed by vehicle_tracker.py unpredictably gets
+ 				   shifted sometimes. Unknown reason, but if that happens,
+ 				   restart vehicle_tracker.py. Current fix includes restarting
+ 				   the camera every RESET number of iterations.
+5) Parallax: The tag is not exactly centered at the reflectance sensor, and may
+			 cause some noise in the data.
+6) MATLAB: Currently, MATLAB is having issues plotting images, so the actual
+		   image reconstruction is carried out on another computer. The
+		   adaptive path selection using MATLAB still works without problems.
+		   So to recontruct data,
+
+
+XII. Future Improvements
+------------------------
+1) Eliminate the need for the Wi232 transceivers by creating virtual ports or
+  sockets, so that the server-side script can communicate with
+  vehicle_tracker.py without external hardware.
+2) Write small test programs for the individual libraries.
+3) Extend the analog sensor for use with images with varying shades of grey.
+  Currently, a reading from the reflectance sensor is characterised as black or
+  white based on the reading. Add more 'buckets' based on the range of values.
+4) Write a script that can access the 'State_Record' and display the current
+  status of the robot. This will save time from trying to make sense of the
+  status data in 'State_Record'.
+\end{verbatim}
+
+
+
+\subsection{Code Documentation (refman.pdf)}
 
 \end{document}
