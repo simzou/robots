@@ -15,6 +15,7 @@
 \usepackage{verbatim} % for \begin{comment}
 \usepackage{subcaption}
 \usepackage{float}
+\usepackage{tocbibind}
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 
@@ -40,22 +41,26 @@ Compressed sensing is a technique used to reconstruct sparse signals and images 
 Discuss Compressed Sensing
 \end{comment}
 
-Environment mapping is amongst the foundational problems of mobile robotics. In order for an autonomous vehicle to operate effectively within an environment, 
+Environment mapping is amongst the foundational problems of mobile robotics. Mobile robots have very real constraints, such as limited on-board memory and processing power, and so might need to offload data to some remote server as it gets collected or have very simple controls. This naturally leads to another constraint - in the interest of speedy collection of data, the robot would ideally only communicate with this remote server infrequently. Given these constraints, if we wish to map an environment quickly, we will want the robot to send as much meaningful data as it can each time it offloads to the server.
 
-The task of mapping an unknown environment is well-studied in the area of autonomous robotics. 
+We considered a scenario where a robot has to map a terrain without being able to collect data at every single data point. Ordinarily, any data collected would be incomplete and we would not be able to achieve good reconstruction. However, we also assume that the terrain i
 
-Compressed sensing describes a technique in which a signal is reconstructed by solving an underdetermined linear system. Doing so allows a signal to be found from a relatively small amount of data. 
+
+Compressed sensing describes a technique in which a signal is reconstructed by solving an underdetermined linear system, often used in MRIs. Doing so allows a signal to be found from a relatively small amount of data. Our research applies compressed sensing techniques to environmental mapping by robots. We first implemented Split-Bregman iteration to solve a unde
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LAB SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Lab Setup}
 \subsection{Overview}
-The setup in the UCLA Applied Mathematics Laboratory (AML) consists of three main components: 
+The setup in the UCLA Applied Mathematics Laboratory (AML) consists of four main components: 
 
-\begin{itemize}
-\item A robot vehicle on a black 1.5 m x 2.0 m rectangular test bed made of black asphalt felt paper
+\begin{enumerate}
+\item A robot vehicle 
+\item A black 1.5 m x 2.0 m rectangular test bed made of black asphalt felt paper
 \item 2 Overhead Imaging Source DMK 21F04 1/4 Monochrome CCD cameras
 \item A Server hosted on a Windows Computer
-\end{itemize}
+\end{enumerate}
 
 \subsection{Robot}
 
@@ -86,9 +91,9 @@ server with its ``state'' and optionally ``data.'' Note that we do not need an i
 
 To obtain the robot's location, the server reads data from the serial port. The serial port should be connected to a Wi232 transceiver that receives data broadcast by the other Wi232 transceiver.
 
-\subsection{Putting it all together}
+\subsection{Workflow}
 
-We wish to collect some $m$ data points, where $m << n$, the dimension of the image. Each data point consists of the starting location of the robot, the final location of the robot and the sum of the reflectance sensor values obtained as it travelled in a straight line between the two points. The robot operates as a finite state machine. It consists of binary states, and they function as follows:
+Each data point collected consists of the starting location of the robot, the final location of the robot and the sum of the reflectance sensor values obtained as it travelled in a straight line between the two points. The robot operates as a finite state machine. It consists of binary states, and they function as follows:
 \begin{itemize}
 \item State 0: When the robot is in state 0, it is either moving/turning to its new start position or requesting the server to confirm it position as it is about to start travelling along a new path and collect data. Note that when the robot is getting into its new start position, there is no communication with the server. This happens everytime the robot switches to state 0 from state 1.
 \item State 1: When the robot is in state 1, it is either moving along a path collecting data or requesting the server that its position at the end of a path. Note that when the robot is travelling along a path collecting data, there is no communication with the server. This happens everytime the robot switches to state 1 from state 0.
@@ -110,7 +115,7 @@ Description of testbed, hardware, software, logic
 Sid's flowchart
 \end{comment}
 
-\subsection{Noise}
+\subsection{System Error Analysis}
 
 Some of the factors that may affect the quality of the data collected are detailed below:
 \begin{itemize}
@@ -128,9 +133,9 @@ Some of the factors that may affect the quality of the data collected are detail
 \subsection{Problem Constraints}
 
 Our model and lab setup were designed with the following constraints in mind: 
-limited on board processing power, limited on board storage, and limited bandwidth 
+limitations of on board processing power, on board storage, and  bandwidth 
 (or infrequent communication with the main server). Real world examples where these constraints 
-might exist include robot submarines that can only transmit data when they surface but given the massive amount of sensor information that would be collected whilst traveling in the ocean it becomes infeasible to store it all.  robot need only to sum up the the sensor readings it gets
+might exist include robot submarines that can only transmit data when they surface but given the massive amount of sensor information that would be collected whilst traveling in the ocean it becomes infeasible to store it all. In our experiment, we then limit the robot to performing only simple summations of sensor readings and only a single data value is communicated back to the server for each path the vehicle travels.
 
 \subsection{Mathematical Model}
 Without loss of generality, we assume the area to be explored is a
@@ -164,7 +169,7 @@ For computational purpose, the whole domain is discretized into rectangular
 pixels (See Figure \ref{fig:An-illustration-of-paths}). Each path
 $C_{k}$ defines a weight $a_{k,ij}$ for each pixel $(i,j)$. If
 $C_{k}$ does not intersect with pixel $(i,j)$, then $a_{k,ij}=0$,
-otherwise $a_{k,ij}$ is defined to be proportional to the length
+otherwise $a_{k,ij}$ is defined to be the length
 of the part of $C_{k}$ that falls within pixel $(i,j)$. It is also
 assumed that the value of $u$ is a constant within each pixel $(i,j)$,
 which is denoted by $u_{ij}$. After discretization, Eq (\ref{eq:path-integral})
@@ -180,9 +185,7 @@ Au=b,\label{eq:system-eq}
 \end{equation}
 where the linear operator $A$ is specified in Eq (\ref{eq:path-integral-discrete}).
 Eq (\ref{eq:system-eq}) is the model equation, which poses an inverse
-problem. In this equation, $b$ can be obtained from the experiment,
-$A$ is determined by user-specified paths for the robot, which can
-be calculated offline. $u$ is the variable that we want to solve.
+problem. In this equation, $A$ is determined from the paths that the robot travelled in - it travels in straight line paths, hence we only need the start and end locations to determine its trajectory. Each path contributes one row to $A$. $b$ is obtained from the experiment, and is the vector of the integral of sensor values as the robot travelled along each of its paths. $u$ is the variable that we want to solve.
 Of course, if the paths form a complete raster scan over the whole
 domain, then theoretically Eq (\ref{eq:system-eq}) has a unique solution.
 For economical reasons, it is desirable to use much fewer paths and
@@ -211,7 +214,7 @@ of $u$.
 Now, let $A$ be our measurement operator as described in the previous section, and let 
 $b$ be the collected samples. Then, in order to reconstruct $u$, given that we have $A$ and $b$, we must solve the optimization problem
 \[ \underset{u}{{\text{{min }}}} E(u)\quad\text{such that}\; Au=b.\]
-Solving this problem is intractible due to our use of the $\ell^0$ pseudo-norm, but we 
+This problem is intractible due to our use of the $\ell^0$ pseudo-norm, but we 
 can relax it to an easily solved optimization problem by using a different sparsity-inducing 
 objective function. We choose to use the $\ell^1$ norm or the nonconvex penalty function
 $\varphi_p$ with $p \leq 1$, as described in the introduction. In order to account for noise 
@@ -223,9 +226,9 @@ fidelity. Therefore, we can recover $u$ by solving the unconstrained optimizatio
 &H(u)=\frac{\mu}{2}\|Au-b\|_2^2.\notag
 \end{align}
 Although this is a nonconvex optimization problem in the case that $p<1$,
-Chartrand \cite{chartrand2009fast} and other numerical and theoretical results have shown that it can easily be solved, 
-and that the solution will converge to the global minimum of the 
-associated $\ell^0$ formulation. Therefore, we use the Split-Bregman method to reconstruct $u$. 
+Chartrand \cite{chartrand2009fast} and other numerical and theoretical results have shown that it can be solved using the Split-Bregman method, 
+and that the solution converges to the global minimum of the 
+associated $\ell^0$ formulation.
 
 In order to use Split-Bregman, we rewrite Eq~(\ref{eq:minprob}) as
 \begin{align}
@@ -263,7 +266,7 @@ and then use our algorithm to reconstruct for $u$ through the following process 
 
 This algorithm requires us to solve two different subproblems. The first problem, \[u^{k+1}=\min_u{H(u)+B(d,d_x,d_y,u)},\] has optimality condition
 \[\left(\mu A^TA + \lambda_1I - \lambda_2\Delta\right)u^{k+1}=\mu A^Tb + \lambda_1(d-b)+\lambda_2\left(\nabla_x^T(d_x-b_x)+\nabla_y^T(d_y-b_y)\right),\]
-so it may be solved directly. The second set of subproblems is that of computing $d^{k+1},d_x{k+1},d_y^{k+1}$. This step is easily 
+which is a linear equation. The second set of subproblems is that of computing $d^{k+1},d_x{k+1},d_y^{k+1}$. This step is easily 
 accomplished by applying a generalized $p$-Shrinkage operator
 \[S_\gamma^p(t)=\frac{t}{|t|}\max\left({|x|-\gamma|x|^{p-1},0}\right)\]
 elementwise to $d^k,d_x^k,d_y^k$ with $\gamma = \alpha/\lambda_1, \beta/\lambda_2, \beta/\lambda_2$, respectively.
@@ -316,10 +319,8 @@ a subset of points $P\subseteq\Omega$ such that each point in $P$ is a possible 
 \begin{algorithm}[H]
 \caption{Adaptive path selection}\label{adaptivepath}
 \begin{algorithmic}[1]
-\Procedure{AdaptivePaths}{$\Omega$}
-\State $s_1\gets \text{rand(}\Omega)$
-\State $e_1\gets \text{rand(}\Omega)$
-\For{$i=2$ to $n$}
+\Procedure{AdaptivePaths}{}
+\For{$i=1$ to $n$}
 \State $s_k\gets e_{k-1}$\Comment{Robot doesnt need to reposition.}
 \State $e_k\gets \text{rand(}\Omega)$
 \EndFor
@@ -332,6 +333,10 @@ we simply revert to Algorithm~\ref{ranpath} to collect the next set of data poin
 important for there to be an element of randomness when constructing $P$. Otherwise, there is the risk that the initial set of random 
 paths does not capture an important feature of $u^*$. If this is the case, then the adaptive pathing will never select those points, and will instead only produce paths where information has already been detected so far. Let us describe the method that we developed  
 for choosing $P$ in more detail.
+
+Given that we have computed $u^*$, we can select the set of points where information has been found by thresholding our reconstructed image and converting it to a binary image, $u^*_{bw}$. Then, we 
+can take the set of all of the nonzero pixels in $u^*_{bw}$, and call it $P_1$. At this point, we are 
+
 
 
 \section{Results}
@@ -436,16 +441,16 @@ However, if we use the robot data alongside the same set of parameters as the si
 
 In order to judge the effectiveness of our approach, we examine other methods of collecting data and reconstructing an image. Perhaps the most intuitive manner in which to gather data about the image is to sample individual points rather than travelling and integrating along a path. As when collecting data in the form of path integrals, we would want the number of sampled points to be as low as possible. Having sampled points for data, there are then multiple approaches to recovering the image. One approach is to simply use the same Split Bregman iteration that we are using for reconstruction from path integrals, but with the individually sampled pixels. Alternatively, we can take the value found at each pixel and assign the same value to nearby pixels, a method that we refer to as pixel expansion.
 
-\begin{figure}
+\begin{figure}[h]
 \centering
-\begin{subfigure}{.45\textwidth}
+\begin{subfigure}{.3\textwidth}
   \centering
     \includegraphics[width=1\linewidth]{figures/randompointreconstruction}
   \caption{Reconstruction using points sampled randomly.}
   \label{fig:randrec}
 \end{subfigure}%
-\hspace{10pt}
-\begin{subfigure}{.45\textwidth}
+\hspace{30pt}
+\begin{subfigure}{.3\textwidth}
   \centering
     \includegraphics[width=1\linewidth]{figures/gridpointreconstruction}
   \caption{Reconstruction using points sampled on a grid.}
@@ -455,16 +460,16 @@ In order to judge the effectiveness of our approach, we examine other methods of
 \label{fig:samplerec}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h]
 \centering
-\begin{subfigure}{.45\textwidth}
+\begin{subfigure}{.3\textwidth}
   \centering
     \includegraphics[width=1\linewidth]{figures/randompointexpansion}
   \caption{Expansion of points sampled randomly.}
   \label{fig:randexp}
 \end{subfigure}%
-\hspace{10pt}
-\begin{subfigure}{.45\textwidth}
+\hspace{30pt}
+\begin{subfigure}{.3\textwidth}
   \centering
     \includegraphics[width=1\linewidth]{figures/gridpointexpansion}
   \caption{Expansion of points sampled on a grid.}
@@ -480,6 +485,13 @@ In Figure \ref{fig:samplerec}, Split Bregman iteration was used with the collect
 
 Figure \ref{fig:sampleexp} illustrates pixel expansion. This is done by looping through every pixel in the image, and for each pixel, finding and assigning the value from the nearest pixel that was sampled. This process creates expanded pixels of a single color around each sampled pixel. When the pixels are sampled on a grid, the even distribution causes the expanded pixels to simply be squares, essentially creating a low resolution version of the image, as in Figure \ref{fig:gridexp}. Figure \ref{fig:randexp} is a result of pixel expansion with randomly sampled pixels. The unpredictable spread of sampled pixels causes the expanded pixels to vary widely in shape and size, and the reconstruction does a poor job of determining the shape of the region of interest.
 
+\begin{figure}[H]
+\centering
+	\includegraphics[width=1\textwidth]{figures/othermethoderror}
+\caption{Plot of error for the various methods of reconstruction with respect to the number of data samples used.}
+\label{fig:othermethoderror}
+\end{figure}
+
 To compare these methods, Figure \ref{fig:othermethoderror} plots the error of these approaches, as well as the path integral reconstruction that we are actually carrying out, with respect to the number of data points collected. The blue line represents reconstruction from randomly generated path integrals, and as desired, for a low number of data points, it has lower error than the other methods. As the number of samples grows, all methods begin to have similar error; this is expected because any method will work reasonably well with enough data. Worth noting is that while pixel expansion from samples on a grid appears to do better than random path integrals for some of the low data situations, the effectiveness of grid point expansion is highly variable, and as such, its overall usefulness is limited. The accuracy of reconstruction is very dependent on how well the grid aligns with the given image, and choosing the best grid size for a given environment would require prior knowledge of the environment. Another flaw with pixel expansion is the dependence on accurate sampling; pixel expansion will be very heavily affected by noise. If a pixel is sampled inaccurately, the entire expanded pixel associated with that sample will be inaccurately reconstructed. Using Split Bregman iteration mitigates this issue, and using path integrals further diminishes the impact that a single inaccurate sample can have.
 
 
@@ -488,7 +500,7 @@ To compare these methods, Figure \ref{fig:othermethoderror} plots the error of t
 \end{comment}
 
 \subsection{Simulated Results}
-\begin{figure}
+\begin{figure}[H]
 \centering
 \begin{subfigure}{.22\textwidth}
   \centering
@@ -502,7 +514,7 @@ To compare these methods, Figure \ref{fig:othermethoderror} plots the error of t
   \centering
     \includegraphics[width=1\linewidth]{figures/nonadaptiveresultrec}
   \caption{Simulated reconstruction from the 200 paths}
-  \vspace{0pt}
+  \vspace{10pt}
   \label{fig:adp_randpaths_sim_rec}
 \end{subfigure}%
 \hspace{10pt}
@@ -510,7 +522,7 @@ To compare these methods, Figure \ref{fig:othermethoderror} plots the error of t
   \centering
     \includegraphics[width=1\linewidth]{figures/nonadaptiveresultpath}
   \caption{The 200 randomly generated paths.}
-  \vspace{0pt}
+  \vspace{20pt}
   \label{fig:adp_randpaths_sim}
 \end{subfigure}%
 \hspace {10pt}
@@ -518,7 +530,7 @@ To compare these methods, Figure \ref{fig:othermethoderror} plots the error of t
   \centering
     \includegraphics[width=1\linewidth]{figures/nonadaptiveresulterror}
   \caption{Difference between the original image and the reconstruction}
-  \vspace{0pt}
+  \vspace{10pt}
   \label{fig:adp_randpaths_diff}
 \end{subfigure}%
 \caption{Simulated reconstruction using random paths as before.}
@@ -535,7 +547,7 @@ To compare these methods, Figure \ref{fig:othermethoderror} plots the error of t
   \centering
     \includegraphics[width=1\linewidth]{figures/adaptiveresultpath}
   \caption{The 200 adaptive paths.}
-  \vspace{0pt}
+  \vspace{10pt}
   \label{fig:adp_adpaths}
 \end{subfigure}%
 \hspace {10pt}
@@ -556,21 +568,21 @@ Figure \ref{fig:adp_randpaths_sim} shows the 200 random paths taken by the simul
 
 The reconstruction obtained with these paths is shown in Figure \ref{fig:adp_adpaths_sim_rec}. This reconstruction is able to recover successfully generally the region of interest and the size of the area, but is not able to ascertain some of the more detailed information about the shape and boundary of the area accurately. 
 
-Figure \ref{fig:adp_randpaths_diff} shows the difference between the the reconstructed image and the ground truth. The error is primarly along the edges but more prominent along the bottom edge. The norm of the difference divided by the norm of the original is <INSERT VALUE HERE>.
+Figure \ref{fig:adp_randpaths_diff} shows the difference between the the reconstructed image and the ground truth. The error is primarly along the edges but more prominent along the bottom edge. The norm of the difference divided by the norm of the original is .5023.
 
 We compare these results against those displayed in Figure \ref{fig:adp_adpaths_sim_fig}, which are generated by the adaptive pathing algorithm on the same test image in \ref{fig:adp_sim_orig}. 
 
-Figure \ref{fig:adp_adpaths} shows the 200 adaptive paths taken by the simulation. There are visibly clustered near the bottom of the image, where it identified early on had the area of interest. Figure \ref{fig:adp_adpaths_sim_rec} then shows the results of the Split Bregman reconstruction with the data collected from the adaptive paths. Because the paths examined the area more closely, the reconstruction is able to more accurately capture the curve along the borders and thus the shape of the area itself. This is illustrated in Figure \ref{fig:adp_adpaths_sim_diff}, which shows the difference between this reconstruction and the original test image. The norm of the difference divided by the norm of the original is <INSERT VALUE HERE>, which is significantly lower than the reconstruction done by purely random paths.
+Figure \ref{fig:adp_adpaths} shows the 200 adaptive paths taken by the simulation. There are visibly clustered near the bottom of the image, where it identified early on had the area of interest. Figure \ref{fig:adp_adpaths_sim_rec} then shows the results of the Split Bregman reconstruction with the data collected from the adaptive paths. Because the paths examined the area more closely, the reconstruction is able to more accurately capture the curve along the borders and thus the shape of the area itself. This is illustrated in Figure \ref{fig:adp_adpaths_sim_diff}, which shows the difference between this reconstruction and the original test image. The norm of the difference divided by the norm of the original is .2614, which is nearly half than the reconstruction done by purely random paths.
 
 \subsection{Experimental Results}
 
-\begin{figure}
+\begin{figure}[H]
 \centering
 \begin{subfigure}{.4\textwidth}
   \centering
     \includegraphics[width=1\linewidth]{figures/adaptiveexperimentalresultoriginal}
   \caption{Image of the testbed, sized at 70x90}
-  \vspace{0pt}
+  \vspace{10pt}
   \label{fig:adp_exp_orig}
 \end{subfigure}%
 \hspace{10pt}
@@ -594,7 +606,7 @@ Figure \ref{fig:adp_adpaths} shows the 200 adaptive paths taken by the simulatio
   \centering
     \includegraphics[width=1\linewidth]{figures/adaptiveexperimentalresultrec}
   \caption{Image reconstruction using robot collected data}
-  \vspace{0pt}
+  \vspace{10pt}
   \label{fig:adp_exp_recon_untuned}
 \end{subfigure}%
 \hspace {10pt}
@@ -612,17 +624,24 @@ Once we were able to confirm that adaptive pathing could yield better results, w
 
 Figure \ref{fig:adp_adpaths} shows the 224 straight line paths the robot vehicle traveled on the testbed and it can be observed that it did not travel often to black areas or corners where there were no areas of interest.
 
-We then generate Figure \ref{fig:adp_exp_recon_simmed}, which is an ideal reconstruction (how the simulation would run if data could be collected with no noise). If we run the same reconstruction with robot data, the resulting reconstruction is significantly affected by the noise in the data, as shown in Figure \ref{fig:adp_exp_recon_untuned}. Because of the sources of noise described earlier, such as the testbed not being entirely black and the sensor sometimes taking incorrect readings, the resulting reconstruction appears to have streaks of areas that do not exist in the original image. To account for noise in the data, we again tune the parameters in our minimization problem and lower the data fidelity term. With greater importance placed on minimizing the gradient, we obtain \ref{fig:adp_exp_recon_tuned}, which is a more accurate reconstruction and is much closer to reconstruction that assumes no noise.
+We then generate Figure \ref{fig:adp_exp_recon_simmed}, which is an ideal reconstruction (how the simulation would run if data could be collected with no noise). If we run the same reconstruction with robot data, the resulting reconstruction is significantly affected by the noise in the data, as shown in Figure \ref{fig:adp_exp_recon_untuned}. Because of the sources of noise described earlier, such as the testbed not being entirely black and the sensor sometimes taking incorrect readings, the resulting reconstruction appears to have streaks of areas that do not exist in the original image. To account for noise in the data, we again tune the parameters in our minimization problem and lower the data fidelity term. With greater importance placed on minimizing the norm of the gradient, we obtain Figure \ref{fig:adp_exp_recon_tuned}, which is a more accurate reconstruction and is much closer to reconstruction that assumes no noise.
+
+
 \section{Conclusions and Further Work}
+
+In summary, we sent a robot along straight line paths through an environment, had the robot integrate the sensor values along these paths, and used Split Bregman iteration to reconstruct the environment from the collected path integrals. We also ran simulations of reconstruction as a means of determining how well this method would work given ideal data, and while the data collected by the robot did have some noise detracting from the quality of reconstructions, by tuning the paramaters in the algorithm, we were nevertheless able to obtain reasonably good recovery of the testbed with relatively few data points. By employing adaptive pathing, it is possible to further reduce the number of data points required.
+
+The work here can be further extended in a number of ways. Given the data the algorithm requires, the testbed does not have to be restricted to the use of one robot. The challenges in using multiple robots would include collision avoidance on the testbed as well as calibrating multiple robots to take data consistent with each other. The robot vehicles could be equipped with infrared sensors that see where the other vehicles are. The setup could also be adapted to be less reliant on an overhead camera if the vehicles had sensors that allowed it to do dead reckoning and be able to determine location by themselves. The algorithm, as demonstrated in simulation, is capable of reconstructing more than just binary images so using different colored paper and thresholding the sensor appropriately more complex environments could be reconstructed. The results of the project could also be applied to more than just physical mapping of an environments but can be used to map any number of variables, such as salinity in the ocean, or the temperature of an environment. The speed of the experiments could also be improved by having the robots travel multiple paths before trying to connect to the server. 
 
 \newpage
 \bibliographystyle{plain}
 \bibliography{resources.bib}
-
+\nocite{*}
 
 \newpage
-\section{Appendix}
+\begin{appendix}
 
+\section{Appendix}
 \subsection{README.txt for Data Collection}
 
 \begin{verbatim}
@@ -703,6 +722,9 @@ V. Code Documentation
  run doxygen doxygen from C:\REU_2014_Server.
 3) The .cgi and .py scripts are documented under "Packages" and the .ino file is
   documented under "Files"
+4) The project files are: robotServer.cgi and databaseManager.cgi for server
+  management, vehicle_tracker.py for video processing and compressedSensing.ino
+  as code for the Arduino.
 
 
 VI. Arduino Pins
@@ -894,5 +916,5 @@ XII. Future Improvements
 
 
 \subsection{Code Documentation (refman.pdf)}
-
+\end{appendix}
 \end{document}
