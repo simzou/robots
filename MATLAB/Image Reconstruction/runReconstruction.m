@@ -47,9 +47,9 @@
 %
 
 %% Define the file path, paths options, and Split Bregman parameters.
-function [err, similarity, time] = runReconstruction(num_paths, path_style)
+function [num_paths, trueError, solveTime, uguess] = runReconstruction(num_paths, path_style)
 
-file          = 'testbed03_aligned_70x90.png'; % Image file for error checking
+file          = 'test50.png'; % Image file for error checking
 
 times         = [];
 errors        = [];
@@ -59,8 +59,8 @@ param.p       = 1;  % We are using the l^p norm.
 param.alpha   = 0;  % Alpha weights towards sparsity of the signal.
 param.beta    = 1;  % Beta weights towards sparsity of gradient.
 param.mu      = 1;  % Parameter on the fidelity term.
-param.lambda1 = .1; % Coefficient on the regular constraint.
-param.lambda2 = 10;  % Coefficient on the gradient constraints.
+param.lambda1 = 1e-10; % Coefficient on the regular constraint.
+param.lambda2 = 1;  % Coefficient on the gradient constraints.
 param.N       = 1;  % Number of inner loops.
 param.tol     = 1/255; % We iterate until the rel. err is under this.
 param.maxiter = 100; % Split Bregman performs this many iterations at most.
@@ -81,7 +81,7 @@ if view_profile, profile on; end
 u_image = rgb2gray(imread(file));
 dim = size(u_image);
 paths = generatePaths(num_paths, dim, path_style, []);
-
+num_paths = size(paths, 1);
 %% Compute A, our path matrix, convert u to a vector, and compute Au=g.
 [A, u, g_from_image] = generateAug(u_image, paths);
 
@@ -140,7 +140,5 @@ imagesc(reshape(abs(u-uguess), dim));
 title(strcat('True Error =', [' ' num2str(trueError)]));
 
 hold off
-
-
 
 if view_profile, profile viewer; end
