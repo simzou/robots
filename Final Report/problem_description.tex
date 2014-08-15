@@ -10,47 +10,56 @@
 \usepackage{graphicx}
 \usepackage{esint}
 \usepackage{babel}
+\usepackage{verbatim} % for \begin{comment}
+\usepackage{subcaption}
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 
-\title{Problem description and current progress}
+\title{Autonomous Robots and Environmental Mapping}
 
-\author{Ke Yin}
+\author{M. Horning, M. Lin, S. Srinivasan, S. Zou}
 
 \maketitle
 
+\begin{abstract}
+
+Compressed sensing is a technique used to reconstruct sparse signals and images while sampling well below the Nyquist rate. Commonly used in fMRIs and medical imaging, we aim to use this technique to allow autonomous robots to map piecewise constant areas of interest within a larger environment. In our experiment, we programmed a robot equipped with a reflectance sensor to travel along straight-line paths on a black testbed with white regions of interest. The robot integrated sensor readings and sent that sum to a remote server after each path. Each data point consists of the robot's start and end positions, tracked by an overhead camera, and the integral found along that path. Once all the data has been collected, the environment is reconstructed by minimizing the sum of the data fitting term and an L1 penalty term. When using an adaptive path selection scheme, preliminary simulations of our experiment show reconstruction of 100x100 images with only 100 data points (relative err. = 0.28), and we have begun trials with data collected by the robot.
+
+\end{abstract}
+
+\pagebreak
+\tableofcontents
+\pagebreak
+
 \section{Introduction}
 
-Mapping environment variables by robots has drawn a lot of interests
-these days. In particular, we want to identify the regions of interest,
-where the values of certain environment variable is significantly
-different from surrounging area, though almost uniform inside each
-region. Normally the programmed robots are sent out in the field,
-moving along designated paths and collecting the measurements of the
-environment variable on the way. Each robot is equipped with a positioning
-device and are able to get measurements at a given frequency. It can
-also send stored data back to the base by wireless communication.
-If the coordinates at every point on the path can be recorded and
-the robot can send measurements back in real time, then theoretically
-the values of the environment variable at every point can be obtained.
-However, it is impractical due to limited bandwith. To address the
-bandwith limitation, we propose a different strategy. The robot is
-programmed to perform on-board summation of the measurements obtained
-along each path (so-called path integral), and only sending the path
-integral to the base. Ideally the paths are line segments, so only
-the coordinates of begin and end of each line segment are needed in
-order to determine the paths. These path integrals of measurements
-along with the path information are post-processed using the reconstruction
-techniques of computed tomography and compressed sensing. Hopefully
-we are able to reconstruct the environment variables in the field.
+\begin{comment}
+Discuss Compressed Sensing
+\end{comment}
 
+Environment mapping is amongst the foundational problems of mobile robotics. In order for an autonomous vehicle to operate effectively within an environment, 
 
-\section{Experiment settings}
+The task of mapping an unknown environment is well-studied in the area of autonomous robotics. 
 
-To be added.
+Compressed sensing describes a technique in which a signal is reconstructed by solving an underdetermined linear system. Doing so allows a signal to be found from a relatively small amount of data. 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LAB SETUP %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Lab Setup}
+\subsection{Testbed}
+The setup in the UCLA Applied Mathematics Laboratory (AML) used three main components: an overhead camera with a tracking system, a PC computer, and the robot vehicle. The testbed is a 1.5 m x 2.0 m rectangular area made of black asphalt felt paper. The cars' positions are tracked by 2 overhead Imaging Source DMK 21F04 1/4 Monochrome CCD cameras with a resolution of 640 x 480 pixels. They have a frame rate of 30 fps and are connected to an image processing PC via firewire cable. The cars are identified using an OpenCV contour searching function that recognizes black and white ID tags, or "hats", that are fixed on top of the vehicle, giving the robot's current position and orientation \cite{gonzalez2011third}
+
+\subsection{Robot}
+\subsection{Video Camera}
+\subsection{Server}
+\subsection{Putting it all together}
+\begin{comment}
+Description of testbed, hardware, software, logic
+Sid's flowchart
+\end{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Models and assumptions}
+Our model and lab setup were designed with certain constraints in mind. The model is designed for robots with limited on board storage and computing power. Another limitation is bandwith and infrequent communication with the main server. 
 
 Without loss of generality, we assume the area to be explored is a
 rectangle denoted by $\Omega$, and the interested environment variable
@@ -67,24 +76,25 @@ g_{k}=\int_{C_{k}}u(x,y)\mathrm{\,{d}\Gamma},\; k=1,\ldots,n.\label{eq:path-inte
 
 \begin{figure}[h]
 \begin{centering}
-\includegraphics[width=0.5\linewidth]{0_Users_ink_Dropbox_REU_figures_illustration.pdf}
+
+\includegraphics[width=0.5\linewidth]{figures/path-illustration}
 \par\end{centering}
 
 \caption{\label{fig:An-illustration-of-paths}An illustration of the paths
 of robots. The shaded regions denote the area of interest (unknown),
 where the values of environment variable $u$ is significantly different
-from the surroundings. The size of the unit voxel (each small rectangle)
+from the surroundings. The size of the unit pixel (each small rectangle)
 is determined by the accuracy of the positioning system.}
 \end{figure}
 
 
 For computational purpose, the whole domain is discretized into rectangular
-voxels (See Figure \ref{fig:An-illustration-of-paths}). Each path
-$C_{k}$ defines a weight $a_{k,ij}$ for each voxel $(i,j)$. If
-$C_{k}$ does not intersect with voxel $(i,j)$, then $a_{k,ij}=0$,
+pixels (See Figure \ref{fig:An-illustration-of-paths}). Each path
+$C_{k}$ defines a weight $a_{k,ij}$ for each pixel $(i,j)$. If
+$C_{k}$ does not intersect with pixel $(i,j)$, then $a_{k,ij}=0$,
 otherwise $a_{k,ij}$ is defined to be proportional to the length
-of the part of $C_{k}$ that falls within voxel $(i,j)$. It is also
-assumed that the value of $u$ is a constant within each voxel $(i,j)$,
+of the part of $C_{k}$ that falls within pixel $(i,j)$. It is also
+assumed that the value of $u$ is a constant within each pixel $(i,j)$,
 which is denoted by $u_{ij}$. After discretization, Eq (\ref{eq:path-integral})
 becomes
 
@@ -108,77 +118,86 @@ still being able to reconstruct a solution for $u$. Inspired by compresed
 sensing based image reconstruction techniques, it is hopeful that
 reconstruction for our under-determined system can be done.
 
+\begin{comment}
+Description of constraints for our problem
+limited bandwidth, data storage
+Also assumptions about simple piecewise environments
+\end{comment}
 
 \section{Algorithm for solving the inverse problem}
+\begin{comment}
+\end{comment}
+\subsection{Simulated Results}
+\label{sec:simresults}
+\subsection{Experimental Results}
 
-Based on the observation that the image $u$ to be reconstructed is
-piecewise constant, it's gradient $\nabla u$ is sparse over
-the domain. Inspired by the compressed sensing theory, we postulate
-that the actual solution $u$ should minimize the energy functional 
+\section{Comparison with Other Approaches}
+\begin{comment}
+\end{comment}
 
-\begin{equation}
-J(u)=\frac{\mu}{2}\|Au-g\|_{2}^{2}+\alpha|u|_{1}+\beta(|\nabla_{x}u|_{1}+|\nabla_{y}u|_{1}),\label{eq:energy-functional}
-\end{equation}
-where $\alpha,\beta$ are some constants to be tuned depending on
-applications. Here we use Split-Bregman method to solve the problem
-$\underset{u}{{\text{{min}}}}J(u)$. More exactly, we rewrite minimization
-of (\ref{eq:energy-functional}) as a constraint problem 
-\[
-\underset{u,d,d_{x},d_{y}}{{\text{{min}}}}\frac{\mu}{2}\|Au-g\|_{2}^{2}+\alpha|d|_{1}+\beta(|d_{x}|_{1}+|d_{y}|_{1})\quad\text{such that}\; d=u,\, d_{x}=\nabla_{x}u,\, d_{y}=\nabla_{y}u.
-\]
-And its associated Augmented Lagrangian functional $L(u,\, d,\, d_{x,}\, d_{y},\, b,\, b_{x},\, b_{y})$ is 
-\[
-\frac{\mu}{2}\|Au-g\|_{2}^{2}+\alpha|d|_{1}+\beta(|d_{x}|_{1}+|d_{y}|_{1})+\frac{1}{2}\lambda_{1}\|d-u+b\|_{2}^{2}+\frac{{1}}{2}\lambda_{2}(\|d_{x}-\nabla_{x}u+b_{x}\|_{2}^{2}+\|d_{y}-\nabla_{y}u+b_{y}\|_{2}^{2}).
-\]
- The solution process is iterative, with each iteration consisting
-of three major steps:
-\begin{enumerate}
-\item Update $u$ by solving the Least-Squares problem
-\begin{equation}
-\underset{u}{{\text{{min}}}}\frac{\mu}{2}\|Au-g\|_{2}^{2}+\frac{1}{2}\lambda_{1}\|d-u+b\|_{2}^{2}+\frac{{1}}{2}\lambda_{2}(\|d_{x}-\nabla_{x}u+b_{x}\|_{2}^{2}+\|d_{y}-\nabla_{y}u+b_{y}\|_{2}^{2}).\label{eq:LS-problem}
-\end{equation}
+In order to judge the effectiveness of our approach, we examine other methods of collecting data and reconstructing an image. Perhaps the most intuitive manner in which to gather data about the image is to sample individual points rather than travelling and integrating along a path. As when collecting data in the form of path integrals, we would want the number of sampled points to be as low as possible. Having sampled points for data, there are then multiple approaches to recovering the image. One approach is to simply use the same Split Bregman iteration that we are using for reconstruction from path integrals, but with the individually sampled pixels. Alternatively, we can take the value found at each pixel and assign the same value to nearby pixels, a method that we refer to as pixel expansion.
 
-\item Update $d,\, d_{x},\, d_{y}$ by soft-thresholding (shrinkage)
-\[
-d=\text{{sign}}(u-b)\cdot\text{{max}}(|u-b|-\frac{\alpha}{\lambda_{1}},0).
-\]
-\[
-d_{x}=\text{{sign}}(\nabla_{x}u-b_{x})\cdot\text{{max}}(|\nabla_{x}u-b_{x}|-\frac{\beta}{\lambda_{2}},0).
-\]
-\[
-d_{y}=\text{{sign}}(\nabla_{y}u-b_{y})\cdot\text{{max}}(|\nabla_{y}u-b_{y}|-\frac{\beta}{\lambda_{2}},0).
-\]
-\[
-\]
+Figures \ref{fig:samplerec} and \ref{fig:sampleexp} present reconstructions of the previously shown 50x50 test image using these approaches, both with randomly sampled points and points sampled on a grid. In all cases, 100 pixels are sampled, and the sampled points are colored white.
 
-\item Update auxillary variables $b,\, b_{x},\, b_{y}$
-\[
-b=d-u+b.
-\]
-\[
-b_{x}=d_{x}-\nabla_{x}u+b_{x}.
-\]
-\[
-b_{y}=d_{y}-\nabla_{y}u+b_{y}.
-\]
+In Figure \ref{fig:samplerec}, Split Bregman iteration was used with the collected data for reconstruction. The algorithm itself is unchanged, but the equation corresponding to a data point will simply give the value of a pixel rather than weighting pixels along the path. This method provides a moderately good reconstruction, especially in determining the general shape of the region of interest in the environment, but the demarcation between the shades of gray in the image is difficult to distinguish, making the image seem very blurry. This is not surprising because by sampling pixels, the only information gathered is about those specific pixels, so the space in between can gradate as quickly or slowly as the reconstruction algorithm deems fit. By comparing Figures \ref{fig:randrec} and \ref{fig:gridrec}, it seems that the reconstruction is more accurate when the points are sampled on a grid. This is reasonable because by sampling on a grid, the spread of sampled points is very even and well distributed. When the points are sampled randomly, certain areas will be less thoroughly investigated than others, hindering accurate reconstruction.
 
-\end{enumerate}
-In step 1, we need to solve following linear equation
-\begin{equation}
-(\mu A^{T}A+\lambda_{1}I+\lambda_{2}\nabla_{x}^{T}\nabla_{x}+\lambda_{2}\nabla_{y}^{T}\nabla_{y})u=\mu A^{T}g+\lambda_{1}(d+b)+\lambda_{2}\nabla_{x}^{T}(d_{x}+b_{x})+\lambda_{2}\nabla_{y}^{T}(d_{y}+b_{y}).\label{eq:Laplace-equation}
-\end{equation}
-Since it is a positive-definite system, it can be solved by Conjugate
-Gradient method, with the preconditioner give by the linear operator
-\begin{equation}
-(\lambda_{1}I+\lambda_{2}\nabla_{x}^{T}\nabla_{x}+\lambda_{2}\nabla_{y}^{T}\nabla_{y})^{-1}.\label{eq:inverse_Laplace}
-\end{equation}
-Because $\nabla_{x},\,\nabla_{y}$ are both circulant matrices using
-finite-difference approximation assuming periodic boundary condition,
-(\ref{eq:inverse_Laplace}) can be solved by Fourier transform and
-its inverse. 
-\[
-\]
-\[
-\]
+Figure \ref{fig:sampleexp} illustrates pixel expansion. This is done by looping through every pixel in the image, and for each pixel, finding and assigning the value from the nearest pixel that was sampled. This process creates expanded pixels of a single color around each sampled pixel. When the pixels are sampled on a grid, the even distribution causes the expanded pixels to simply be squares, essentially creating a low resolution version of the image, as in Figure \ref{fig:gridexp}. Figure \ref{fig:randexp} is a result of pixel expansion with randomly sampled pixels. The unpredictable spread of sampled pixels causes the expanded pixels to vary widely in shape and size, and the reconstruction does a poor job of determining the shape of the region of interest.
+
+To compare these methods, Figure \ref{fig:othermethoderror} plots the error of these approaches, as well as the path integral reconstruction that we are actually carrying out, with respect to the number of data points collected. The blue line represents reconstruction randomly generated path integrals,
+
+\begin{figure}
+\centering
+\begin{subfigure}{.5\textwidth}
+  \centering
+    \includegraphics[width=.9\linewidth]{figures/randompointreconstruction}
+  \caption{Reconstruction using points sampled randomly.}
+  \label{fig:randrec}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+    \includegraphics[width=.9\linewidth]{figures/gridpointreconstruction}
+  \caption{Reconstruction using points sampled on a grid.}
+  \label{fig:gridrec}
+\end{subfigure}
+\caption{Values are found at sampled points, and Split Bregman iteration is used to reconstruct the image.}
+\label{fig:samplerec}
+\end{figure}
+
+\begin{figure}
+\centering
+\begin{subfigure}{.5\textwidth}
+  \centering
+    \includegraphics[width=.9\linewidth]{figures/randompointexpansion}
+  \caption{Expansion of points sampled randomly.}
+  \label{fig:randexp}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+    \includegraphics[width=.9\linewidth]{figures/gridpointexpansion}
+  \caption{Expansion of points sampled on a grid.}
+  \label{fig:gridexp}
+\end{subfigure}
+\caption{Values are found at sampled points, and those values fill the area surrounding the sampled points.}
+\label{fig:sampleexp}
+\end{figure}
+
+\begin{figure}
+  \centering
+    \includegraphics[width=1\textwidth]{figures/othermethoderror}
+  \caption{Plot of errors using various reconstruction methods with respect to the number of data samples used.}
+  \label{fig:othermethoderror}
+\end{figure}
+
+\section{Adaptive Pathing}
+\begin{comment}
+\end{comment}
+\subsection{Simulated Results}
+\subsection{Experimental Results}
+
+\section{Conclusions and Further Work}
+
+\newpage
+\bibliographystyle{plain}
+\bibliography{resources.bib}
 
 \end{document}

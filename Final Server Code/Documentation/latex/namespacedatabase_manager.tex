@@ -1,0 +1,137 @@
+\hypertarget{namespacedatabase_manager}{\section{database\+Manager Namespace Reference}
+\label{namespacedatabase_manager}\index{database\+Manager@{database\+Manager}}
+}
+
+
+A support script for robot\+Server.\+cgi that allows easy creation, clearing and deletion of databases.  
+
+
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacedatabase_manager_a6758e19fddee1da7f56472341da0659e}{html\+Top}
+\begin{DoxyCompactList}\small\item\em H\+T\+M\+L H\+A\+N\+D\+L\+E\+R\+S. \end{DoxyCompactList}\item 
+def \hyperlink{namespacedatabase_manager_a2373da7082a77683ee44d70b07bd8e8c}{html\+Body}
+\item 
+def \hyperlink{namespacedatabase_manager_af6f1d18a2cc0336673043d813887d821}{html\+Tail}
+\item 
+def \hyperlink{namespacedatabase_manager_ad17451d5a7808225629632bc4edc5a34}{connect\+D\+B}
+\begin{DoxyCompactList}\small\item\em My\+S\+Q\+L H\+A\+N\+D\+L\+E\+R\+S. \end{DoxyCompactList}\item 
+def \hyperlink{namespacedatabase_manager_afad5c21c93af8199aab01624f43650cc}{create\+D\+B}
+\item 
+def \hyperlink{namespacedatabase_manager_a303740ad8e58858fb04dd9de5ee26b84}{clear\+D\+B}
+\item 
+def \hyperlink{namespacedatabase_manager_aa84a35ba6d1fdd1ef39b0ad22c629995}{delete\+D\+B}
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{namespacedatabase_manager_ab10af8887a52c00b2526556afc9e144e}{list \hyperlink{namespacedatabase_manager_ab10af8887a52c00b2526556afc9e144e}{tables} = \mbox{[}\char`\"{}State\+\_\+\+Record\char`\"{}, \char`\"{}Data\+\_\+\+Collection\char`\"{}, \char`\"{}Next\+\_\+\+Paths\char`\"{}\mbox{]}}\label{namespacedatabase_manager_ab10af8887a52c00b2526556afc9e144e}
+
+\begin{DoxyCompactList}\small\item\em M\+A\+I\+N P\+R\+O\+G\+R\+A\+M. \end{DoxyCompactList}\item 
+\hypertarget{namespacedatabase_manager_a6e185b7b0a5f9739231e396d1f2708c6}{tuple {\bfseries form\+Data} = cgi.\+Field\+Storage()}\label{namespacedatabase_manager_a6e185b7b0a5f9739231e396d1f2708c6}
+
+\item 
+\hypertarget{namespacedatabase_manager_abe0cedabe9f597c96eb60ac29e6fe510}{tuple {\bfseries db\+Name\+Create} = form\+Data.\+getvalue(\char`\"{}dbnamecreate\char`\"{})}\label{namespacedatabase_manager_abe0cedabe9f597c96eb60ac29e6fe510}
+
+\item 
+\hypertarget{namespacedatabase_manager_afbf6981dc9d63cc055637624e25fc191}{tuple {\bfseries db\+Name\+Clear} = form\+Data.\+getvalue(\char`\"{}dbnameclear\char`\"{})}\label{namespacedatabase_manager_afbf6981dc9d63cc055637624e25fc191}
+
+\item 
+\hypertarget{namespacedatabase_manager_a3f05fdb39fb73a3975595b77e291d9bd}{tuple {\bfseries db\+Name\+Delete} = form\+Data.\+getvalue(\char`\"{}dbnamedelete\char`\"{})}\label{namespacedatabase_manager_a3f05fdb39fb73a3975595b77e291d9bd}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A support script for robot\+Server.\+cgi that allows easy creation, clearing and deletion of databases. 
+
+\begin{DoxyAuthor}{Author}
+Siddarth Srinivasan (U\+C\+L\+A R\+E\+U 2014) 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+8th July 2014 
+\end{DoxyDate}
+
+
+\subsection{Function Documentation}
+\hypertarget{namespacedatabase_manager_a303740ad8e58858fb04dd9de5ee26b84}{\index{database\+Manager@{database\+Manager}!clear\+D\+B@{clear\+D\+B}}
+\index{clear\+D\+B@{clear\+D\+B}!database\+Manager@{database\+Manager}}
+\subsubsection[{clear\+D\+B}]{\setlength{\rightskip}{0pt plus 5cm}def database\+Manager.\+clear\+D\+B (
+\begin{DoxyParamCaption}
+\item[{}]{db, }
+\item[{}]{cursor, }
+\item[{}]{dbname, }
+\item[{}]{tables}
+\end{DoxyParamCaption}
+)}}\label{namespacedatabase_manager_a303740ad8e58858fb04dd9de5ee26b84}
+\begin{DoxyVerb}    @brief  Function that clears the database with name 'dbname' of all
+           'tables'
+\end{DoxyVerb}
+ \hypertarget{namespacedatabase_manager_ad17451d5a7808225629632bc4edc5a34}{\index{database\+Manager@{database\+Manager}!connect\+D\+B@{connect\+D\+B}}
+\index{connect\+D\+B@{connect\+D\+B}!database\+Manager@{database\+Manager}}
+\subsubsection[{connect\+D\+B}]{\setlength{\rightskip}{0pt plus 5cm}def database\+Manager.\+connect\+D\+B (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{namespacedatabase_manager_ad17451d5a7808225629632bc4edc5a34}
+
+
+My\+S\+Q\+L H\+A\+N\+D\+L\+E\+R\+S. 
+
+\begin{DoxyVerb}    @brief Function that connects to the database
+\end{DoxyVerb}
+ \hypertarget{namespacedatabase_manager_afad5c21c93af8199aab01624f43650cc}{\index{database\+Manager@{database\+Manager}!create\+D\+B@{create\+D\+B}}
+\index{create\+D\+B@{create\+D\+B}!database\+Manager@{database\+Manager}}
+\subsubsection[{create\+D\+B}]{\setlength{\rightskip}{0pt plus 5cm}def database\+Manager.\+create\+D\+B (
+\begin{DoxyParamCaption}
+\item[{}]{db, }
+\item[{}]{cursor, }
+\item[{}]{dbname}
+\end{DoxyParamCaption}
+)}}\label{namespacedatabase_manager_afad5c21c93af8199aab01624f43650cc}
+\begin{DoxyVerb}    @brief Function that creates a database with name 'dbname'
+\end{DoxyVerb}
+ \hypertarget{namespacedatabase_manager_aa84a35ba6d1fdd1ef39b0ad22c629995}{\index{database\+Manager@{database\+Manager}!delete\+D\+B@{delete\+D\+B}}
+\index{delete\+D\+B@{delete\+D\+B}!database\+Manager@{database\+Manager}}
+\subsubsection[{delete\+D\+B}]{\setlength{\rightskip}{0pt plus 5cm}def database\+Manager.\+delete\+D\+B (
+\begin{DoxyParamCaption}
+\item[{}]{db, }
+\item[{}]{cursor, }
+\item[{}]{dbname}
+\end{DoxyParamCaption}
+)}}\label{namespacedatabase_manager_aa84a35ba6d1fdd1ef39b0ad22c629995}
+\begin{DoxyVerb}    @brief Function that deletes the database with name 'dbname'
+\end{DoxyVerb}
+ \hypertarget{namespacedatabase_manager_a2373da7082a77683ee44d70b07bd8e8c}{\index{database\+Manager@{database\+Manager}!html\+Body@{html\+Body}}
+\index{html\+Body@{html\+Body}!database\+Manager@{database\+Manager}}
+\subsubsection[{html\+Body}]{\setlength{\rightskip}{0pt plus 5cm}def database\+Manager.\+html\+Body (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{namespacedatabase_manager_a2373da7082a77683ee44d70b07bd8e8c}
+\begin{DoxyVerb}    @brief Function that generates the body of the page
+\end{DoxyVerb}
+ \hypertarget{namespacedatabase_manager_af6f1d18a2cc0336673043d813887d821}{\index{database\+Manager@{database\+Manager}!html\+Tail@{html\+Tail}}
+\index{html\+Tail@{html\+Tail}!database\+Manager@{database\+Manager}}
+\subsubsection[{html\+Tail}]{\setlength{\rightskip}{0pt plus 5cm}def database\+Manager.\+html\+Tail (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{namespacedatabase_manager_af6f1d18a2cc0336673043d813887d821}
+\begin{DoxyVerb}    @brief Function that generates the closing html tags
+\end{DoxyVerb}
+ \hypertarget{namespacedatabase_manager_a6758e19fddee1da7f56472341da0659e}{\index{database\+Manager@{database\+Manager}!html\+Top@{html\+Top}}
+\index{html\+Top@{html\+Top}!database\+Manager@{database\+Manager}}
+\subsubsection[{html\+Top}]{\setlength{\rightskip}{0pt plus 5cm}def database\+Manager.\+html\+Top (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{namespacedatabase_manager_a6758e19fddee1da7f56472341da0659e}
+
+
+H\+T\+M\+L H\+A\+N\+D\+L\+E\+R\+S. 
+
+\begin{DoxyVerb}    @brief Function that generates the html tags till the body.
+\end{DoxyVerb}
+ 

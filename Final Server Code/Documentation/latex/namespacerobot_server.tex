@@ -1,0 +1,551 @@
+\hypertarget{namespacerobot_server}{\section{robot\+Server Namespace Reference}
+\label{namespacerobot_server}\index{robot\+Server@{robot\+Server}}
+}
+
+
+Server-\/\+Side Script that handles communication with the robot. Saves the requests from the robot, the data it collects and the robot's position (as tracked by the overhead video camera), to a My\+S\+Q\+L D\+B. A M\+A\+T\+L\+A\+B script directs the robot where to go, using adaptive path selection.  
+
+
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacerobot_server_a3179f2c861172f46235068b70ec49aa4}{html\+Form}
+\begin{DoxyCompactList}\small\item\em H\+T\+M\+L H\+A\+N\+D\+L\+E\+R\+S. \end{DoxyCompactList}\item 
+def \hyperlink{namespacerobot_server_a6bb2ef04cec1313fe219ad0d4026d623}{html\+Response}
+\item 
+def \hyperlink{namespacerobot_server_a7cf853bf6d089f8aff7462dea0635505}{json\+Response}
+\item 
+def \hyperlink{namespacerobot_server_af96854f8704c2374b1faece3a09aba58}{locate}
+\begin{DoxyCompactList}\small\item\em C\+A\+M\+E\+R\+A/\+L\+O\+C\+A\+T\+I\+O\+N H\+A\+N\+D\+L\+E\+R\+S. \end{DoxyCompactList}\item 
+def \hyperlink{namespacerobot_server_af6f7c88782ee472dbabc087a7067c9a4}{find\+Max\+Time}
+\item 
+def \hyperlink{namespacerobot_server_ac61a36579b1ff41815996d03b5d01590}{find\+Next\+Time}
+\item 
+def \hyperlink{namespacerobot_server_acefe30e37a8b8c89f8d01a373fa2c9c3}{dot\+Product}
+\item 
+def \hyperlink{namespacerobot_server_aab85c3ddb2bfa79f6cfc691ec2d7002e}{cross\+Product}
+\item 
+def \hyperlink{namespacerobot_server_a16ed8e4a9f5a2f74b76f0113da04cb8d}{connect\+D\+B}
+\begin{DoxyCompactList}\small\item\em My\+S\+Q\+L D\+A\+T\+A\+B\+A\+S\+E H\+A\+N\+D\+L\+E\+R\+S. \end{DoxyCompactList}\item 
+def \hyperlink{namespacerobot_server_a9eaa696a7fb2b35e179de338b82d449b}{save\+State\+To\+D\+B}
+\item 
+def \hyperlink{namespacerobot_server_ad82aac81396feae3d320927a0e714dc5}{save\+Start\+To\+D\+B}
+\item 
+def \hyperlink{namespacerobot_server_ac05eca8e325b3b65fa8fdd679b117991}{save\+End\+Data\+To\+D\+B}
+\item 
+def \hyperlink{namespacerobot_server_a75eae201dbb88551a95cbc983d659353}{num\+Data\+Collected}
+\item 
+def \hyperlink{namespacerobot_server_acee1413bacea5205a3e924fe474d9ddb}{find\+Current\+Entry}
+\item 
+def \hyperlink{namespacerobot_server_a26efd5684a33ead9a8c9e886293fba43}{in\+New\+Location}
+\item 
+def \hyperlink{namespacerobot_server_a8cdfcb641116b6b145bb35666f036c33}{get\+Next\+Dest}
+\begin{DoxyCompactList}\small\item\em M\+A\+T\+L\+A\+B D\+A\+T\+A\+B\+A\+S\+E H\+A\+N\+D\+L\+E\+R\+S. \end{DoxyCompactList}\item 
+def \hyperlink{namespacerobot_server_abf00341a56ede63a7a575df41ef9c242}{gen\+New\+Dests}
+\item 
+def \hyperlink{namespacerobot_server_a3df4158c8161e8a27a8ddcdcc3f838d9}{update\+Next\+Paths}
+\item 
+def \hyperlink{namespacerobot_server_a630be15680f4c3b1220c78142313dc34}{get\+Data\+Collected}
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{namespacerobot_server_aa5e23ac5aa93bf8a39c3f6004695e1f1}{int {\bfseries X\+\_\+\+M\+I\+N} = 40}\label{namespacerobot_server_aa5e23ac5aa93bf8a39c3f6004695e1f1}
+
+\item 
+\hypertarget{namespacerobot_server_a9cd34d018713a3cb0bc03318d21a1e3a}{int {\bfseries Y\+\_\+\+M\+I\+N} = 80}\label{namespacerobot_server_a9cd34d018713a3cb0bc03318d21a1e3a}
+
+\item 
+\hypertarget{namespacerobot_server_a3c4a87789ea333bf5b3eb7f5f53adf81}{int {\bfseries X\+\_\+\+M\+A\+X} = 600}\label{namespacerobot_server_a3c4a87789ea333bf5b3eb7f5f53adf81}
+
+\item 
+\hypertarget{namespacerobot_server_a7602e837421ea530d89da890439c3d27}{int {\bfseries Y\+\_\+\+M\+A\+X} = 800}\label{namespacerobot_server_a7602e837421ea530d89da890439c3d27}
+
+\item 
+\hypertarget{namespacerobot_server_a4829ab66cc630741739671d5ab0c661b}{int {\bfseries N\+O\+\_\+\+E\+R\+R\+O\+R\+\_\+\+M} = -\/1}\label{namespacerobot_server_a4829ab66cc630741739671d5ab0c661b}
+
+\item 
+\hypertarget{namespacerobot_server_a9c0338aab52e3cfaa9ebb8dfd2c417b0}{int {\bfseries N\+O\+\_\+\+E\+R\+R\+O\+R\+\_\+\+T} = 0}\label{namespacerobot_server_a9c0338aab52e3cfaa9ebb8dfd2c417b0}
+
+\item 
+\hypertarget{namespacerobot_server_aeef963026661132dc3bbbfb53f5c27c3}{int {\bfseries N\+N\+L\+\_\+\+E\+R\+R\+O\+R} = 1}\label{namespacerobot_server_aeef963026661132dc3bbbfb53f5c27c3}
+
+\item 
+\hypertarget{namespacerobot_server_a50619a052238b20c72e8abfb21c7d423}{int {\bfseries S\+\_\+\+T\+I\+M\+E\+O\+U\+T\+\_\+\+E\+R\+R\+O\+R} = 2}\label{namespacerobot_server_a50619a052238b20c72e8abfb21c7d423}
+
+\item 
+\hypertarget{namespacerobot_server_a3bfdce93035dd54c4a1e258d2cb2c5c0}{string {\bfseries C\+O\+M\+\_\+\+P\+O\+R\+T} = 'C\+O\+M6'}\label{namespacerobot_server_a3bfdce93035dd54c4a1e258d2cb2c5c0}
+
+\item 
+\hypertarget{namespacerobot_server_af2390bb7984e7a34b823d56e3dea5b54}{int {\bfseries B\+A\+U\+D\+\_\+\+R\+A\+T\+E} = 115200}\label{namespacerobot_server_af2390bb7984e7a34b823d56e3dea5b54}
+
+\item 
+\hypertarget{namespacerobot_server_aaa6106f1a6f1c2fa88961c5ff53916ce}{int {\bfseries S\+E\+R\+\_\+\+T\+I\+M\+E\+O\+U\+T} = 2}\label{namespacerobot_server_aaa6106f1a6f1c2fa88961c5ff53916ce}
+
+\item 
+\hypertarget{namespacerobot_server_af4ade6c4b53fdb3d28007c14db64cebf}{int {\bfseries T\+I\+M\+E\+O\+U\+T} = 3}\label{namespacerobot_server_af4ade6c4b53fdb3d28007c14db64cebf}
+
+\item 
+\hypertarget{namespacerobot_server_a0941ff3ab252f9f8faef0d13a80d2d06}{int {\bfseries N\+U\+M\+\_\+\+S\+E\+R\+I\+A\+L\+\_\+\+D\+A\+T\+A} = 4}\label{namespacerobot_server_a0941ff3ab252f9f8faef0d13a80d2d06}
+
+\item 
+\hypertarget{namespacerobot_server_afa9cc0f61de1e3ddf128ad6e79f41a29}{int {\bfseries R\+A\+D\+I\+U\+S\+\_\+\+C\+U\+T\+O\+F\+F} = 1}\label{namespacerobot_server_afa9cc0f61de1e3ddf128ad6e79f41a29}
+
+\item 
+\hypertarget{namespacerobot_server_aa361d788b72f89bf800408c1e9894f5c}{int {\bfseries M\+I\+N\+\_\+\+T\+I\+M\+E\+\_\+\+T\+O\+\_\+\+T\+R\+A\+V\+E\+L} = 1500}\label{namespacerobot_server_aa361d788b72f89bf800408c1e9894f5c}
+
+\item 
+\hypertarget{namespacerobot_server_a88136bec5f252a9a3a718865b0e520f2}{int {\bfseries N\+U\+M\+\_\+\+P\+A\+T\+H\+S\+\_\+\+T\+O\+\_\+\+A\+D\+D} = 20}\label{namespacerobot_server_a88136bec5f252a9a3a718865b0e520f2}
+
+\item 
+\hypertarget{namespacerobot_server_a33e3f168dab9ac9454d83576da9428dc}{string {\bfseries D\+I\+M} = \char`\"{}\mbox{[} 900 700 \mbox{]}\char`\"{}}\label{namespacerobot_server_a33e3f168dab9ac9454d83576da9428dc}
+
+\item 
+\hypertarget{namespacerobot_server_a90954bcc29ac148d0bbd19433e10a607}{string {\bfseries S\+C\+A\+L\+E} = \char`\"{}0.\+1\char`\"{}}\label{namespacerobot_server_a90954bcc29ac148d0bbd19433e10a607}
+
+\item 
+\hypertarget{namespacerobot_server_a9c1a8823a8701aa2e2b52f0e2b4f0a0a}{{\bfseries U\+S\+E\+\_\+\+A\+D\+A\+P\+T\+I\+V\+E} = True}\label{namespacerobot_server_a9c1a8823a8701aa2e2b52f0e2b4f0a0a}
+
+\item 
+\hypertarget{namespacerobot_server_a193a0d6781cf0093e98c7b36169addb1}{string {\bfseries B\+O\+U\+N\+D\+S} = \char`\"{}\mbox{[}100 120 540 760\mbox{]}\char`\"{}}\label{namespacerobot_server_a193a0d6781cf0093e98c7b36169addb1}
+
+\item 
+\hypertarget{namespacerobot_server_ad2f129668335024d3019624b40472488}{float {\bfseries P\+I\+X\+E\+L\+S\+\_\+\+P\+E\+R\+\_\+\+S\+E\+C\+O\+N\+D} = 170.\+0}\label{namespacerobot_server_ad2f129668335024d3019624b40472488}
+
+\item 
+\hypertarget{namespacerobot_server_a80d5879703e1ad20c3bbf30a4945e8b8}{float {\bfseries R\+A\+D\+S\+\_\+\+P\+E\+R\+\_\+\+S\+E\+C\+O\+N\+D} = 1.\+30}\label{namespacerobot_server_a80d5879703e1ad20c3bbf30a4945e8b8}
+
+\item 
+\hypertarget{namespacerobot_server_a867eb9453324936fd8236a0a757e621c}{string {\bfseries db\+Name} = \char`\"{}Log7\char`\"{}}\label{namespacerobot_server_a867eb9453324936fd8236a0a757e621c}
+
+\item 
+\hypertarget{namespacerobot_server_a36b9708bc1a3e2a2812554ee1fec6573}{int {\bfseries N\+O\+\_\+\+D\+A\+T\+A} = -\/1}\label{namespacerobot_server_a36b9708bc1a3e2a2812554ee1fec6573}
+
+\item 
+\hypertarget{namespacerobot_server_a10f4b52c046a14e0cbd2ed9febf21b46}{tuple \hyperlink{namespacerobot_server_a10f4b52c046a14e0cbd2ed9febf21b46}{num\+Data\+Pt} = \hyperlink{namespacerobot_server_a75eae201dbb88551a95cbc983d659353}{num\+Data\+Collected}(db\+Name)}\label{namespacerobot_server_a10f4b52c046a14e0cbd2ed9febf21b46}
+
+\begin{DoxyCompactList}\small\item\em M\+A\+I\+N P\+R\+O\+G\+R\+A\+M. \end{DoxyCompactList}\item 
+\hypertarget{namespacerobot_server_a0481a58d7cf1e68320dc24c40deb90ca}{tuple {\bfseries curr\+Data\+Entry} = \hyperlink{namespacerobot_server_acee1413bacea5205a3e924fe474d9ddb}{find\+Current\+Entry}(db\+Name)}\label{namespacerobot_server_a0481a58d7cf1e68320dc24c40deb90ca}
+
+\item 
+\hypertarget{namespacerobot_server_a9863d268973dedc72e91bb5edcbd661b}{tuple {\bfseries submitted\+Data} = cgi.\+Field\+Storage()}\label{namespacerobot_server_a9863d268973dedc72e91bb5edcbd661b}
+
+\item 
+\hypertarget{namespacerobot_server_a9dc9db166574d681e1d005d3560b29ed}{tuple {\bfseries state} = submitted\+Data.\+getvalue(\char`\"{}state\char`\"{})}\label{namespacerobot_server_a9dc9db166574d681e1d005d3560b29ed}
+
+\item 
+\hypertarget{namespacerobot_server_ab28107f53bc5e7623fb27e6f510305df}{{\bfseries data} = N\+O\+\_\+\+D\+A\+T\+A}\label{namespacerobot_server_ab28107f53bc5e7623fb27e6f510305df}
+
+\item 
+\hypertarget{namespacerobot_server_adf782794f4405bb365f1d3a20b6f7616}{{\bfseries resp} = False}\label{namespacerobot_server_adf782794f4405bb365f1d3a20b6f7616}
+
+\item 
+\hypertarget{namespacerobot_server_a03d5c206b511455579ec1a28fdc063ff}{int {\bfseries next\+Time} = 0}\label{namespacerobot_server_a03d5c206b511455579ec1a28fdc063ff}
+
+\item 
+\hypertarget{namespacerobot_server_a390ec09ce739645fc27d3d61fbda14ab}{{\bfseries error\+Code} = N\+O\+\_\+\+E\+R\+R\+O\+R\+\_\+\+T}\label{namespacerobot_server_a390ec09ce739645fc27d3d61fbda14ab}
+
+\item 
+\hypertarget{namespacerobot_server_afabbe7f5b75a08e6671092f656ed3c04}{tuple {\bfseries x} = int(x)}\label{namespacerobot_server_afabbe7f5b75a08e6671092f656ed3c04}
+
+\item 
+\hypertarget{namespacerobot_server_a69dc665847466075934352088629aa2e}{tuple {\bfseries y} = int(y)}\label{namespacerobot_server_a69dc665847466075934352088629aa2e}
+
+\item 
+\hypertarget{namespacerobot_server_acd0817d2086ea4a8c11a607667bb4105}{tuple {\bfseries theta} = float(theta)}\label{namespacerobot_server_acd0817d2086ea4a8c11a607667bb4105}
+
+\item 
+\hypertarget{namespacerobot_server_a7e9e01885d720ea75b08a46f91a8e73f}{{\bfseries resp\+X} = x}\label{namespacerobot_server_a7e9e01885d720ea75b08a46f91a8e73f}
+
+\item 
+\hypertarget{namespacerobot_server_a19f3fbdd0e7fdda8dad211bda5398b5a}{{\bfseries resp\+Y} = y}\label{namespacerobot_server_a19f3fbdd0e7fdda8dad211bda5398b5a}
+
+\item 
+\hypertarget{namespacerobot_server_ad0456f5a4216a5bcccb79365cc003d6f}{{\bfseries resp\+Theta} = theta}\label{namespacerobot_server_ad0456f5a4216a5bcccb79365cc003d6f}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Server-\/\+Side Script that handles communication with the robot. Saves the requests from the robot, the data it collects and the robot's position (as tracked by the overhead video camera), to a My\+S\+Q\+L D\+B. A M\+A\+T\+L\+A\+B script directs the robot where to go, using adaptive path selection. 
+
+\begin{DoxyAuthor}{Author}
+Siddarth Srinivasan (U\+C\+L\+A R\+E\+U 2014) 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+8th July 2014 
+\end{DoxyDate}
+\begin{DoxyRemark}{Remarks}
+State Definitions (as submitted to the server)\+:
+\end{DoxyRemark}
+State 0\+: Arduino is asking if the video camera has its start position. If so, the server will send a json response \char`\"{}\+True\char`\"{}, telling the robot it can begin its path. If not, the server will send a json response \char`\"{}\+False\char`\"{} telling the robot that it has not been located, and so it should wait. State 1\+: Arduino is asking if the video camera has its end position. If so, the server will send a json response \char`\"{}\+True\char`\"{}, telling the robot it can move to the starting point of its new path. If not, the server will send a json response \char`\"{}\+False\char`\"{} telling the robot that it has not been located, and so it should wait.
+
+Error Codes\+: The server reports these to the database with every response
+
+N\+O\+\_\+\+E\+R\+R\+O\+R\+\_\+\+M -\/1 \+: No Error, but will travel a \char`\"{}maximum\char`\"{} distance instead of the directed distance. If this error code is obtained time sent to the robot is 0, the robot is out of bounds. N\+O\+\_\+\+E\+R\+R\+O\+R\+\_\+\+T 0 \+: No Error, robot should travel distnace to next point N\+N\+L\+\_\+\+E\+R\+R\+O\+R 1 \+: Not a New Location Error S\+\_\+\+T\+I\+M\+E\+O\+U\+T\+\_\+\+E\+R\+R\+O\+R 2 \+: Serial Timeout Error 
+
+\subsection{Function Documentation}
+\hypertarget{namespacerobot_server_a16ed8e4a9f5a2f74b76f0113da04cb8d}{\index{robot\+Server@{robot\+Server}!connect\+D\+B@{connect\+D\+B}}
+\index{connect\+D\+B@{connect\+D\+B}!robot\+Server@{robot\+Server}}
+\subsubsection[{connect\+D\+B}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+connect\+D\+B (
+\begin{DoxyParamCaption}
+\item[{}]{db\+Name}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_a16ed8e4a9f5a2f74b76f0113da04cb8d}
+
+
+My\+S\+Q\+L D\+A\+T\+A\+B\+A\+S\+E H\+A\+N\+D\+L\+E\+R\+S. 
+
+\begin{DoxyVerb}    @brief Connects to the database with name 'dbName'
+
+    @returns db and cursor objects.
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_aab85c3ddb2bfa79f6cfc691ec2d7002e}{\index{robot\+Server@{robot\+Server}!cross\+Product@{cross\+Product}}
+\index{cross\+Product@{cross\+Product}!robot\+Server@{robot\+Server}}
+\subsubsection[{cross\+Product}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+cross\+Product (
+\begin{DoxyParamCaption}
+\item[{}]{a, }
+\item[{}]{b}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_aab85c3ddb2bfa79f6cfc691ec2d7002e}
+\begin{DoxyVerb}    @brief Helper function - returns cross product of two vectors a and b
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_acefe30e37a8b8c89f8d01a373fa2c9c3}{\index{robot\+Server@{robot\+Server}!dot\+Product@{dot\+Product}}
+\index{dot\+Product@{dot\+Product}!robot\+Server@{robot\+Server}}
+\subsubsection[{dot\+Product}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+dot\+Product (
+\begin{DoxyParamCaption}
+\item[{}]{a, }
+\item[{}]{b}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_acefe30e37a8b8c89f8d01a373fa2c9c3}
+\begin{DoxyVerb}    @brief Helper function - returns dot product of two vectors a and b
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_acee1413bacea5205a3e924fe474d9ddb}{\index{robot\+Server@{robot\+Server}!find\+Current\+Entry@{find\+Current\+Entry}}
+\index{find\+Current\+Entry@{find\+Current\+Entry}!robot\+Server@{robot\+Server}}
+\subsubsection[{find\+Current\+Entry}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+find\+Current\+Entry (
+\begin{DoxyParamCaption}
+\item[{}]{db\+Name}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_acee1413bacea5205a3e924fe474d9ddb}
+\begin{DoxyVerb}    @brief   Given the name of the database, returns the DataPtID of the
+             most recent entry in the database.
+    @param dbName   The database from which to find current entry.
+    @returns   The value of DataPtID, the primary key, for the database.
+
+    @remarks  Not always the same as numDataCollected() as there may be
+              insertions or deletions in the database.
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_af6f7c88782ee472dbabc087a7067c9a4}{\index{robot\+Server@{robot\+Server}!find\+Max\+Time@{find\+Max\+Time}}
+\index{find\+Max\+Time@{find\+Max\+Time}!robot\+Server@{robot\+Server}}
+\subsubsection[{find\+Max\+Time}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+find\+Max\+Time (
+\begin{DoxyParamCaption}
+\item[{}]{x, }
+\item[{}]{y, }
+\item[{}]{theta}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_af6f7c88782ee472dbabc087a7067c9a4}
+\begin{DoxyVerb}    @brief Given the robot's position and heading, the function returns the
+           max time for which the robot can travel before it will go off the
+           edge.
+
+    @param x   The x coordinate of the robot
+    @param y   The y coordinate of the robot
+    @param theta   The heading of the robot
+
+    @returns   The time returned is expected to be the value used by the
+                motors in driving the robot.
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_ac61a36579b1ff41815996d03b5d01590}{\index{robot\+Server@{robot\+Server}!find\+Next\+Time@{find\+Next\+Time}}
+\index{find\+Next\+Time@{find\+Next\+Time}!robot\+Server@{robot\+Server}}
+\subsubsection[{find\+Next\+Time}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+find\+Next\+Time (
+\begin{DoxyParamCaption}
+\item[{}]{start\+X, }
+\item[{}]{start\+Y, }
+\item[{}]{theta, }
+\item[{}]{end\+X, }
+\item[{}]{end\+Y}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_ac61a36579b1ff41815996d03b5d01590}
+\begin{DoxyVerb}    @brief Function that returns the duration for which the robot should
+           move or turn in its subsequent movement to reach a given 
+           destination.
+
+    @param startX   The current x-coordinate of the robot
+    @param startY   The current y-coordinate of the robot
+    @param theta    The current heading of the robot
+    @param endX     The next intended x-coordinate for the robot
+    @param endY     The next intended y-coordinate for the robot
+
+    @returns   The duration the robot should move/turn for, by calculating
+               the angle or distance to the desired end location, depending
+               on the state of the robot.
+
+    @remark   Whether the robot turns/moves depends on the state it's in.
+    @remark   Also, the duration returned can be negative, which means the
+              robot needs to turn right. A positive duration with state 1
+              means the robot needs to turn left.
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_abf00341a56ede63a7a575df41ef9c242}{\index{robot\+Server@{robot\+Server}!gen\+New\+Dests@{gen\+New\+Dests}}
+\index{gen\+New\+Dests@{gen\+New\+Dests}!robot\+Server@{robot\+Server}}
+\subsubsection[{gen\+New\+Dests}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+gen\+New\+Dests (
+\begin{DoxyParamCaption}
+\item[{}]{db\+Name}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_abf00341a56ede63a7a575df41ef9c242}
+\begin{DoxyVerb}    @brief   Generate and save the next NUM_PATHS_TO_ADD destinations either
+             randomly or based on previous data, by calling MATLAB's
+             genNextTargets()
+
+    @details This function will add the new list of destinations to
+             existing destinations in Next_Paths. Depending on whether
+             USE_ADAPTIVE is True or False, the call to MATLAB will either
+             ask for adaptive paths or random paths.
+
+    @param dbName   The database to generate new paths in
+
+    @remarks Uses updateNextPaths() to actually update the database and
+             getDataCollected() to read from the database.
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_a630be15680f4c3b1220c78142313dc34}{\index{robot\+Server@{robot\+Server}!get\+Data\+Collected@{get\+Data\+Collected}}
+\index{get\+Data\+Collected@{get\+Data\+Collected}!robot\+Server@{robot\+Server}}
+\subsubsection[{get\+Data\+Collected}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+get\+Data\+Collected (
+\begin{DoxyParamCaption}
+\item[{}]{db\+Name}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_a630be15680f4c3b1220c78142313dc34}
+\begin{DoxyVerb}    @brief   Given the name of the database, returns the data collected thus
+             far from the table Data_Collection as a string
+    @param   dbName   The database from which to pull data
+    @returns The startX, startY, endX, endY, Data in Data_Collection get
+             formatted as a MATLAB matrix and returned as a string
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_a8cdfcb641116b6b145bb35666f036c33}{\index{robot\+Server@{robot\+Server}!get\+Next\+Dest@{get\+Next\+Dest}}
+\index{get\+Next\+Dest@{get\+Next\+Dest}!robot\+Server@{robot\+Server}}
+\subsubsection[{get\+Next\+Dest}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+get\+Next\+Dest (
+\begin{DoxyParamCaption}
+\item[{}]{db\+Name, }
+\item[{}]{num\+Data\+Pt, }
+\item[{}]{state}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_a8cdfcb641116b6b145bb35666f036c33}
+
+
+M\+A\+T\+L\+A\+B D\+A\+T\+A\+B\+A\+S\+E H\+A\+N\+D\+L\+E\+R\+S. 
+
+\begin{DoxyVerb}    @brief   Accesses dbName to find the next destination for the robot.
+
+    @details Paths are generated NUM_PATHS_TO_ADD at a time. If all the
+             paths in Next_Paths have been used, genNewDests() is called to
+             generate the next set of paths.
+
+    @param dbName    The db from which to get the next destination
+    @param numDataPt The number of data points collected so far, to
+                     correctly index the next destination
+    @param state     New paths need only be generated once every
+                     NUM_PATHS_TO_ADD, and this happens when state = 1.
+
+    @returns The x, y coordinates of the next destination
+
+    @remarks Handles all the communication with MATLAB. None of the other
+             functions in this section need to be called separately.
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_a3179f2c861172f46235068b70ec49aa4}{\index{robot\+Server@{robot\+Server}!html\+Form@{html\+Form}}
+\index{html\+Form@{html\+Form}!robot\+Server@{robot\+Server}}
+\subsubsection[{html\+Form}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+html\+Form (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_a3179f2c861172f46235068b70ec49aa4}
+
+
+H\+T\+M\+L H\+A\+N\+D\+L\+E\+R\+S. 
+
+\begin{DoxyVerb}    @brief   Function that generates the html form if a state hasn't been 
+             submitted to the script. 
+
+    @remarks For all practical purposes, this is only when testing
+             so the robot should never really 'see' this code.
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_a6bb2ef04cec1313fe219ad0d4026d623}{\index{robot\+Server@{robot\+Server}!html\+Response@{html\+Response}}
+\index{html\+Response@{html\+Response}!robot\+Server@{robot\+Server}}
+\subsubsection[{html\+Response}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+html\+Response (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_a6bb2ef04cec1313fe219ad0d4026d623}
+\begin{DoxyVerb}    @brief   This function declares that the response will be in json if a
+             state has been submitted to the form.
+
+    @remarks It is separate from jsonResponse() to allow print statements to
+             be added anywhere in the code, as the response header must be
+             declared before any response (through print statements) can be
+             sent.
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_a26efd5684a33ead9a8c9e886293fba43}{\index{robot\+Server@{robot\+Server}!in\+New\+Location@{in\+New\+Location}}
+\index{in\+New\+Location@{in\+New\+Location}!robot\+Server@{robot\+Server}}
+\subsubsection[{in\+New\+Location}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+in\+New\+Location (
+\begin{DoxyParamCaption}
+\item[{}]{db\+Name, }
+\item[{}]{x, }
+\item[{}]{y, }
+\item[{}]{curr\+Data\+Entry}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_a26efd5684a33ead9a8c9e886293fba43}
+\begin{DoxyVerb}    @brief   Checks if the given x, y coordinates are outside some radius
+             of the start coordinate of the robot during that data sample,
+             and returns true if so
+    
+    @param dbName   The database from which to find the last start coords
+    @param x        The x-coord of the robot, after it has started its path
+    @param y        The y-coord of the robot, after it has started its path
+    @param currDataEntry The last entry in the db, used to find start coords
+
+    @returns True if the robot's current position is outside some radius of
+             its start position, false otherwise
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_a7cf853bf6d089f8aff7462dea0635505}{\index{robot\+Server@{robot\+Server}!json\+Response@{json\+Response}}
+\index{json\+Response@{json\+Response}!robot\+Server@{robot\+Server}}
+\subsubsection[{json\+Response}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+json\+Response (
+\begin{DoxyParamCaption}
+\item[{}]{response}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_a7cf853bf6d089f8aff7462dea0635505}
+\begin{DoxyVerb}    @brief Returns the response in json form.
+
+    @param response   A 3-element list containing
+                        0) Response: True or False, depending on whether
+                                     the video camrea located the robot
+                        1) Duration: How long the robot should turn or
+                                     travel along its next path.
+                        2) Error Code: Informs whether the locating and
+                                       processing of the robot's position
+                                       was successful.
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_af96854f8704c2374b1faece3a09aba58}{\index{robot\+Server@{robot\+Server}!locate@{locate}}
+\index{locate@{locate}!robot\+Server@{robot\+Server}}
+\subsubsection[{locate}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+locate (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_af96854f8704c2374b1faece3a09aba58}
+
+
+C\+A\+M\+E\+R\+A/\+L\+O\+C\+A\+T\+I\+O\+N H\+A\+N\+D\+L\+E\+R\+S. 
+
+\begin{DoxyVerb}    @brief   Function that uses the overhead video camera to locate robot
+
+    @details The data sent by the robot-tracking script "vehicle_tracker.py"
+             is read from the serial port. The data comes in the following
+             format:
+                    *$|x|y|theta|!\\n
+
+    @returns The x, y and theta of the robot
+
+    @remarks The origin of the grid is the bottom-left corner of the test
+             bed, as seen when facing the whiteboard in MS3355.
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_a75eae201dbb88551a95cbc983d659353}{\index{robot\+Server@{robot\+Server}!num\+Data\+Collected@{num\+Data\+Collected}}
+\index{num\+Data\+Collected@{num\+Data\+Collected}!robot\+Server@{robot\+Server}}
+\subsubsection[{num\+Data\+Collected}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+num\+Data\+Collected (
+\begin{DoxyParamCaption}
+\item[{}]{db\+Name}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_a75eae201dbb88551a95cbc983d659353}
+\begin{DoxyVerb}    @brief Given the name of the database, returns the number of data points
+           collected in the table "Data_Collection".
+    @param dbName The database from which to find numDataCollected
+    @returns The number of entries in "Data_Collection"
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_ac05eca8e325b3b65fa8fdd679b117991}{\index{robot\+Server@{robot\+Server}!save\+End\+Data\+To\+D\+B@{save\+End\+Data\+To\+D\+B}}
+\index{save\+End\+Data\+To\+D\+B@{save\+End\+Data\+To\+D\+B}!robot\+Server@{robot\+Server}}
+\subsubsection[{save\+End\+Data\+To\+D\+B}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+save\+End\+Data\+To\+D\+B (
+\begin{DoxyParamCaption}
+\item[{}]{db\+Name, }
+\item[{}]{end\+X, }
+\item[{}]{end\+Y, }
+\item[{}]{data, }
+\item[{}]{num\+Data\+Pt}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_ac05eca8e325b3b65fa8fdd679b117991}
+\begin{DoxyVerb}    @brief   Saves the end coordinates of the robot, along with the data it
+             collected to the database.
+    @details Called when the video camera has located the robot and the 
+             robot has completed its path, function saves end coordinates to
+             data table "Data_Collection".
+
+    @param dbName The database to write to
+    @param endX   The ending x-coord of the robot
+    @param endY   The ending y-coord of the robot
+    @param data   The data collected by the robot along this path
+    @param numDataPt The entry number in the database to write to
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_ad82aac81396feae3d320927a0e714dc5}{\index{robot\+Server@{robot\+Server}!save\+Start\+To\+D\+B@{save\+Start\+To\+D\+B}}
+\index{save\+Start\+To\+D\+B@{save\+Start\+To\+D\+B}!robot\+Server@{robot\+Server}}
+\subsubsection[{save\+Start\+To\+D\+B}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+save\+Start\+To\+D\+B (
+\begin{DoxyParamCaption}
+\item[{}]{db\+Name, }
+\item[{}]{start\+X, }
+\item[{}]{start\+Y}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_ad82aac81396feae3d320927a0e714dc5}
+\begin{DoxyVerb}    @brief   Saves the starting coordinates of the robot to the database.
+    @details Called when the video camera has located the robot, and the
+             robot is looking to start its path. Saves info to data table
+             "Data_Collection".
+
+    @param dbName   The database to store to
+    @param startX   The starting x-coord of the robot
+    @param startY   The starting y-coord of the robot
+
+    @remarks   ASSUMES that the previous entry has been completed.
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_a9eaa696a7fb2b35e179de338b82d449b}{\index{robot\+Server@{robot\+Server}!save\+State\+To\+D\+B@{save\+State\+To\+D\+B}}
+\index{save\+State\+To\+D\+B@{save\+State\+To\+D\+B}!robot\+Server@{robot\+Server}}
+\subsubsection[{save\+State\+To\+D\+B}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+save\+State\+To\+D\+B (
+\begin{DoxyParamCaption}
+\item[{}]{db\+Name, }
+\item[{}]{State, }
+\item[{}]{Data, }
+\item[{}]{current\+X, }
+\item[{}]{current\+Y, }
+\item[{}]{theta, }
+\item[{}]{dest\+X, }
+\item[{}]{dest\+Y, }
+\item[{}]{Response, }
+\item[{}]{Duration, }
+\item[{}]{Error\+\_\+\+Code}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_a9eaa696a7fb2b35e179de338b82d449b}
+\begin{DoxyVerb}    @brief   Stores the state that the robot sent, along with other useful
+             information to keep track of the robot's actions.
+    @details Called when the robot has contacted the server, stores info in
+             the debugging table "State_Record".
+
+    @param   dbName   The database to save to
+    @param   State    The state the robot submitted to the server
+    @param   Data     The data the robot collected and submitted to server
+    @param   currentX The x-coord that the video camera returned to server
+    @param   currentY The y-coord that the video camera returned to server
+    @param   theta    The heading that the video camera returned to server
+    @param   destX    The x-coord the robot is trying to get to
+    @param   destY    The y-coord the robot is trying to get to
+    @param   Response The Response that the server is sending to the robot
+    @param   Duration The Duration the robot is sending to the robot
+    @param   Error_Code The Error_Code as reported by the server
+\end{DoxyVerb}
+ \hypertarget{namespacerobot_server_a3df4158c8161e8a27a8ddcdcc3f838d9}{\index{robot\+Server@{robot\+Server}!update\+Next\+Paths@{update\+Next\+Paths}}
+\index{update\+Next\+Paths@{update\+Next\+Paths}!robot\+Server@{robot\+Server}}
+\subsubsection[{update\+Next\+Paths}]{\setlength{\rightskip}{0pt plus 5cm}def robot\+Server.\+update\+Next\+Paths (
+\begin{DoxyParamCaption}
+\item[{}]{db\+Name, }
+\item[{}]{new\+Paths}
+\end{DoxyParamCaption}
+)}}\label{namespacerobot_server_a3df4158c8161e8a27a8ddcdcc3f838d9}
+\begin{DoxyVerb}    @brief   Adds newPaths to Next_Paths table of database dbName.
+
+    @param dbName   The database to update the next paths in
+    @param newPaths A string of the new paths, formatted as "x_0 y_0
+                    x_1 y_1 ... x_n y_n", where x_i, y_i is the i'th
+                    destination to add.
+\end{DoxyVerb}
+ 

@@ -1,0 +1,267 @@
+\hypertarget{compressed_sensing_8ino}{\section{compressed\+Sensing/compressed\+Sensing.ino File Reference}
+\label{compressed_sensing_8ino}\index{compressed\+Sensing/compressed\+Sensing.\+ino@{compressed\+Sensing/compressed\+Sensing.\+ino}}
+}
+
+
+Arduino code to collect and communicate data to a server which can reconstruct it using a compressed sensing algorithm.  
+
+
+{\ttfamily \#include $<$Adafruit\+\_\+\+C\+C3000.\+h$>$}\\*
+{\ttfamily \#include $<$ccspi.\+h$>$}\\*
+{\ttfamily \#include $<$S\+P\+I.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}utility/debug.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$Json\+Parser.\+h$>$}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{compressed_sensing_8ino_a5863bf16a0f6addecfd502856c2ba0f0}{\#define {\bfseries A\+D\+A\+F\+R\+U\+I\+T\+\_\+\+C\+C3000\+\_\+\+I\+R\+Q}~3}\label{compressed_sensing_8ino_a5863bf16a0f6addecfd502856c2ba0f0}
+
+\item 
+\hypertarget{compressed_sensing_8ino_aba6361788d09974072f6e1aec700c950}{\#define {\bfseries A\+D\+A\+F\+R\+U\+I\+T\+\_\+\+C\+C3000\+\_\+\+V\+B\+A\+T}~5}\label{compressed_sensing_8ino_aba6361788d09974072f6e1aec700c950}
+
+\item 
+\hypertarget{compressed_sensing_8ino_aa38deec1705654d8464b9c552c22e4d6}{\#define {\bfseries A\+D\+A\+F\+R\+U\+I\+T\+\_\+\+C\+C3000\+\_\+\+C\+S}~10}\label{compressed_sensing_8ino_aa38deec1705654d8464b9c552c22e4d6}
+
+\item 
+\hypertarget{compressed_sensing_8ino_aeb7a7ba1ab7e0406f1b5ab36d579f585}{\#define {\bfseries L\+E\+D}~13}\label{compressed_sensing_8ino_aeb7a7ba1ab7e0406f1b5ab36d579f585}
+
+\item 
+\hypertarget{compressed_sensing_8ino_a5c5d64ba8dc341fce64f0709022c6740}{\#define {\bfseries L\+P\+L\+U\+S}~6}\label{compressed_sensing_8ino_a5c5d64ba8dc341fce64f0709022c6740}
+
+\item 
+\hypertarget{compressed_sensing_8ino_aabf42ed37ab691c48a66105976e537e7}{\#define {\bfseries L\+M\+I\+N\+U\+S}~7}\label{compressed_sensing_8ino_aabf42ed37ab691c48a66105976e537e7}
+
+\item 
+\hypertarget{compressed_sensing_8ino_af7c81d02991640acf728457675ba7c72}{\#define {\bfseries R\+P\+L\+U\+S}~8}\label{compressed_sensing_8ino_af7c81d02991640acf728457675ba7c72}
+
+\item 
+\hypertarget{compressed_sensing_8ino_a2a74bc3cb529d74d1a3e862a1484c9b7}{\#define {\bfseries R\+M\+I\+N\+U\+S}~9}\label{compressed_sensing_8ino_a2a74bc3cb529d74d1a3e862a1484c9b7}
+
+\item 
+\hypertarget{compressed_sensing_8ino_a68e22635ff207d8ca10459833856bd75}{\#define {\bfseries I\+R}~4}\label{compressed_sensing_8ino_a68e22635ff207d8ca10459833856bd75}
+
+\item 
+\hypertarget{compressed_sensing_8ino_af8d23ae6c17168a7ce76f565959a7100}{\#define {\bfseries W\+L\+A\+N\+\_\+\+S\+S\+I\+D}~\char`\"{}T\+P-\/L\+I\+N\+K\+\_\+3\+C1\+C5\+E\char`\"{}}\label{compressed_sensing_8ino_af8d23ae6c17168a7ce76f565959a7100}
+
+\item 
+\hypertarget{compressed_sensing_8ino_a81677f718a77a70296f7681cdb913455}{\#define {\bfseries W\+L\+A\+N\+\_\+\+P\+A\+S\+S}~\char`\"{}20225964\char`\"{}}\label{compressed_sensing_8ino_a81677f718a77a70296f7681cdb913455}
+
+\item 
+\hypertarget{compressed_sensing_8ino_afac8a1382cf2af5f3045eab50669e6d0}{\#define {\bfseries W\+L\+A\+N\+\_\+\+S\+E\+C\+U\+R\+I\+T\+Y}~W\+L\+A\+N\+\_\+\+S\+E\+C\+\_\+\+W\+P\+A2}\label{compressed_sensing_8ino_afac8a1382cf2af5f3045eab50669e6d0}
+
+\item 
+\hypertarget{compressed_sensing_8ino_a9dadacd5ee41d21ea8974d66757983dd}{\#define {\bfseries P\+R\+E\+A\+L\+L\+O\+C}~256}\label{compressed_sensing_8ino_a9dadacd5ee41d21ea8974d66757983dd}
+
+\item 
+\hypertarget{compressed_sensing_8ino_af217a5dc61c4e5069971d91a9d9048f7}{\#define {\bfseries N\+U\+M\+\_\+\+P\+A\+T\+H\+S}~225}\label{compressed_sensing_8ino_af217a5dc61c4e5069971d91a9d9048f7}
+
+\item 
+\hypertarget{compressed_sensing_8ino_ad35df4142741edb3e8a06a384611e41f}{\#define {\bfseries M\+A\+X\+\_\+\+F\+A\+I\+L\+S}~2}\label{compressed_sensing_8ino_ad35df4142741edb3e8a06a384611e41f}
+
+\item 
+\hypertarget{compressed_sensing_8ino_ab31fd7569f9643816a5f7715e65cd172}{\#define {\bfseries M\+A\+X\+\_\+\+S\+E\+N\+S\+O\+R}~720}\label{compressed_sensing_8ino_ab31fd7569f9643816a5f7715e65cd172}
+
+\item 
+\hypertarget{compressed_sensing_8ino_a7ad8821d9f5a7551178b769258fa4866}{\#define {\bfseries W\+H\+I\+T\+E\+\_\+\+B\+O\+U\+N\+D\+A\+R\+Y}~65}\label{compressed_sensing_8ino_a7ad8821d9f5a7551178b769258fa4866}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{compressed_sensing_8ino_a7dfd9b79bc5a37d7df40207afbc5431f}{setup} (void)
+\begin{DoxyCompactList}\small\item\em The required setup function for the Arduino. \end{DoxyCompactList}\item 
+\hypertarget{compressed_sensing_8ino_a4c3b7689564254274a0e3a2a1771d473}{void \hyperlink{compressed_sensing_8ino_a4c3b7689564254274a0e3a2a1771d473}{init\+Pins} ()}\label{compressed_sensing_8ino_a4c3b7689564254274a0e3a2a1771d473}
+
+\begin{DoxyCompactList}\small\item\em Initializes the relevant pins on the arduino. \end{DoxyCompactList}\item 
+void \hyperlink{compressed_sensing_8ino_a0b33edabd7f1c4e4a0bf32c67269be2f}{loop} (void)
+\begin{DoxyCompactList}\small\item\em The required loop function for the Arduino. \end{DoxyCompactList}\item 
+bool \hyperlink{compressed_sensing_8ino_a5f527ab54a51b215bb0f3492df22ab9b}{send\+\_\+request} (String request)
+\begin{DoxyCompactList}\small\item\em Sends a request to the server with the state and possibly data. \end{DoxyCompactList}\item 
+void \hyperlink{compressed_sensing_8ino_adbf1a7054439ab0113ab50cc2fb28c19}{get\+\_\+response} ()
+\begin{DoxyCompactList}\small\item\em Receives and processes the H\+T\+T\+P response from the server. \end{DoxyCompactList}\item 
+\hypertarget{compressed_sensing_8ino_a7de2a543986e45b9083c69f6138bf079}{void \hyperlink{compressed_sensing_8ino_a7de2a543986e45b9083c69f6138bf079}{forward} ()}\label{compressed_sensing_8ino_a7de2a543986e45b9083c69f6138bf079}
+
+\begin{DoxyCompactList}\small\item\em Motor control method to drive forward. \end{DoxyCompactList}\item 
+\hypertarget{compressed_sensing_8ino_a9b83f0fc7f06bee951213dd4b22e0e93}{void \hyperlink{compressed_sensing_8ino_a9b83f0fc7f06bee951213dd4b22e0e93}{backward} ()}\label{compressed_sensing_8ino_a9b83f0fc7f06bee951213dd4b22e0e93}
+
+\begin{DoxyCompactList}\small\item\em Motor control method to drive backward. \end{DoxyCompactList}\item 
+\hypertarget{compressed_sensing_8ino_a3626c95a655db63dc665702075daa7bc}{void \hyperlink{compressed_sensing_8ino_a3626c95a655db63dc665702075daa7bc}{rotate\+Left} ()}\label{compressed_sensing_8ino_a3626c95a655db63dc665702075daa7bc}
+
+\begin{DoxyCompactList}\small\item\em Motor control method to rotate left. \end{DoxyCompactList}\item 
+\hypertarget{compressed_sensing_8ino_abf32e979343f98b647e2a8c08ac56abb}{void \hyperlink{compressed_sensing_8ino_abf32e979343f98b647e2a8c08ac56abb}{rotate\+Right} ()}\label{compressed_sensing_8ino_abf32e979343f98b647e2a8c08ac56abb}
+
+\begin{DoxyCompactList}\small\item\em Motor control method to rotate right. \end{DoxyCompactList}\item 
+\hypertarget{compressed_sensing_8ino_ade0430439247877006d7df950f94918a}{void \hyperlink{compressed_sensing_8ino_ade0430439247877006d7df950f94918a}{halt} ()}\label{compressed_sensing_8ino_ade0430439247877006d7df950f94918a}
+
+\begin{DoxyCompactList}\small\item\em Motor control method to stop moving. \end{DoxyCompactList}\item 
+\hypertarget{compressed_sensing_8ino_ac35dd63cb275f844339e426068c27c85}{uint16\+\_\+t \hyperlink{compressed_sensing_8ino_ac35dd63cb275f844339e426068c27c85}{move\+Next} (boolean state)}\label{compressed_sensing_8ino_ac35dd63cb275f844339e426068c27c85}
+
+\begin{DoxyCompactList}\small\item\em Function to direct motors and sensor in collecting data. \end{DoxyCompactList}\item 
+void \hyperlink{compressed_sensing_8ino_a0fc912d7e8ff4b0908303847912e0da1}{setup\+Connection} (void)
+\begin{DoxyCompactList}\small\item\em Starts up the Ada\+Fruit C\+C3000 Shield and connects to the internet. \end{DoxyCompactList}\item 
+bool \hyperlink{compressed_sensing_8ino_a9b1d041a41e4d1a390370c7096171bf8}{display\+Connection\+Details} (void)
+\begin{DoxyCompactList}\small\item\em Retrieves the I\+P address and other connection details. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+Adafruit\+\_\+\+C\+C3000 {\bfseries cc3000}
+\item 
+\hypertarget{compressed_sensing_8ino_abbac84d8b4ff1602f8df3309331e81be}{Adafruit\+\_\+\+C\+C3000\+\_\+\+Client {\bfseries client}}\label{compressed_sensing_8ino_abbac84d8b4ff1602f8df3309331e81be}
+
+\item 
+\hypertarget{compressed_sensing_8ino_a69ddb9c845da426f636d9dd0dbed4e7e}{uint32\+\_\+t {\bfseries ip} = cc3000.\+I\+P2\+U32(192,168,0,101)}\label{compressed_sensing_8ino_a69ddb9c845da426f636d9dd0dbed4e7e}
+
+\item 
+\hypertarget{compressed_sensing_8ino_a63c89c04d1feae07ca35558055155ffb}{int {\bfseries port} = 80}\label{compressed_sensing_8ino_a63c89c04d1feae07ca35558055155ffb}
+
+\item 
+\hypertarget{compressed_sensing_8ino_a15e669cf77f4c9525d31f954fb060807}{String {\bfseries repository} = \char`\"{}/\char`\"{}}\label{compressed_sensing_8ino_a15e669cf77f4c9525d31f954fb060807}
+
+\item 
+\hypertarget{compressed_sensing_8ino_a38c6aa24b36d981c49405db425c24db0}{int {\bfseries connect\+Timeout} = 15\+L $\ast$ 10000\+L}\label{compressed_sensing_8ino_a38c6aa24b36d981c49405db425c24db0}
+
+\item 
+\hypertarget{compressed_sensing_8ino_ab30ba07e2a0bd07a15e45a92c32db9c5}{bool {\bfseries state} = true}\label{compressed_sensing_8ino_ab30ba07e2a0bd07a15e45a92c32db9c5}
+
+\item 
+\hypertarget{compressed_sensing_8ino_a7aafc743302894a43d26b00075cc553b}{bool {\bfseries old\+State} = false}\label{compressed_sensing_8ino_a7aafc743302894a43d26b00075cc553b}
+
+\item 
+\hypertarget{compressed_sensing_8ino_ad6eab33201496ee923f45155e6a47b58}{unsigned long {\bfseries data} = 0}\label{compressed_sensing_8ino_ad6eab33201496ee923f45155e6a47b58}
+
+\item 
+\hypertarget{compressed_sensing_8ino_a2563328cda49f11e3c4f0c8c81778167}{uint16\+\_\+t {\bfseries paths} = 0}\label{compressed_sensing_8ino_a2563328cda49f11e3c4f0c8c81778167}
+
+\item 
+\hypertarget{compressed_sensing_8ino_a8667588dec524bf854d0c16771d425a1}{long {\bfseries time} = 1000}\label{compressed_sensing_8ino_a8667588dec524bf854d0c16771d425a1}
+
+\item 
+\hypertarget{compressed_sensing_8ino_a81fd0e7721c9f0efbea5a5c1273b14ac}{int {\bfseries num\+Fails} = 0}\label{compressed_sensing_8ino_a81fd0e7721c9f0efbea5a5c1273b14ac}
+
+\item 
+\hypertarget{compressed_sensing_8ino_affd9ce989708bfebcfc40468e8452fd6}{Json\+Parser$<$ 8 $>$ {\bfseries parser}}\label{compressed_sensing_8ino_affd9ce989708bfebcfc40468e8452fd6}
+
+\item 
+\hypertarget{compressed_sensing_8ino_a930e639b975813ee1ff73f35d4a4bc74}{Json\+Hash\+Table {\bfseries root}}\label{compressed_sensing_8ino_a930e639b975813ee1ff73f35d4a4bc74}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Arduino code to collect and communicate data to a server which can reconstruct it using a compressed sensing algorithm. 
+
+\begin{DoxyAuthor}{Authors}
+Siddarth Srinivasan (U\+C\+L\+A R\+E\+U 2014) 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+10th July 2014 
+\end{DoxyDate}
+
+
+\subsection{Function Documentation}
+\hypertarget{compressed_sensing_8ino_a9b1d041a41e4d1a390370c7096171bf8}{\index{compressed\+Sensing.\+ino@{compressed\+Sensing.\+ino}!display\+Connection\+Details@{display\+Connection\+Details}}
+\index{display\+Connection\+Details@{display\+Connection\+Details}!compressed\+Sensing.\+ino@{compressed\+Sensing.\+ino}}
+\subsubsection[{display\+Connection\+Details}]{\setlength{\rightskip}{0pt plus 5cm}bool display\+Connection\+Details (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}\label{compressed_sensing_8ino_a9b1d041a41e4d1a390370c7096171bf8}
+
+
+Retrieves the I\+P address and other connection details. 
+
+Prints the I\+P Address, Netmask, Gateway, D\+H\+C\+P server and D\+N\+S server.
+
+\begin{DoxyRemark}{Remarks}
+The following code was taken from Ada\+Fruit's build\+Test example. 
+\end{DoxyRemark}
+\hypertarget{compressed_sensing_8ino_adbf1a7054439ab0113ab50cc2fb28c19}{\index{compressed\+Sensing.\+ino@{compressed\+Sensing.\+ino}!get\+\_\+response@{get\+\_\+response}}
+\index{get\+\_\+response@{get\+\_\+response}!compressed\+Sensing.\+ino@{compressed\+Sensing.\+ino}}
+\subsubsection[{get\+\_\+response}]{\setlength{\rightskip}{0pt plus 5cm}void get\+\_\+response (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{compressed_sensing_8ino_adbf1a7054439ab0113ab50cc2fb28c19}
+
+
+Receives and processes the H\+T\+T\+P response from the server. 
+
+The response from the server gets stored in response\+H\+T\+T\+P, but it also gets parsed to obtain just the json response without the headers in response\+J\+S\+O\+N. If the server's 'Response' is true, then it has identified the robot's location, so we can flip its state.
+
+\begin{DoxyRemark}{Remarks}
+The parsing code was taken from \href{http://forum.arduino.cc/index.php/topic,188902.0.html}{\tt http\+://forum.\+arduino.\+cc/index.\+php/topic,188902.\+0.\+html} It works under the assumption that there is no nesting in the json file. I\+T W\+I\+L\+L N\+O\+T W\+O\+R\+K F\+O\+R A\+L\+L J\+S\+O\+N R\+E\+S\+P\+O\+N\+S\+E\+S. 
+\end{DoxyRemark}
+\hypertarget{compressed_sensing_8ino_a0b33edabd7f1c4e4a0bf32c67269be2f}{\index{compressed\+Sensing.\+ino@{compressed\+Sensing.\+ino}!loop@{loop}}
+\index{loop@{loop}!compressed\+Sensing.\+ino@{compressed\+Sensing.\+ino}}
+\subsubsection[{loop}]{\setlength{\rightskip}{0pt plus 5cm}void loop (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}\label{compressed_sensing_8ino_a0b33edabd7f1c4e4a0bf32c67269be2f}
+
+
+The required loop function for the Arduino. 
+
+Handles the main logic for the Arduino. Essentially, it checks if the Arduino has travelled N\+U\+M\+\_\+\+P\+A\+T\+H\+S. If not, check how its state has changed\+: 1) If it has gone from state 0 to state 1, it is ready to move and collect data from the reflectance sensor. 2) If it has gone from state 1 to state 0, it is ready to move to a new starting position. 3) Otherwise, the state has not changed, so the server has not been able to successfully locate the robot, so send a request to the server again. \hypertarget{compressed_sensing_8ino_a5f527ab54a51b215bb0f3492df22ab9b}{\index{compressed\+Sensing.\+ino@{compressed\+Sensing.\+ino}!send\+\_\+request@{send\+\_\+request}}
+\index{send\+\_\+request@{send\+\_\+request}!compressed\+Sensing.\+ino@{compressed\+Sensing.\+ino}}
+\subsubsection[{send\+\_\+request}]{\setlength{\rightskip}{0pt plus 5cm}bool send\+\_\+request (
+\begin{DoxyParamCaption}
+\item[{String}]{request}
+\end{DoxyParamCaption}
+)}}\label{compressed_sensing_8ino_a5f527ab54a51b215bb0f3492df22ab9b}
+
+
+Sends a request to the server with the state and possibly data. 
+
+Connects to the server at 'ip' through 'port' using T\+C\+P, for as long as the connection does not timeout. If successfully connected, send a H\+T\+T\+P request to the page in the 'request' string with state and data.
+
+
+\begin{DoxyParams}{Parameters}
+{\em request} & The H\+T\+T\+P request that is sent to the server.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if the request is made successfully, false otherwise 
+\end{DoxyReturn}
+\hypertarget{compressed_sensing_8ino_a7dfd9b79bc5a37d7df40207afbc5431f}{\index{compressed\+Sensing.\+ino@{compressed\+Sensing.\+ino}!setup@{setup}}
+\index{setup@{setup}!compressed\+Sensing.\+ino@{compressed\+Sensing.\+ino}}
+\subsubsection[{setup}]{\setlength{\rightskip}{0pt plus 5cm}void setup (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}\label{compressed_sensing_8ino_a7dfd9b79bc5a37d7df40207afbc5431f}
+
+
+The required setup function for the Arduino. 
+
+Initializes the pins on the Arduino and sets up an internet connection. \hypertarget{compressed_sensing_8ino_a0fc912d7e8ff4b0908303847912e0da1}{\index{compressed\+Sensing.\+ino@{compressed\+Sensing.\+ino}!setup\+Connection@{setup\+Connection}}
+\index{setup\+Connection@{setup\+Connection}!compressed\+Sensing.\+ino@{compressed\+Sensing.\+ino}}
+\subsubsection[{setup\+Connection}]{\setlength{\rightskip}{0pt plus 5cm}void setup\+Connection (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}\label{compressed_sensing_8ino_a0fc912d7e8ff4b0908303847912e0da1}
+
+
+Starts up the Ada\+Fruit C\+C3000 Shield and connects to the internet. 
+
+Prints the amount of free R\+A\+M, checks initialization of the Wi\+Fi shield, deletes old connection profiles and obtains an I\+P address.
+
+\begin{DoxyRemark}{Remarks}
+The following code was taken from Ada\+Fruit's build\+Test example. 
+\end{DoxyRemark}
+
+
+\subsection{Variable Documentation}
+\hypertarget{compressed_sensing_8ino_a7966965abcc24dee5aa6d080b7cccbb5}{\index{compressed\+Sensing.\+ino@{compressed\+Sensing.\+ino}!cc3000@{cc3000}}
+\index{cc3000@{cc3000}!compressed\+Sensing.\+ino@{compressed\+Sensing.\+ino}}
+\subsubsection[{cc3000}]{\setlength{\rightskip}{0pt plus 5cm}Adafruit\+\_\+\+C\+C3000 cc3000}}\label{compressed_sensing_8ino_a7966965abcc24dee5aa6d080b7cccbb5}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= Adafruit\_CC3000(ADAFRUIT\_CC3000\_CS, 
+                                         ADAFRUIT\_CC3000\_IRQ,
+                                         ADAFRUIT\_CC3000\_VBAT,
+                                         SPI\_CLOCK\_DIVIDER)
+\end{DoxyCode}

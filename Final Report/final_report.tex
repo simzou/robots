@@ -9,9 +9,12 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{esint}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
 \usepackage{babel}
 \usepackage{verbatim} % for \begin{comment}
 \usepackage{subcaption}
+\usepackage{float}
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 
@@ -37,7 +40,9 @@ Compressed sensing is a technique used to reconstruct sparse signals and images 
 Discuss Compressed Sensing
 \end{comment}
 
+Environment mapping is amongst the foundational problems of mobile robotics. In order for an autonomous vehicle to operate effectively within an environment, 
 
+The task of mapping an unknown environment is well-studied in the area of autonomous robotics. 
 
 Compressed sensing describes a technique in which a signal is reconstructed by solving an underdetermined linear system. Doing so allows a signal to be found from a relatively small amount of data. 
 
@@ -46,8 +51,6 @@ Compressed sensing describes a technique in which a signal is reconstructed by s
 \subsection{Testbed}
 The setup in the UCLA Applied Mathematics Laboratory (AML) used three main components: an overhead camera with a tracking system, a PC computer, and the robot vehicle. The testbed is a 1.5 m x 2.0 m rectangular area made of black asphalt felt paper. The cars' positions are tracked by 2 overhead Imaging Source DMK 21F04 1/4 Monochrome CCD cameras with a resolution of 640 x 480 pixels. They have a frame rate of 30 fps and are connected to an image processing PC via firewire cable. The cars are identified using an OpenCV contour searching function that recognizes black and white ID tags, or "hats", that are fixed on top of the vehicle, giving the robot's current position and orientation \cite{gonzalez2011third}
 
-This information is then broadcast through a serial radio module to be received by the cars on the testbed, for use in control algorithms. This mimics the functionality of a GPS unit that may be present in more advanced vehicles in the field.
-The cars are given commands and can relay status information by communicating via a separate serial radio with an interface PC that serves primarily as a remote terminal for the cars. The ability to broadcast messages to the interface PC for display proves to be a very useful debugging tool.
 \subsection{Robot}
 \subsection{Video Camera}
 \subsection{Server}
@@ -59,7 +62,64 @@ Sid's flowchart
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Models and assumptions}
-Our model and lab setup were designed with certain constraints in mind. The model is designed for robots with limited on board storage and computing power. 
+Our model and lab setup were designed with certain constraints in mind. The model is designed for robots with limited on board storage and computing power. Another limitation is bandwith and infrequent communication with the main server
+
+Without loss of generality, we assume the area to be explored is a
+rectangle denoted by $\Omega$, and the interested environment variable
+$u(x,y)$ is a piece-wise constant function defined on $\Omega$.
+See Figure \ref{fig:An-illustration-of-paths} for an illustration.
+Assume the robot travels through $n$ different paths, which are denoted
+by $C_{1},\ldots,C_{n}$. Along each path $C_{k}$, the integral of
+environment variable $u$ is obtained, which is denoted by $g_{k}$.
+The path integrals are written as
+\begin{equation}
+g_{k}=\int_{C_{k}}u(x,y)\mathrm{\,{d}\Gamma},\; k=1,\ldots,n.\label{eq:path-integral}
+\end{equation}
+
+
+\begin{figure}[h]
+\begin{centering}
+
+\includegraphics[width=0.5\linewidth]{figures/path-illustration}
+\par\end{centering}
+
+\caption{\label{fig:An-illustration-of-paths}An illustration of the paths
+of robots. The shaded regions denote the area of interest (unknown),
+where the values of environment variable $u$ is significantly different
+from the surroundings. The size of the unit pixel (each small rectangle)
+is determined by the accuracy of the positioning system.}
+\end{figure}
+
+
+For computational purpose, the whole domain is discretized into rectangular
+pixels (See Figure \ref{fig:An-illustration-of-paths}). Each path
+$C_{k}$ defines a weight $a_{k,ij}$ for each pixel $(i,j)$. If
+$C_{k}$ does not intersect with pixel $(i,j)$, then $a_{k,ij}=0$,
+otherwise $a_{k,ij}$ is defined to be proportional to the length
+of the part of $C_{k}$ that falls within pixel $(i,j)$. It is also
+assumed that the value of $u$ is a constant within each pixel $(i,j)$,
+which is denoted by $u_{ij}$. After discretization, Eq (\ref{eq:path-integral})
+becomes
+
+\begin{equation}
+g_{k}=\sum_{i}\sum_{j}a_{k,ij}u_{ij}.\label{eq:path-integral-discrete}
+\end{equation}
+Let $g=(g_{1},\ldots,g_{n})^{t}$, $u=(u_{ij})$, then $g$ and $u$
+have a linear relation, which is written as 
+\begin{equation}
+g=Au,\label{eq:system-eq}
+\end{equation}
+where the linear operator $A$ is specified in Eq (\ref{eq:path-integral-discrete}).
+Eq (\ref{eq:system-eq}) is the model equation, which poses an inverse
+problem. In this equation, $g$ can be obtained from the experiment,
+$A$ is determined by user-specified paths for the robot, which can
+be calculated offline. $u$ is the variable that we want to solve.
+Of course, if the paths form a complete raster scan over the whole
+domain, then theoretically Eq (\ref{eq:system-eq}) has a unique solution.
+For economical reasons, it is desirable to use much fewer paths and
+still being able to reconstruct a solution for $u$. Inspired by compresed
+sensing based image reconstruction techniques, it is hopeful that
+reconstruction for our under-determined system can be done.
 
 \begin{comment}
 Description of constraints for our problem
@@ -68,10 +128,7 @@ Also assumptions about simple piecewise environments
 \end{comment}
 
 \section{Algorithm for solving the inverse problem}
-\begin{comment}
-\end{comment}
-\subsection{Simulated Results}
-\label{sec:simresults}
+
 \subsection{Experimental Results}
 
 \section{Comparison with Other Approaches}
@@ -82,9 +139,11 @@ In order to judge the effectiveness of our approach, we examine other methods of
 
 Figures \ref{fig:samplerec} and \ref{fig:sampleexp} present reconstructions of the previously shown 50x50 test image using these approaches, both with randomly sampled points and points sampled on a grid. In all cases, 100 pixels are sampled, and the sampled points are colored white.
 
-In Figure \ref{fig:samplerec}, Split Bregman iteration was used with the collected data for reconstruction. The algorithm itself is unchanged, but the equation corresponding to a data point will simply give the value of a pixel rather than weighting pixels along the path. This method provides a moderately good reconstruction, especially in determining the general shape of the region of interest in the environment, but the demarcation between the shades of gray in the image is difficult to distinguish, making the image seem very blurry. This is not surprising because by sampling pixels, the only information gathered is about those specific pixels, so the space in between can gradate as quickly or slowly as the reconstruction algorithm deems fit. By comparing \ref{fig:randrec} and \ref{fig:gridrec}, it appears that the reconstruction is more accurate when the points are 
+In Figure \ref{fig:samplerec}, Split Bregman iteration was used with the collected data for reconstruction. The algorithm itself is unchanged, but the equation corresponding to a data point will simply give the value of a pixel rather than weighting pixels along the path. This method provides a moderately good reconstruction, especially in determining the general shape of the region of interest in the environment, but the demarcation between the shades of gray in the image is difficult to distinguish, making the image seem very blurry. This is not surprising because by sampling pixels, the only information gathered is about those specific pixels, so the space in between can gradate as quickly or slowly as the reconstruction algorithm deems fit. By comparing Figures \ref{fig:randrec} and \ref{fig:gridrec}, it seems that the reconstruction is more accurate when the points are sampled on a grid. This is reasonable because by sampling on a grid, the spread of sampled points is very even and well distributed. When the points are sampled randomly, certain areas will be less thoroughly investigated than others, hindering accurate reconstruction.
 
-Figure \ref{fig:sampleexp} illustrates pixel expansion. This is done by looping through every pixel in the image, and for each pixel, finding and assigning the value from the nearest pixel that was sampled.
+Figure \ref{fig:sampleexp} illustrates pixel expansion. This is done by looping through every pixel in the image, and for each pixel, finding and assigning the value from the nearest pixel that was sampled. This process creates expanded pixels of a single color around each sampled pixel. When the pixels are sampled on a grid, the even distribution causes the expanded pixels to simply be squares, essentially creating a low resolution version of the image, as in Figure \ref{fig:gridexp}. Figure \ref{fig:randexp} is a result of pixel expansion with randomly sampled pixels. The unpredictable spread of sampled pixels causes the expanded pixels to vary widely in shape and size, and the reconstruction does a poor job of determining the shape of the region of interest.
+
+To compare these methods, Figure \ref{fig:othermethoderror} plots the error of these approaches, as well as the path integral reconstruction that we are actually carrying out, with respect to the number of data points collected. The blue line represents reconstruction from randomly generated path integrals, and as desired, for a low number of data points, it has lower error than the other methods. As the number of samples grows, all methods begin to have similar error; this is expected because any method will work reasonably well with enough data. Worth noting is that while pixel expansion from samples on a grid appears to do better than random path integrals for some of the low data situations, the effectiveness of grid point expansion is highly variable, and as such, its overall usefulness is limited. The accuracy of reconstruction is very dependent on how well the grid aligns with the given image, and choosing the best grid size for a given environment would require prior knowledge of the environment. Another flaw with pixel expansion is the dependence on accurate sampling; pixel expansion will be very heavily affected by noise. If a pixel is sampled inaccurately, the entire expanded pixel associated with that sample will be inaccurately reconstructed. Using Split Bregman iteration mitigates this issue, and using path integrals further diminishes the impact that a single inaccurate sample can have.
 
 \begin{figure}
 \centering
@@ -132,6 +191,7 @@ Figure \ref{fig:sampleexp} illustrates pixel expansion. This is done by looping 
 \section{Adaptive Pathing}
 \begin{comment}
 \end{comment}
+
 \subsection{Simulated Results}
 \subsection{Experimental Results}
 
