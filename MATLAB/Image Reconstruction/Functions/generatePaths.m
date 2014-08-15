@@ -1,4 +1,6 @@
 function paths = generatePaths(num_paths, dim, bounds, path_type, points)
+
+    rng('shuffle');
 	% by default, generate random paths
     
 	paths = zeros(num_paths,4);
