@@ -15,9 +15,10 @@ VI.   Arduino Pins
 VII.  Hardware on Robot
 VIII. Other Hardware
 IX.   Setup
-X.    Run
-XI.   Other Issues
-XII.  Future Improvements
+X.    Quick Setup
+XI.   Run
+XII.  Other Issues
+XIII. Future Improvements
 
 
 I. Introduction
@@ -74,6 +75,9 @@ V. Code Documentation
  run doxygen doxygen from C:\REU_2014_Server.
 3) The .cgi and .py scripts are documented under "Packages" and the .ino file is
   documented under "Files"
+4) The project files are: robotServer.cgi and databaseManager.cgi for server
+  management, vehicle_tracker.py for video processing and compressedSensing.ino
+  as code for the Arduino.
 
 
 VI. Arduino Pins
@@ -205,17 +209,33 @@ IX. Setup
 	  on.
 	*   Ensure the chassis is covered with black tape, so that the camera
 	  doesn't confuse some part of the chassis for the tag.
+	*   Set NUM_PATHS in compressedSensing.ino to 1 more than the number of
+	  paths you want the robot to travel.
 	*   Upload compressedSensing.ino to the Arduino.
 
 
-X. Run
+X. Quick Setup
+--------------
+This is what needs to be checked before every test, but after the preliminary
+setup is complete.
+
+1) Check that dbName in robotServer.cgi exists and matches the database you
+  wish to use.
+2) Check that the IP address in compressedSensing.ino matches the server's IP.
+
+
+XI. Run
 ------
 1) Launch vehicle_tracker.py.
 2) Launch XAMPP and start Apache and MySQL.
 3) Place the Arduino on the test bed and connect the board to the battery.
+4) Once the data has been collected in MySQL, export it to a csv and put it
+   in the same folder as reconstructImage.m MATLAB script. Edit that file
+   to ensure that the file it's pulling data from is the file you have just
+   downloaded, and run the file.
 
 
-XI. Known Issues
+XII. Known Issues
 ----------------
 1) Off the test bed: Occasionally, the video camera might make a mistake and
   					 accidentally send the robot off the test bed. If that
@@ -236,9 +256,13 @@ XI. Known Issues
  				   the camera every RESET number of iterations.
 5) Parallax: The tag is not exactly centered at the reflectance sensor, and may
 			 cause some noise in the data.
+6) MATLAB: Currently, MATLAB is having issues plotting images, so the actual
+		   image reconstruction is carried out on another computer. The
+		   adaptive path selection using MATLAB still works without problems.
+		   So to recontruct data,
 
 
-XII. Future Improvements
+XIII. Future Improvements
 ------------------------
 1) Eliminate the need for the Wi232 transceivers by creating virtual ports or
   sockets, so that the server-side script can communicate with

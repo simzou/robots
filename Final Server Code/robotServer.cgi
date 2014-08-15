@@ -81,7 +81,7 @@ PIXELS_PER_SECOND = 170.0   # Pixels the robot covers in moving straight for 1s
 RADS_PER_SECOND = 1.30      # Radians the robot covers in turning for 1s
 
 # Database
-dbName = "Log7"  # The database to save to
+dbName = "Log9"  # The database to save to
 NO_DATA = -1     # The dummy value to store in database if no data was collected
 
 ################################################################################
