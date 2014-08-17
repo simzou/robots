@@ -1,5 +1,7 @@
 function newpaths = genNextTargets( data, dim, bounds, scale, numpaths )
 
+rng('shuffle')
+
 data = data.*scale;
 bounds = bounds.*scale;
 dim = dim.*scale;
